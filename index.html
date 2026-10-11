@@ -275,6 +275,13 @@
             flex-wrap: wrap;
         }
 
+        .price-tag {
+            color: #198754;
+            font-weight: bold;
+            font-size: 1.05rem;
+            margin-top: 4px;
+        }
+
         .booking-form {
             display: flex;
             gap: 10px;
@@ -362,7 +369,7 @@
     <header>
         <div class="header-title">
             <h1>TTC Elizza Praha – rezervace veřejnosti</h1>
-            <p>Rezervace stolů na stolní tenis | Neděle 17:00 – 21:00 (sloty po 30 min)</p>
+            <p>Rezervace stolů na stolní tenis | Neděle 17:00 – 21:00 (sloty po 30 min) | Cena: 150 Kč / hodina (75 Kč za 30 min)</p>
         </div>
         <button class="admin-login-btn" id="admin-login-btn">🔒 Admin přihlášení</button>
     </header>
@@ -424,14 +431,15 @@
     <div class="booking-content">
         <div>
             <h4 id="summary-title">Vybráno: Stůl 1</h4>
-            <p id="summary-details">Datum: -- | Čas: --</p>
+            <p id="summary-details">Datum: -- | Časy: --</p>
+            <div class="price-tag" id="summary-price">Celková cena: 0 Kč</div>
         </div>
         <form class="booking-form" id="booking-form">
             <input type="text" id="cust-name" placeholder="Jméno a příjmení" required>
             <input type="email" id="cust-email" placeholder="E-mail" required>
             <input type="tel" id="cust-phone" placeholder="Telefon" required>
             <button type="submit" class="btn-confirm">Potvrdit rezervaci</button>
-            <button type="button" class="btn-cancel" id="btn-cancel">Zrušit</button>
+            <button type="button" class="btn-cancel" id="btn-cancel">Zrušit výběr</button>
         </form>
     </div>
 </div>
@@ -450,8 +458,10 @@
         "19:00–19:30", "19:30–20:00", "20:00–20:30", "20:30–21:00"
     ];
 
+    const PRICE_PER_SLOT = 75; // 75 Kč za 30 minut (150 Kč / hod)
+
     let selectedTable = null;
-    let selectedSlot = null;
+    let selectedSlots = [];
     let selectedDate = null;
     let currentBookings = [];
 
@@ -461,6 +471,7 @@
     const bookingPanel = document.getElementById('booking-panel');
     const summaryTitle = document.getElementById('summary-title');
     const summaryDetails = document.getElementById('summary-details');
+    const summaryPrice = document.getElementById('summary-price');
     const adminSection = document.getElementById('admin-section');
     const adminLoginBtn = document.getElementById('admin-login-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
@@ -496,7 +507,6 @@
         });
     }
 
-    // Načtení z cloudové databáze Supabase
     async function fetchBookings() {
         const { data, error } = await supabaseClient
             .from('rezervace')
@@ -509,26 +519,27 @@
         return data || [];
     }
 
-    // Uložení rezervace do Supabase
-    async function saveBookingToCloud(booking) {
+    async function saveBookingsToCloud(bookingsArray) {
+        const rows = bookingsArray.map(b => ({
+            stul: b.table,
+            cas: b.slot,
+            datum: b.date,
+            jmeno: b.name,
+            email: b.email,
+            telefon: b.phone
+        }));
+
         const { data, error } = await supabaseClient
             .from('rezervace')
-            .insert([{
-                stul: booking.table,
-                cas: booking.slot,
-                datum: booking.date,
-                jmeno: booking.name,
-                email: booking.email,
-                telefon: booking.phone
-            }]);
+            .insert(rows);
+
         if (error) {
-            alert('Chyba při ukládání rezervace: ' + error.message);
+            alert('Chyba při ukládání rezervací: ' + error.message);
             return false;
         }
         return true;
     }
 
-    // Mazání v Supabase
     async function deleteBookingFromCloud(id) {
         const { error } = await supabaseClient
             .from('rezervace')
@@ -564,7 +575,7 @@
                     b.stul === t && b.cas === slot
                 );
 
-                const isSelected = selectedTable === t && selectedSlot === slot;
+                const isSelected = selectedTable === t && selectedSlots.includes(slot);
 
                 const btn = document.createElement('button');
                 btn.className = `slot-btn ${isOccupied ? 'occupied' : (isSelected ? 'selected' : 'available')}`;
@@ -572,7 +583,7 @@
                 btn.disabled = isOccupied;
 
                 if (!isOccupied) {
-                    btn.addEventListener('click', () => selectSlot(t, slot));
+                    btn.addEventListener('click', () => toggleSlotSelection(t, slot));
                 }
 
                 slotList.appendChild(btn);
@@ -636,20 +647,39 @@
         });
     }
 
-    function selectSlot(tableNum, slot) {
-        selectedTable = tableNum;
-        selectedSlot = slot;
+    function toggleSlotSelection(tableNum, slot) {
+        if (selectedTable !== tableNum) {
+            selectedTable = tableNum;
+            selectedSlots = [];
+        }
 
-        summaryTitle.textContent = `Vybráno: Stůl ${selectedTable}`;
-        summaryDetails.textContent = `Datum: ${selectedDate} (Neděle) | Čas: ${selectedSlot}`;
-        bookingPanel.classList.add('active');
+        const index = selectedSlots.indexOf(slot);
+        if (index > -1) {
+            selectedSlots.splice(index, 1);
+        } else {
+            selectedSlots.push(slot);
+        }
 
-        renderGrid();
+        selectedSlots.sort((a, b) => timeSlots.indexOf(a) - timeSlots.indexOf(b));
+
+        if (selectedSlots.length === 0) {
+            clearSelection();
+        } else {
+            const totalPrice = selectedSlots.length * PRICE_PER_SLOT;
+            const totalHours = (selectedSlots.length * 0.5).toString().replace('.', ',');
+
+            summaryTitle.textContent = `Vybráno: Stůl ${selectedTable} (${selectedSlots.length}x 30 min)`;
+            summaryDetails.textContent = `Datum: ${selectedDate} | Časy: ${selectedSlots.join(', ')}`;
+            summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod)`;
+
+            bookingPanel.classList.add('active');
+            renderGrid();
+        }
     }
 
     function clearSelection() {
         selectedTable = null;
-        selectedSlot = null;
+        selectedSlots = [];
         bookingPanel.classList.remove('active');
         renderGrid();
     }
@@ -683,21 +713,29 @@
     document.getElementById('booking-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        if (selectedSlots.length === 0) {
+            alert('Vyberte prosím alespoň jeden časový slot.');
+            return;
+        }
+
         const name = document.getElementById('cust-name').value;
         const email = document.getElementById('cust-email').value;
         const phone = document.getElementById('cust-phone').value;
 
-        const success = await saveBookingToCloud({
+        const bookingsToSave = selectedSlots.map(slot => ({
             table: selectedTable,
-            slot: selectedSlot,
+            slot: slot,
             date: selectedDate,
             name,
             email,
             phone
-        });
+        }));
+
+        const success = await saveBookingsToCloud(bookingsToSave);
 
         if (success) {
-            alert(`Rezervace byla úspěšně vytvořena!\n\nStůl: ${selectedTable}\nČas: ${selectedSlot}\nDatum: ${selectedDate}`);
+            const totalPrice = selectedSlots.length * PRICE_PER_SLOT;
+            alert(`Rezervace byla úspěšně vytvořena!\n\nStůl: ${selectedTable}\nČasy: ${selectedSlots.join(', ')}\nDatum: ${selectedDate}\nCelková cena: ${totalPrice} Kč`);
             document.getElementById('booking-form').reset();
             clearSelection();
             loadAndRender();
