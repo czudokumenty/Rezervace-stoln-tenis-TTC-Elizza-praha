@@ -708,8 +708,8 @@
                 .map(t => `Stůl ${t}: (${groupedByTable[t].sort((a,b) => timeSlots.indexOf(a) - timeSlots.indexOf(b)).join(', ')})`)
                 .join(' | ');
 
-            summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} ${uniqueTablesCount === 1 ? 'stole' : 'stolech'}`;
-            summaryDetails.textContent = `Datum: ${selectedDate} | ${detailsText}`;
+            summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount}${uniqueTablesCount === 1 ? 'stole' : 'stolech'}`;
+            summaryDetails.textContent = `Datum: ${selectedDate} \vert{}${detailsText}`;
             summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
 
             bookingPanel.classList.add('active');
@@ -759,59 +759,14 @@
 
         const submitBtn = document.getElementById('btn-confirm-submit');
         submitBtn.disabled = true;
-        submitBtn.textContent = "Ukládám a odesílám e-mail...";
+        submitBtn.textContent = "KONTROLUJI DOSTUPNOST...";
 
-        const name = document.getElementById('cust-name').value;
-        const email = document.getElementById('cust-email').value;
-        const phone = document.getElementById('cust-phone').value;
+        // --- BLESKOVÁ KONTROLA KOLIZÍ TĚSNĚ PŘED ULOŽENÍM ---
+        const freshBookings = await fetchBookings();
+        const conflicts = selectedSelections.filter(sel => 
+            freshBookings.some(b => b.stul === sel.table && b.cas === sel.slot)
+        );
 
-        const bookingsToSave = selectedSelections.map(s => ({
-            table: s.table,
-            slot: s.slot,
-            date: selectedDate,
-            name,
-            email,
-            phone
-        }));
-
-        const success = await saveBookingsToCloud(bookingsToSave);
-
-        if (success) {
-            const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
-
-            const groupedByTable = {};
-            selectedSelections.forEach(s => {
-                if (!groupedByTable[s.table]) groupedByTable[s.table] = [];
-                groupedByTable[s.table].push(s.slot);
-            });
-
-            const reservationText = Object.keys(groupedByTable)
-                .sort((a,b) => a - b)
-                .map(t => `• Stůl ${t}: ${groupedByTable[t].sort((a,b) => timeSlots.indexOf(a) - timeSlots.indexOf(b)).join(', ')}`)
-                .join('\n');
-
-            // Odeslání e-mailu přes EmailJS
-            await sendConfirmationEmail({
-                name,
-                email,
-                phone,
-                date: selectedDate,
-                reservationText,
-                totalPrice
-            });
-
-            alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nPočet slotů: ${selectedSelections.length}\nDatum: ${selectedDate}\nCelková cena: ${totalPrice} Kč`);
-            document.getElementById('booking-form').reset();
-            clearSelection();
-            loadAndRender();
-        }
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Potvrdit rezervaci";
-    });
-
-    initDatePicker();
-    loadAndRender();
-</script>
-</body>
-</html>
+        if (conflicts.length > 0) {
+            const conflictText = conflicts.map(c => `Stůl ${c.table} (${c.slot})`).join(', ');
+            alert(`Omlouváme se, ale následující slot(y) si právě zarezervoval někdo jiný
