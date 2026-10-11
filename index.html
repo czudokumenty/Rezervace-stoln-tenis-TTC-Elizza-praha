@@ -6,6 +6,8 @@
     <title>TTC Elizza Praha – rezervace veřejnosti</title>
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --primary: #0d6efd;
@@ -438,7 +440,7 @@
             <input type="text" id="cust-name" placeholder="Jméno a příjmení" required>
             <input type="email" id="cust-email" placeholder="E-mail" required>
             <input type="tel" id="cust-phone" placeholder="Telefon" required>
-            <button type="submit" class="btn-confirm">Potvrdit rezervaci</button>
+            <button type="submit" class="btn-confirm" id="btn-confirm-submit">Potvrdit rezervaci</button>
             <button type="button" class="btn-cancel" id="btn-cancel">Zrušit výběr</button>
         </form>
     </div>
@@ -448,19 +450,31 @@
     // --- NASTAVENÍ SUPABASE ---
     const SUPABASE_URL = "https://vhpcohumorvazjnnlapb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_ev_vWlw02eL8T57zhoEbDA_neYEcuH4";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // --- NASTAVENÍ EMAILJS ---
+    const EMAILJS_PUBLIC_KEY = "fmAgxrv_9uGRVVNFk";
+    const EMAILJS_SERVICE_ID = "service_enwd33s";
+    const EMAILJS_TEMPLATE_ID = "template_i7dbjbi";
+
+    if (window.emailjs) {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
+
+    let supabaseClient = null;
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
 
     const ADMIN_PASSWORD = "elizza2026";
     let isAdminLoggedIn = false;
 
     const timeSlots = [
-        "17:00–17:30", "17:30–18:00", "18:00–18:30", "18:30–19:00",
-        "19:00–19:30", "19:30–20:00", "20:00–20:30", "20:30–21:00"
+        "17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00",
+        "19:00-19:30", "19:30-20:00", "20:00-20:30", "20:30-21:00"
     ];
 
-    const PRICE_PER_SLOT = 75; // 75 Kč za 30 minut (150 Kč / hod)
+    const PRICE_PER_SLOT = 75;
 
-    // Pole vybraných rezervací: [{ table: 1, slot: '17:00–17:30' }, ...]
     let selectedSelections = [];
     let selectedDate = null;
     let currentBookings = [];
@@ -508,248 +522,5 @@
     }
 
     async function fetchBookings() {
-        const { data, error } = await supabaseClient
-            .from('rezervace')
-            .select('*')
-            .eq('datum', selectedDate);
-        if (error) {
-            console.error('Chyba při načítání:', error);
-            return [];
-        }
-        return data || [];
-    }
-
-    async function saveBookingsToCloud(bookingsArray) {
-        const rows = bookingsArray.map(b => ({
-            stul: b.table,
-            cas: b.slot,
-            datum: b.date,
-            jmeno: b.name,
-            email: b.email,
-            telefon: b.phone
-        }));
-
-        const { data, error } = await supabaseClient
-            .from('rezervace')
-            .insert(rows);
-
-        if (error) {
-            alert('Chyba při ukládání rezervací: ' + error.message);
-            return false;
-        }
-        return true;
-    }
-
-    async function deleteBookingFromCloud(id) {
-        const { error } = await supabaseClient
-            .from('rezervace')
-            .delete()
-            .eq('id', id);
-        if (error) {
-            alert('Chyba při mazání: ' + error.message);
-        } else {
-            loadAndRender();
-        }
-    }
-
-    async function loadAndRender() {
-        currentBookings = await fetchBookings();
-        renderGrid();
-        renderNonReservable();
-        renderAdminPanel();
-    }
-
-    function renderGrid() {
-        reservableGrid.innerHTML = '';
-
-        for (let t = 1; t <= 6; t++) {
-            const card = document.createElement('div');
-            card.className = 'table-card';
-            card.innerHTML = `<h3>Stůl ${t}</h3>`;
-
-            const slotList = document.createElement('div');
-            slotList.className = 'slot-list';
-
-            timeSlots.forEach(slot => {
-                const isOccupied = currentBookings.some(b => 
-                    b.stul === t && b.cas === slot
-                );
-
-                const isSelected = selectedSelections.some(s => s.table === t && s.slot === slot);
-
-                const btn = document.createElement('button');
-                btn.className = `slot-btn ${isOccupied ? 'occupied' : (isSelected ? 'selected' : 'available')}`;
-                btn.textContent = slot;
-                btn.disabled = isOccupied;
-
-                if (!isOccupied) {
-                    btn.addEventListener('click', () => toggleSlotSelection(t, slot));
-                }
-
-                slotList.appendChild(btn);
-            });
-
-            card.appendChild(slotList);
-            reservableGrid.appendChild(card);
-        }
-    }
-
-    function renderNonReservable() {
-        nonReservableGrid.innerHTML = '';
-        const onsiteStatus = JSON.parse(localStorage.getItem('ttc_elizza_onsite') || '{}');
-
-        for (let t = 7; t <= 9; t++) {
-            const isOccupied = !!onsiteStatus[t];
-            const card = document.createElement('div');
-            card.className = `non-reservable-card ${isOccupied ? 'occupied-onsite' : ''}`;
-            
-            card.innerHTML = `
-                <h4>Stůl ${t}</h4>
-                <p>${isOccupied ? '🔴 Obsazeno na místě' : '🟢 Volno pro příchozí (bez rezervace)'}</p>
-                ${isAdminLoggedIn ? `<button class="admin-toggle-btn" onclick="toggleOnsiteStatus(${t})">Změnit stav (Admin)</button>` : ''}
-            `;
-            nonReservableGrid.appendChild(card);
-        }
-    }
-
-    function toggleOnsiteStatus(tableNum) {
-        const onsiteStatus = JSON.parse(localStorage.getItem('ttc_elizza_onsite') || '{}');
-        onsiteStatus[tableNum] = !onsiteStatus[tableNum];
-        localStorage.setItem('ttc_elizza_onsite', JSON.stringify(onsiteStatus));
-        renderNonReservable();
-    }
-
-    function renderAdminPanel() {
-        if (!isAdminLoggedIn) {
-            adminSection.classList.remove('active');
-            return;
-        }
-
-        adminSection.classList.add('active');
-        adminBookingList.innerHTML = '';
-
-        if (currentBookings.length === 0) {
-            adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#6c757d;">Žádné rezervace pro tento den.</td></tr>`;
-            return;
-        }
-
-        currentBookings.forEach(b => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>Stůl ${b.stul}</strong></td>
-                <td>${b.cas}</td>
-                <td>${b.jmeno}</td>
-                <td>${b.email}</td>
-                <td>${b.telefon}</td>
-                <td><button class="btn-delete" onclick="deleteBookingFromCloud(${b.id})">Zrušit</button></td>
-            `;
-            adminBookingList.appendChild(tr);
-        });
-    }
-
-    function toggleSlotSelection(tableNum, slot) {
-        const existingIndex = selectedSelections.findIndex(s => s.table === tableNum && s.slot === slot);
-
-        if (existingIndex > -1) {
-            selectedSelections.splice(existingIndex, 1);
-        } else {
-            selectedSelections.push({ table: tableNum, slot: slot });
-        }
-
-        if (selectedSelections.length === 0) {
-            clearSelection();
-        } else {
-            const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
-            const totalHours = (selectedSelections.length * 0.5).toString().replace('.', ',');
-
-            // Seskupení podle stolů pro přehledný výpis v liště
-            const groupedByTable = {};
-            selectedSelections.forEach(s => {
-                if (!groupedByTable[s.table]) groupedByTable[s.table] = [];
-                groupedByTable[s.table].push(s.slot);
-            });
-
-            const uniqueTablesCount = Object.keys(groupedByTable).length;
-            const detailsText = Object.keys(groupedByTable)
-                .sort((a,b) => a - b)
-                .map(t => `Stůl ${t}: (${groupedByTable[t].sort((a,b) => timeSlots.indexOf(a) - timeSlots.indexOf(b)).join(', ')})`)
-                .join(' | ');
-
-            summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} ${uniqueTablesCount === 1 ? 'stole' : 'stolech'}`;
-            summaryDetails.textContent = `Datum: ${selectedDate} | ${detailsText}`;
-            summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
-
-            bookingPanel.classList.add('active');
-            renderGrid();
-        }
-    }
-
-    function clearSelection() {
-        selectedSelections = [];
-        bookingPanel.classList.remove('active');
-        renderGrid();
-    }
-
-    adminLoginBtn.addEventListener('click', () => {
-        if (isAdminLoggedIn) {
-            alert('Již jste přihlášeni jako správce.');
-            return;
-        }
-        const pwd = prompt('Zadejte heslo pro správce:');
-        if (pwd === ADMIN_PASSWORD) {
-            isAdminLoggedIn = true;
-            adminLoginBtn.textContent = '✅ Správce přihlášen';
-            alert('Přihlášení úspěšné!');
-            renderAdminPanel();
-            renderNonReservable();
-        } else if (pwd !== null) {
-            alert('Nesprávné heslo!');
-        }
-    });
-
-    adminLogoutBtn.addEventListener('click', () => {
-        isAdminLoggedIn = false;
-        adminLoginBtn.textContent = '🔒 Admin přihlášení';
-        renderAdminPanel();
-        renderNonReservable();
-    });
-
-    document.getElementById('btn-cancel').addEventListener('click', clearSelection);
-
-    document.getElementById('booking-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        if (selectedSelections.length === 0) {
-            alert('Vyberte prosím alespoň jeden časový slot.');
-            return;
-        }
-
-        const name = document.getElementById('cust-name').value;
-        const email = document.getElementById('cust-email').value;
-        const phone = document.getElementById('cust-phone').value;
-
-        const bookingsToSave = selectedSelections.map(s => ({
-            table: s.table,
-            slot: s.slot,
-            date: selectedDate,
-            name,
-            email,
-            phone
-        }));
-
-        const success = await saveBookingsToCloud(bookingsToSave);
-
-        if (success) {
-            const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
-            alert(`Rezervace byla úspěšně vytvořena!\n\nPočet slotů: ${selectedSelections.length}\nDatum: ${selectedDate}\nCelková cena: ${totalPrice} Kč`);
-            document.getElementById('booking-form').reset();
-            clearSelection();
-            loadAndRender();
-        }
-    });
-
-    initDatePicker();
-    loadAndRender();
-</script>
-</body>
-</html>
+        if (!supabaseClient) return [];
+        const { data, error
