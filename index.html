@@ -636,6 +636,49 @@
     const cancelDetailsText = document.getElementById('cancel-details-text');
     const btnExecuteCancel = document.getElementById('btn-execute-cancel');
 
+    // --- FORMÁTOVÁNÍ DATA DO ČESKÉHO TVARU (např. 18. 10. 2026) ---
+    function formatCzechDate(isoDateStr) {
+        if (!isoDateStr) return '';
+        const parts = isoDateStr.split('-');
+        if (parts.length !== 3) return isoDateStr;
+        return `${parseInt(parts[2], 10)}. ${parseInt(parts[1], 10)}. ${parts[0]}`;
+    }
+
+    // --- LOGIKA PRO SLUČOVÁNÍ ČASOVÝCH SLOTŮ DO PÁSMA OD–DO ---
+    function formatTimeRanges(slotList) {
+        if (!slotList || slotList.length === 0) return '';
+        
+        // Seřadíme sloty chronologicky
+        const sortedSlots = [...slotList].sort((a, b) => timeSlots.indexOf(a) - timeSlots.indexOf(b));
+        
+        const ranges = [];
+        let currentStart = null;
+        let currentEnd = null;
+
+        sortedSlots.forEach((slot, index) => {
+            const [start, end] = slot.split('-');
+            
+            if (!currentStart) {
+                currentStart = start;
+                currentEnd = end;
+            } else if (start === currentEnd) {
+                // Sloty na sebe přímo navazují
+                currentEnd = end;
+            } else {
+                // Přerušení – uložíme předchozí pásmo a začneme nové
+                ranges.push(`${currentStart}–${currentEnd}`);
+                currentStart = start;
+                currentEnd = end;
+            }
+
+            if (index === sortedSlots.length - 1) {
+                ranges.push(`${currentStart}–${currentEnd}`);
+            }
+        });
+
+        return ranges.join(', ');
+    }
+
     // --- NAČTENÍ ULOŽENÝCH ÚDAJŮ Z LOCALSTORAGE ---
     function loadSavedUserData() {
         const savedData = JSON.parse(localStorage.getItem('ttc_elizza_user_data') || '{}');
@@ -717,7 +760,7 @@
                 to_name: details.name,
                 to_email: details.email,
                 phone: details.phone,
-                date: details.date,
+                date: details.formattedDate,
                 reservation_details: details.reservationText,
                 total_price: details.totalPrice,
                 cancel_link: details.cancelLink
@@ -764,10 +807,10 @@
                 });
 
                 const detailsList = Object.keys(groupedByTable)
-                    .map(t => `Stůl ${t}: ${groupedByTable[t].join(', ')}`)
+                    .map(t => `Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`)
                     .join(' | ');
 
-                cancelDetailsText.innerHTML = `<strong>Jméno:</strong> ${name}<br><strong>Datum:</strong> ${cancelDate}<br><strong>Rezervované sloty:</strong> ${detailsList}`;
+                cancelDetailsText.innerHTML = `<strong>Jméno:</strong> ${name}<br><strong>Datum:</strong> ${formatCzechDate(cancelDate)}<br><strong>Rezervované stoly:</strong> ${detailsList}`;
                 cancelBanner.classList.add('active');
 
                 btnExecuteCancel.onclick = async () => {
@@ -807,7 +850,7 @@
     function updateSlotsCount() {
         const occupiedCount = currentBookings.length;
         const remainingCount = Math.max(0, TOTAL_SLOTS - occupiedCount);
-        slotsCountBadge.textContent = `🏓 Na tuto neděli zbývá ještě ${remainingCount} volných slotů`;
+        slotsCountBadge.textContent = `🏓 Na neděli ${formatCzechDate(selectedDate)} zbývá ještě ${remainingCount} volných slotů`;
     }
 
     function renderGrid() {
@@ -922,11 +965,11 @@
             const uniqueTablesCount = Object.keys(groupedByTable).length;
             const detailsText = Object.keys(groupedByTable)
                 .sort((a,b) => a - b)
-                .map(t => `Stůl ${t}: (${groupedByTable[t].sort((a,b) => timeSlots.indexOf(a) - timeSlots.indexOf(b)).join(', ')})`)
+                .map(t => `Stůl ${t}: (${formatTimeRanges(groupedByTable[t])})`)
                 .join(' | ');
 
             summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} ${uniqueTablesCount === 1 ? 'stole' : 'stolech'}`;
-            summaryDetails.textContent = `Datum: ${selectedDate} | ${detailsText}`;
+            summaryDetails.textContent = `Datum: ${formatCzechDate(selectedDate)} | ${detailsText}`;
             summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
 
             bookingPanel.classList.add('active');
@@ -1002,7 +1045,6 @@
         const phone = document.getElementById('cust-phone').value;
         const shouldSaveData = document.getElementById('save-data-checkbox').checked;
 
-        // Uložení/smazání údajů z localStorage
         if (shouldSaveData) {
             localStorage.setItem('ttc_elizza_user_data', JSON.stringify({ name, email, phone }));
         } else {
@@ -1031,9 +1073,10 @@
 
             const reservationText = Object.keys(groupedByTable)
                 .sort((a,b) => a - b)
-                .map(t => `• Stůl ${t}: ${groupedByTable[t].sort((a,b) => timeSlots.indexOf(a) - timeSlots.indexOf(b)).join(', ')}`)
+                .map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`)
                 .join('\n');
 
+            const formattedCzechDate = formatCzechDate(selectedDate);
             const cancelLink = `${window.location.origin}${window.location.pathname}?cancel_email=${encodeURIComponent(email)}&cancel_date=${encodeURIComponent(selectedDate)}`;
 
             await sendConfirmationEmail({
@@ -1041,12 +1084,13 @@
                 email,
                 phone,
                 date: selectedDate,
+                formattedDate: formattedCzechDate,
                 reservationText,
                 totalPrice,
                 cancelLink
             });
 
-            alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nPočet slotů: ${selectedSelections.length}\nDatum: ${selectedDate}\nCelková cena: ${totalPrice} Kč`);
+            alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nDatum: ${formattedCzechDate}\nCelková cena: ${totalPrice} Kč`);
             clearSelection();
             loadAndRender();
         }
