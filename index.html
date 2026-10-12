@@ -538,7 +538,7 @@
             <input type="date" id="res-date">
         </div>
         <div class="slots-count-badge" id="slots-count-badge">
-            🏓 Na tuto neděli zbývá ještě -- volných slotů
+            🏓 Volné sloty: -- / 48
         </div>
         <div class="legend">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
@@ -700,7 +700,7 @@
     ];
 
     const PRICE_PER_SLOT = 75;
-    const TOTAL_SLOTS = 6 * timeSlots.length;
+    const TOTAL_SLOTS = 6 * timeSlots.length; // 48 slotů celkem
 
     let selectedSelections = [];
     let selectedDate = null;
@@ -965,10 +965,19 @@
         renderAdminPanel();
     }
 
+    // NOVÝ INTELIGENTNÍ VÝPOČET STATISTIKY SLOTŮ (VOLNÉ, OBSAZENÉ, VYBRANÉ)
     function updateSlotsCount() {
         const occupiedCount = currentBookings.length;
-        const remainingCount = Math.max(0, TOTAL_SLOTS - occupiedCount);
-        slotsCountBadge.textContent = `🏓 Na neděli ${formatCzechDate(selectedDate)} zbývá ještě ${remainingCount} volných slotů`;
+        const selectedCount = selectedSelections.length;
+        const remainingCount = Math.max(0, TOTAL_SLOTS - occupiedCount - selectedCount);
+
+        let detailsPart = [];
+        if (occupiedCount > 0) detailsPart.push(`${occupiedCount} obsazeno`);
+        if (selectedCount > 0) detailsPart.push(`${selectedCount} vybráno`);
+
+        const detailsText = detailsPart.length > 0 ? ` (${detailsPart.join(', ')})` : '';
+
+        slotsCountBadge.textContent = `🏓 Volné sloty: ${remainingCount} / ${TOTAL_SLOTS}${detailsText}`;
     }
 
     function toggleWholeTableSelection(tableNum) {
@@ -1227,6 +1236,7 @@
         summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
 
         bookingPanel.classList.add('active');
+        updateSlotsCount();
     }
 
     function toggleSlotSelection(tableNum, slot) {
@@ -1249,6 +1259,7 @@
     function clearSelection() {
         selectedSelections = [];
         bookingPanel.classList.remove('active');
+        updateSlotsCount();
         renderGrid();
     }
 
@@ -1315,7 +1326,6 @@
 
         if (isAdminLoggedIn) {
             if (!name) {
-                // Spočítáme stávající testovací rezervace a vygenerujeme uniktání název Test 1, Test 2, ...
                 const allCurrentNames = [
                     ...freshBookings.active.map(b => b.jmeno),
                     ...freshBookings.cancelled.map(b => b.jmeno)
