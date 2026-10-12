@@ -276,29 +276,32 @@
             flex-direction: column;
         }
 
-        .table-card h3 {
-            text-align: center;
-            margin-bottom: 8px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid var(--border);
-            font-size: 1.05rem;
+        .table-header-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 12px;
+            width: 100%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .btn-select-all-table {
+        .table-header-btn:hover {
             background-color: var(--primary);
             color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 10px;
-            width: 100%;
         }
 
-        .btn-select-all-table:hover {
-            background-color: var(--primary-hover);
+        .table-header-btn.all-selected {
+            background-color: var(--primary);
+            color: white;
         }
 
         .slot-list {
@@ -349,7 +352,6 @@
             border: 1px solid var(--border);
         }
 
-        /* REZERVAČNÍ LIŠTA DOLE */
         .booking-panel {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -373,7 +375,6 @@
             gap: 15px;
         }
 
-        /* ROZLOŽENÍ 3 ÚDAJŮ O VYBRANÝCH SLOTECH */
         .summary-info-grid {
             display: flex;
             flex-direction: column;
@@ -971,7 +972,6 @@
     }
 
     function toggleWholeTableSelection(tableNum) {
-        // Zjistíme volné sloty na tomto stole
         const availableSlotsForTable = timeSlots.filter(slot => 
             !currentBookings.some(b => b.stul === tableNum && b.cas === slot)
         );
@@ -981,16 +981,13 @@
             return;
         }
 
-        // Zjistíme, zda jsou všechny dostupné sloty již vybrány
         const allAvailableSelected = availableSlotsForTable.every(slot => 
             selectedSelections.some(s => s.table === tableNum && s.slot === slot)
         );
 
         if (allAvailableSelected) {
-            // Odoznačíme všechny sloty tohoto stolu
             selectedSelections = selectedSelections.filter(s => s.table !== tableNum);
         } else {
-            // Přidáme všechny volné sloty tohoto stolu, které ještě nebyly vybrány
             availableSlotsForTable.forEach(slot => {
                 if (!selectedSelections.some(s => s.table === tableNum && s.slot === slot)) {
                     selectedSelections.push({ table: tableNum, slot: slot });
@@ -1021,12 +1018,13 @@
                 selectedSelections.some(s => s.table === t && s.slot === slot)
             );
 
-            const selectAllBtnText = isAllSelected ? `✓ Odoznačit celý Stůl ${t}` : `⚡ Označit celý Stůl ${t}`;
+            const headerBtn = document.createElement('button');
+            headerBtn.type = 'button';
+            headerBtn.className = `table-header-btn ${isAllSelected ? 'all-selected' : ''}`;
+            headerBtn.innerHTML = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
+            headerBtn.onclick = () => toggleWholeTableSelection(t);
 
-            card.innerHTML = `
-                <h3>Stůl ${t}</h3>
-                <button type="button" class="btn-select-all-table" onclick="toggleWholeTableSelection(${t})">${selectAllBtnText}</button>
-            `;
+            card.appendChild(headerBtn);
 
             const slotList = document.createElement('div');
             slotList.className = 'slot-list';
@@ -1316,7 +1314,25 @@
         let phone = inputPhone.value.trim();
 
         if (isAdminLoggedIn) {
-            if (!name) name = "Test";
+            if (!name) {
+                // Spočítáme stávající testovací rezervace a vygenerujeme uniktání název Test 1, Test 2, ...
+                const allCurrentNames = [
+                    ...freshBookings.active.map(b => b.jmeno),
+                    ...freshBookings.cancelled.map(b => b.jmeno)
+                ];
+                
+                let maxTestNum = 0;
+                allCurrentNames.forEach(n => {
+                    if (n && n.startsWith('Test')) {
+                        const numPart = parseInt(n.replace('Test', '').trim(), 10);
+                        if (!isNaN(numPart) && numPart > maxTestNum) {
+                            maxTestNum = numPart;
+                        }
+                    }
+                });
+
+                name = `Test ${maxTestNum + 1}`;
+            }
             if (!email) email = "";
             if (!phone) phone = "";
         }
