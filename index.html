@@ -250,21 +250,6 @@
             border-radius: 4px;
         }
 
-        .cancel-banner {
-            display: none;
-            background: #fff3cd;
-            border: 2px solid #ffe69c;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            color: #333;
-        }
-
-        .cancel-banner.active {
-            display: block;
-        }
-
         .grid-section {
             margin-bottom: 30px;
         }
@@ -481,13 +466,6 @@
         </div>
     </header>
 
-    <!-- Banner pro storno z e-mailu -->
-    <div class="cancel-banner" id="cancel-banner">
-        <h3>❌ Žádost o zrušení rezervace</h3>
-        <div class="cancel-details" id="cancel-details-text">Načítám detaily rezervace...</div>
-        <button class="btn-delete" style="padding: 8px 16px; font-size: 1rem;" id="btn-execute-cancel">Zrušit tuto rezervaci</button>
-    </div>
-
     <div class="controls">
         <div class="date-picker-group">
             <label for="res-date">Vyberte neděli:</label>
@@ -632,10 +610,6 @@
     const adminBookingList = document.getElementById('admin-booking-list');
     const slotsCountBadge = document.getElementById('slots-count-badge');
 
-    const cancelBanner = document.getElementById('cancel-banner');
-    const cancelDetailsText = document.getElementById('cancel-details-text');
-    const btnExecuteCancel = document.getElementById('btn-execute-cancel');
-
     // --- FORMÁTOVÁNÍ DATA DO ČESKÉHO TVARU (např. 18. 10. 2026) ---
     function formatCzechDate(isoDateStr) {
         if (!isoDateStr) return '';
@@ -648,7 +622,6 @@
     function formatTimeRanges(slotList) {
         if (!slotList || slotList.length === 0) return '';
         
-        // Seřadíme sloty chronologicky
         const sortedSlots = [...slotList].sort((a, b) => timeSlots.indexOf(a) - timeSlots.indexOf(b));
         
         const ranges = [];
@@ -662,10 +635,8 @@
                 currentStart = start;
                 currentEnd = end;
             } else if (start === currentEnd) {
-                // Sloty na sebe přímo navazují
                 currentEnd = end;
             } else {
-                // Přerušení – uložíme předchozí pásmo a začneme nové
                 ranges.push(`${currentStart}–${currentEnd}`);
                 currentStart = start;
                 currentEnd = end;
@@ -762,8 +733,7 @@
                 phone: details.phone,
                 date: details.formattedDate,
                 reservation_details: details.reservationText,
-                total_price: details.totalPrice,
-                cancel_link: details.cancelLink
+                total_price: details.totalPrice
             });
         } catch (err) {
             console.error('Chyba odesílání e-mailu:', err);
@@ -780,62 +750,6 @@
             alert('Chyba při mazání: ' + error.message);
         } else {
             loadAndRender();
-        }
-    }
-
-    async function checkCancelParam() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const cancelEmail = urlParams.get('cancel_email');
-        const cancelDate = urlParams.get('cancel_date');
-
-        if (cancelEmail && cancelDate) {
-            selectedDate = cancelDate;
-            dateInput.value = cancelDate;
-
-            const { data, error } = await supabaseClient
-                .from('rezervace')
-                .select('*')
-                .eq('datum', cancelDate)
-                .eq('email', cancelEmail);
-
-            if (data && data.length > 0) {
-                const name = data[0].jmeno;
-                const groupedByTable = {};
-                data.forEach(b => {
-                    if (!groupedByTable[b.stul]) groupedByTable[b.stul] = [];
-                    groupedByTable[b.stul].push(b.cas);
-                });
-
-                const detailsList = Object.keys(groupedByTable)
-                    .map(t => `Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`)
-                    .join(' | ');
-
-                cancelDetailsText.innerHTML = `<strong>Jméno:</strong> ${name}<br><strong>Datum:</strong> ${formatCzechDate(cancelDate)}<br><strong>Rezervované stoly:</strong> ${detailsList}`;
-                cancelBanner.classList.add('active');
-
-                btnExecuteCancel.onclick = async () => {
-                    const confirmed = confirm("Opravdu chcete doopravdy zrušit tuto rezervaci?");
-                    if (confirmed) {
-                        const idsToDelete = data.map(b => b.id);
-                        const { error: delErr } = await supabaseClient
-                            .from('rezervace')
-                            .delete()
-                            .in('id', idsToDelete);
-
-                        if (!delErr) {
-                            alert("Vaše rezervace byla úspěšně zrušena!");
-                            cancelBanner.classList.remove('active');
-                            window.history.replaceState({}, document.title, window.location.pathname);
-                            loadAndRender();
-                        } else {
-                            alert("Chyba při rušení rezervace: " + delErr.message);
-                        }
-                    }
-                };
-            } else {
-                alert("Rezervace nebyla nalezena nebo již byla dříve zrušena.");
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
         }
     }
 
@@ -1077,7 +991,6 @@
                 .join('\n');
 
             const formattedCzechDate = formatCzechDate(selectedDate);
-            const cancelLink = `${window.location.origin}${window.location.pathname}?cancel_email=${encodeURIComponent(email)}&cancel_date=${encodeURIComponent(selectedDate)}`;
 
             await sendConfirmationEmail({
                 name,
@@ -1086,8 +999,7 @@
                 date: selectedDate,
                 formattedDate: formattedCzechDate,
                 reservationText,
-                totalPrice,
-                cancelLink
+                totalPrice
             });
 
             alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nDatum: ${formattedCzechDate}\nCelková cena: ${totalPrice} Kč`);
@@ -1102,7 +1014,6 @@
     initDatePicker();
     loadSavedUserData();
     loadAndRender();
-    checkCancelParam();
 </script>
 </body>
 </html>
