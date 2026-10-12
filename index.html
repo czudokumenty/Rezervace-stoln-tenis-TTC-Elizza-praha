@@ -522,6 +522,7 @@
             <h3>⚙️ Administrace pro obsluhu</h3>
             <button class="btn-cancel" id="admin-logout-btn">Odhlásit správce</button>
         </div>
+        
         <h4>Aktivní rezervace na vybraný den</h4>
         <div style="overflow-x: auto; margin-top: 10px;">
             <table class="admin-table">
@@ -536,6 +537,24 @@
                     </tr>
                 </thead>
                 <tbody id="admin-booking-list"></tbody>
+            </table>
+        </div>
+
+        <!-- Sekce s proběhlými rezervacemi z minulosti -->
+        <h4 class="history-title">📜 Proběhlé rezervace (minulé neděle)</h4>
+        <div style="overflow-x: auto; margin-top: 10px;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Jméno a příjmení</th>
+                        <th>E-mail</th>
+                        <th>Telefon</th>
+                        <th>Odehrané stoly a časy</th>
+                        <th>Částka</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-past-list"></tbody>
             </table>
         </div>
 
@@ -638,6 +657,7 @@
     let selectedDate = null;
     let currentBookings = [];
     let cancelledBookings = [];
+    let pastBookings = [];
 
     const dateInput = document.getElementById('res-date');
     const reservableGrid = document.getElementById('reservable-grid');
@@ -651,6 +671,7 @@
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
     const adminBookingList = document.getElementById('admin-booking-list');
     const adminCancelledList = document.getElementById('admin-cancelled-list');
+    const adminPastList = document.getElementById('admin-past-list');
     const slotsCountBadge = document.getElementById('slots-count-badge');
 
     function formatCzechDate(isoDateStr) {
@@ -730,21 +751,38 @@
     }
 
     async function fetchBookings() {
-        if (!supabaseClient) return { active: [], cancelled: [] };
-        const { data, error } = await supabaseClient
+        if (!supabaseClient) return { active: [], cancelled: [], past: [] };
+
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // 1. Načtení rezervací pro vybraný den
+        const { data: selectedData, error: errSelected } = await supabaseClient
             .from('rezervace')
             .select('*')
             .eq('datum', selectedDate);
-            
-        if (error) {
-            console.error('Chyba při načítání:', error);
-            return { active: [], cancelled: [] };
+
+        if (errSelected) {
+            console.error('Chyba při načítání vybraného dne:', errSelected);
         }
 
-        const active = (data || []).filter(b => !b.zruseno);
-        const cancelled = (data || []).filter(b => b.zruseno === true);
+        // 2. Načtení proběhlých minulých rezervací (datum < dnes) pouze pokud je správce přihlášen
+        let pastData = [];
+        if (isAdminLoggedIn) {
+            const { data: pastRes, error: errPast } = await supabaseClient
+                .from('rezervace')
+                .select('*')
+                .lt('datum', todayStr)
+                .order('datum', { ascending: false });
 
-        return { active, cancelled };
+            if (!errPast && pastRes) {
+                pastData = pastRes.filter(b => !b.zruseno);
+            }
+        }
+
+        const active = (selectedData || []).filter(b => !b.zruseno);
+        const cancelled = (selectedData || []).filter(b => b.zruseno === true);
+
+        return { active, cancelled, past: pastData };
     }
 
     async function saveBookingsToCloud(bookingsArray) {
@@ -787,7 +825,6 @@
         }
     }
 
-    // OZNANČENÍ REZERVACE JAKO ZRUSTENÁ (SOFT DELETE)
     async function cancelGroupInCloud(idsArray, customerName) {
         if (!supabaseClient || !idsArray || idsArray.length === 0) return;
 
@@ -807,7 +844,6 @@
         }
     }
 
-    // OBNOVENÍ ZRUSTENÉ REZERVACE
     async function restoreGroupInCloud(idsArray, customerName) {
         if (!supabaseClient || !idsArray || idsArray.length === 0) return;
 
@@ -831,6 +867,7 @@
         const fetched = await fetchBookings();
         currentBookings = fetched.active;
         cancelledBookings = fetched.cancelled;
+        pastBookings = fetched.past;
 
         updateSlotsCount();
         renderGrid();
@@ -904,12 +941,16 @@
         renderNonReservable();
     }
 
-    function groupBookings(bookingsList) {
+    function groupBookings(bookingsList, includeDate = false) {
         const grouped = {};
         bookingsList.forEach(b => {
-            const key = `${b.email.toLowerCase().trim()}_${b.jmeno.toLowerCase().trim()}`;
+            const key = includeDate 
+                ? `${b.datum}_${b.email.toLowerCase().trim()}_${b.jmeno.toLowerCase().trim()}`
+                : `${b.email.toLowerCase().trim()}_${b.jmeno.toLowerCase().trim()}`;
+
             if (!grouped[key]) {
                 grouped[key] = {
+                    date: b.datum,
                     name: b.jmeno,
                     email: b.email,
                     phone: b.telefon,
@@ -939,8 +980,9 @@
         adminSection.classList.add('active');
         adminBookingList.innerHTML = '';
         adminCancelledList.innerHTML = '';
+        adminPastList.innerHTML = '';
 
-        // --- RENDER AKTIVNÍCH REZERVACÍ ---
+        // --- 1. RENDER AKTIVNÍCH REZERVACÍ ---
         if (currentBookings.length === 0) {
             adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--subtext);">Žádné aktivní rezervace pro tento den.</td></tr>`;
         } else {
@@ -968,7 +1010,35 @@
             });
         }
 
-        // --- RENDER ZRUSTENÝCH REZERVACÍ (HISTORIE) ---
+        // --- 2. RENDER MINULÝCH (PROBĚHLÝCH) REZERVACÍ ---
+        if (pastBookings.length === 0) {
+            adminPastList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--subtext);">Zatím žádné odehrané rezervace v historii.</td></tr>`;
+        } else {
+            const groupedPast = groupBookings(pastBookings, true);
+            Object.keys(groupedPast).forEach(key => {
+                const customer = groupedPast[key];
+
+                const tablesSummary = Object.keys(customer.tables)
+                    .sort((a,b) => a - b)
+                    .map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(customer.tables[t])}`)
+                    .join('<br>');
+
+                const totalPrice = customer.totalSlotsCount * PRICE_PER_SLOT;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${formatCzechDate(customer.date)}</strong></td>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>${tablesSummary}</td>
+                    <td><strong>${totalPrice} Kč</strong></td>
+                `;
+                adminPastList.appendChild(tr);
+            });
+        }
+
+        // --- 3. RENDER ZRUSTENÝCH REZERVACÍ (HISTORIE) ---
         if (cancelledBookings.length === 0) {
             adminCancelledList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--subtext);">Žádné zrušené rezervace pro tento den.</td></tr>`;
         } else {
@@ -1039,7 +1109,7 @@
         renderGrid();
     }
 
-    adminLoginBtn.addEventListener('click', () => {
+    adminLoginBtn.addEventListener('click', async () => {
         if (isAdminLoggedIn) {
             alert('Již jste přihlášeni jako správce.');
             return;
@@ -1049,18 +1119,16 @@
             isAdminLoggedIn = true;
             adminLoginBtn.textContent = '✅ Správce přihlášen';
             alert('Přihlášení úspěšné!');
-            renderAdminPanel();
-            renderNonReservable();
+            await loadAndRender();
         } else if (pwd !== null) {
             alert('Nesprávné heslo!');
         }
     });
 
-    adminLogoutBtn.addEventListener('click', () => {
+    adminLogoutBtn.addEventListener('click', async () => {
         isAdminLoggedIn = false;
         adminLoginBtn.textContent = '🔒 Admin přihlášení';
-        renderAdminPanel();
-        renderNonReservable();
+        await loadAndRender();
     });
 
     document.getElementById('btn-cancel').addEventListener('click', clearSelection);
