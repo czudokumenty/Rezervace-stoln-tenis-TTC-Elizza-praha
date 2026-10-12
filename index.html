@@ -66,7 +66,7 @@
             color: var(--text);
             padding: 20px;
             line-height: 1.5;
-            padding-bottom: 160px;
+            padding-bottom: 180px;
         }
 
         .container {
@@ -330,12 +330,13 @@
             border: 1px solid var(--border);
         }
 
+        /* REZERVAČNÍ LIŠTA DOLE */
         .booking-panel {
             position: fixed;
             bottom: 0; left: 0; right: 0;
             background: var(--card-bg);
             box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-            padding: 15px;
+            padding: 15px 20px;
             display: none;
             z-index: 100;
             border-top: 1px solid var(--border);
@@ -349,17 +350,45 @@
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* ROZLOŽENÍ 3 ÚDAJŮ O VYBRANÝCH SLOTECH (POD SEBOU NA MOBILU, VEDLE SEBE NA PC) */
+        .summary-info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .summary-info-grid {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                align-items: center;
+                gap: 25px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+
+        .summary-info-grid h4 {
+            margin: 0;
+            font-size: 1.05rem;
+            white-space: nowrap;
+        }
+
+        .summary-info-grid p {
+            margin: 0;
+            color: var(--text);
+            font-size: 0.95rem;
         }
 
         .price-tag {
             color: #198754;
             font-weight: bold;
-            font-size: 1.05rem;
-            margin-top: 4px;
+            font-size: 1.1rem;
+            white-space: nowrap;
         }
 
         .booking-form {
@@ -581,7 +610,7 @@
 <!-- Rezervační lišta dole -->
 <div class="booking-panel" id="booking-panel">
     <div class="booking-content">
-        <div>
+        <div class="summary-info-grid">
             <h4 id="summary-title">Vybráno: 0 slotů</h4>
             <p id="summary-details">Datum: -- | Vybrané stoly a časy: --</p>
             <div class="price-tag" id="summary-price">Celková cena: 0 Kč</div>
@@ -829,7 +858,7 @@
     }
 
     async function sendConfirmationEmail(details) {
-        if (!window.emailjs || details.email.includes('bez-emailu')) return;
+        if (!window.emailjs || !details.email) return;
 
         try {
             await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -964,16 +993,18 @@
     function groupBookings(bookingsList, includeDate = false) {
         const grouped = {};
         bookingsList.forEach(b => {
+            const safeEmail = (b.email || '').toLowerCase().trim();
+            const safeName = (b.jmeno || '').toLowerCase().trim();
             const key = includeDate 
-                ? `${b.datum}_${b.email.toLowerCase().trim()}_${b.jmeno.toLowerCase().trim()}`
-                : `${b.email.toLowerCase().trim()}_${b.jmeno.toLowerCase().trim()}`;
+                ? `${b.datum}_${safeEmail}_${safeName}`
+                : `${safeEmail}_${safeName}`;
 
             if (!grouped[key]) {
                 grouped[key] = {
                     date: b.datum,
-                    name: b.jmeno,
-                    email: b.email,
-                    phone: b.telefon,
+                    name: b.jmeno || '',
+                    email: b.email || '',
+                    phone: b.telefon || '',
                     tables: {},
                     ids: [],
                     totalSlotsCount: 0
@@ -1020,11 +1051,11 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${customer.name}</strong></td>
-                    <td><a href="mailto:${customer.email}" style="color:var(--primary);">${customer.email}</a></td>
-                    <td><a href="tel:${customer.phone}" style="color:var(--text); text-decoration:none;">${customer.phone}</a></td>
+                    <td>${customer.email ? `<a href="mailto:${customer.email}" style="color:var(--primary);">${customer.email}</a>` : '-'}</td>
+                    <td>${customer.phone ? `<a href="tel:${customer.phone}" style="color:var(--text); text-decoration:none;">${customer.phone}</a>` : '-'}</td>
                     <td>${tablesSummary}</td>
                     <td><strong>${totalPrice} Kč</strong></td>
-                    <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Zrušit vše</button></td>
+                    <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(customer.ids)}, "${(customer.name || '').replace(/"/g, '&quot;')}")'>Zrušit vše</button></td>
                 `;
                 adminBookingList.appendChild(tr);
             });
@@ -1049,8 +1080,8 @@
                 tr.innerHTML = `
                     <td><strong>${formatCzechDate(customer.date)}</strong></td>
                     <td>${customer.name}</td>
-                    <td>${customer.email}</td>
-                    <td>${customer.phone}</td>
+                    <td>${customer.email || '-'}</td>
+                    <td>${customer.phone || '-'}</td>
                     <td>${tablesSummary}</td>
                     <td><strong>${totalPrice} Kč</strong></td>
                 `;
@@ -1076,11 +1107,11 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><span style="text-decoration: line-through;">${customer.name}</span></td>
-                    <td>${customer.email}</td>
-                    <td>${customer.phone}</td>
+                    <td>${customer.email || '-'}</td>
+                    <td>${customer.phone || '-'}</td>
                     <td>${tablesSummary}</td>
                     <td>${totalPrice} Kč</td>
-                    <td><button class="btn-restore" onclick='restoreGroupInCloud(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Obnovit</button></td>
+                    <td><button class="btn-restore" onclick='restoreGroupInCloud(${JSON.stringify(customer.ids)}, "${(customer.name || '').replace(/"/g, '&quot;')}")'>Obnovit</button></td>
                 `;
                 adminCancelledList.appendChild(tr);
             });
@@ -1190,11 +1221,10 @@
         let email = inputEmail.value.trim();
         let phone = inputPhone.value.trim();
 
-        // Výchozí hodnoty pro admina, pokud pole nevyplnil
         if (isAdminLoggedIn) {
-            if (!name) name = "Příchozí / Obsluha";
-            if (!email) email = "bez-emailu@elizza.cz";
-            if (!phone) phone = "-";
+            if (!name) name = "Test";
+            if (!email) email = "";
+            if (!phone) phone = "";
         }
 
         const shouldSaveData = document.getElementById('save-data-checkbox').checked;
@@ -1230,7 +1260,7 @@
 
             const formattedCzechDate = formatCzechDate(selectedDate);
 
-            if (!isAdminLoggedIn || (email && !email.includes('bez-emailu'))) {
+            if (email) {
                 await sendConfirmationEmail({
                     name,
                     email,
