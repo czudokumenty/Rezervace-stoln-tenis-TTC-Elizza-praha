@@ -272,14 +272,33 @@
             padding: 12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
         }
 
         .table-card h3 {
             text-align: center;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
             border-bottom: 1px solid var(--border);
             font-size: 1.05rem;
+        }
+
+        .btn-select-all-table {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .btn-select-all-table:hover {
+            background-color: var(--primary-hover);
         }
 
         .slot-list {
@@ -354,7 +373,7 @@
             gap: 15px;
         }
 
-        /* ROZLOŽENÍ 3 ÚDAJŮ O VYBRANÝCH SLOTECH (POD SEBOU NA MOBILU, VEDLE SEBE NA PC) */
+        /* ROZLOŽENÍ 3 ÚDAJŮ O VYBRANÝCH SLOTECH */
         .summary-info-grid {
             display: flex;
             flex-direction: column;
@@ -899,6 +918,27 @@
         const confirmed = confirm(`Opravdu chcete obnovit zrušenou rezervaci pro zákazníka ${customerName}?`);
         if (!confirmed) return;
 
+        const { data: toRestore, error: fetchErr } = await supabaseClient
+            .from('rezervace')
+            .select('*')
+            .in('id', idsArray);
+
+        if (fetchErr || !toRestore) {
+            alert('Chyba při načítání rezervace k obnovení.');
+            return;
+        }
+
+        const freshBookings = await fetchBookings();
+        const conflicts = toRestore.filter(res => 
+            freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas)
+        );
+
+        if (conflicts.length > 0) {
+            const conflictText = conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ');
+            alert(`Nelze obnovit! Následující slot(y) už jsou obsazené jinou rezervací:\n\n${conflictText}`);
+            return;
+        }
+
         const { error } = await supabaseClient
             .from('rezervace')
             .update({ zruseno: false })
@@ -930,13 +970,63 @@
         slotsCountBadge.textContent = `🏓 Na neděli ${formatCzechDate(selectedDate)} zbývá ještě ${remainingCount} volných slotů`;
     }
 
+    function toggleWholeTableSelection(tableNum) {
+        // Zjistíme volné sloty na tomto stole
+        const availableSlotsForTable = timeSlots.filter(slot => 
+            !currentBookings.some(b => b.stul === tableNum && b.cas === slot)
+        );
+
+        if (availableSlotsForTable.length === 0) {
+            alert(`Stůl ${tableNum} je již kompletně obsazený.`);
+            return;
+        }
+
+        // Zjistíme, zda jsou všechny dostupné sloty již vybrány
+        const allAvailableSelected = availableSlotsForTable.every(slot => 
+            selectedSelections.some(s => s.table === tableNum && s.slot === slot)
+        );
+
+        if (allAvailableSelected) {
+            // Odoznačíme všechny sloty tohoto stolu
+            selectedSelections = selectedSelections.filter(s => s.table !== tableNum);
+        } else {
+            // Přidáme všechny volné sloty tohoto stolu, které ještě nebyly vybrány
+            availableSlotsForTable.forEach(slot => {
+                if (!selectedSelections.some(s => s.table === tableNum && s.slot === slot)) {
+                    selectedSelections.push({ table: tableNum, slot: slot });
+                }
+            });
+        }
+
+        if (selectedSelections.length === 0) {
+            clearSelection();
+        } else {
+            updateBookingSummary();
+            renderGrid();
+        }
+    }
+
     function renderGrid() {
         reservableGrid.innerHTML = '';
 
         for (let t = 1; t <= 6; t++) {
             const card = document.createElement('div');
             card.className = 'table-card';
-            card.innerHTML = `<h3>Stůl ${t}</h3>`;
+
+            const availableSlotsForTable = timeSlots.filter(slot => 
+                !currentBookings.some(b => b.stul === t && b.cas === slot)
+            );
+
+            const isAllSelected = availableSlotsForTable.length > 0 && availableSlotsForTable.every(slot => 
+                selectedSelections.some(s => s.table === t && s.slot === slot)
+            );
+
+            const selectAllBtnText = isAllSelected ? `✓ Odoznačit celý Stůl ${t}` : `⚡ Označit celý Stůl ${t}`;
+
+            card.innerHTML = `
+                <h3>Stůl ${t}</h3>
+                <button type="button" class="btn-select-all-table" onclick="toggleWholeTableSelection(${t})">${selectAllBtnText}</button>
+            `;
 
             const slotList = document.createElement('div');
             slotList.className = 'slot-list';
@@ -1118,6 +1208,29 @@
         }
     }
 
+    function updateBookingSummary() {
+        const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
+        const totalHours = (selectedSelections.length * 0.5).toString().replace('.', ',');
+
+        const groupedByTable = {};
+        selectedSelections.forEach(s => {
+            if (!groupedByTable[s.table]) groupedByTable[s.table] = [];
+            groupedByTable[s.table].push(s.slot);
+        });
+
+        const uniqueTablesCount = Object.keys(groupedByTable).length;
+        const detailsText = Object.keys(groupedByTable)
+            .sort((a,b) => a - b)
+            .map(t => `Stůl ${t}: (${formatTimeRanges(groupedByTable[t])})`)
+            .join(' | ');
+
+        summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} ${uniqueTablesCount === 1 ? 'stole' : 'stolech'}`;
+        summaryDetails.textContent = `Datum: ${formatCzechDate(selectedDate)} | ${detailsText}`;
+        summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
+
+        bookingPanel.classList.add('active');
+    }
+
     function toggleSlotSelection(tableNum, slot) {
         const existingIndex = selectedSelections.findIndex(s => s.table === tableNum && s.slot === slot);
 
@@ -1130,26 +1243,7 @@
         if (selectedSelections.length === 0) {
             clearSelection();
         } else {
-            const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
-            const totalHours = (selectedSelections.length * 0.5).toString().replace('.', ',');
-
-            const groupedByTable = {};
-            selectedSelections.forEach(s => {
-                if (!groupedByTable[s.table]) groupedByTable[s.table] = [];
-                groupedByTable[s.table].push(s.slot);
-            });
-
-            const uniqueTablesCount = Object.keys(groupedByTable).length;
-            const detailsText = Object.keys(groupedByTable)
-                .sort((a,b) => a - b)
-                .map(t => `Stůl ${t}: (${formatTimeRanges(groupedByTable[t])})`)
-                .join(' | ');
-
-            summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} ${uniqueTablesCount === 1 ? 'stole' : 'stolech'}`;
-            summaryDetails.textContent = `Datum: ${formatCzechDate(selectedDate)} | ${detailsText}`;
-            summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
-
-            bookingPanel.classList.add('active');
+            updateBookingSummary();
             renderGrid();
         }
     }
