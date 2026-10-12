@@ -214,20 +214,50 @@
             gap: 10px;
         }
 
+        /* BADGE PRO STAV KAPACITY S DYNAMICKÝMI BARVAMI */
         .slots-count-badge {
-            background-color: #d1e7dd;
-            color: #0f5132;
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.85rem;
             font-weight: 600;
-            border: 1px solid #badbcc;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
         }
 
-        [data-theme="dark"] .slots-count-badge {
+        /* Zelená - hodně místa */
+        .badge-green {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border-color: #badbcc;
+        }
+        [data-theme="dark"] .badge-green {
             background-color: #1b4332;
             color: #75e6da;
             border-color: #2d6a4f;
+        }
+
+        /* Oranžová - středně obsazeno */
+        .badge-orange {
+            background-color: #fff3cd;
+            color: #664d03;
+            border-color: #ffecb5;
+        }
+        [data-theme="dark"] .badge-orange {
+            background-color: #4a3b00;
+            color: #ffe066;
+            border-color: #665200;
+        }
+
+        /* Červená - zbývá málo místa */
+        .badge-red {
+            background-color: #f8d7da;
+            color: #842029;
+            border-color: #f5c2c7;
+        }
+        [data-theme="dark"] .badge-red {
+            background-color: #4a121a;
+            color: #ff99a8;
+            border-color: #7a1f2b;
         }
 
         .legend {
@@ -537,7 +567,7 @@
             <label for="res-date">Vyberte neděli:</label>
             <input type="date" id="res-date">
         </div>
-        <div class="slots-count-badge" id="slots-count-badge">
+        <div class="slots-count-badge badge-green" id="slots-count-badge">
             🏓 Volné sloty: -- / 48
         </div>
         <div class="legend">
@@ -965,7 +995,7 @@
         renderAdminPanel();
     }
 
-    // NOVÝ INTELIGENTNÍ VÝPOČET STATISTIKY SLOTŮ (VOLNÉ, OBSAZENÉ, VYBRANÉ)
+    // DYNAMICKÁ ZMĚNA BARVY BADGE DLE VYBRANÝCH A OBSAZENÝCH SLOTŮ
     function updateSlotsCount() {
         const occupiedCount = currentBookings.length;
         const selectedCount = selectedSelections.length;
@@ -978,6 +1008,19 @@
         const detailsText = detailsPart.length > 0 ? ` (${detailsPart.join(', ')})` : '';
 
         slotsCountBadge.textContent = `🏓 Volné sloty: ${remainingCount} / ${TOTAL_SLOTS}${detailsText}`;
+
+        // Nastavení dynamické barvy
+        slotsCountBadge.classList.remove('badge-green', 'badge-orange', 'badge-red');
+
+        const freePercentage = (remainingCount / TOTAL_SLOTS) * 100;
+
+        if (freePercentage > 50) {
+            slotsCountBadge.classList.add('badge-green');
+        } else if (freePercentage >= 20) {
+            slotsCountBadge.classList.add('badge-orange');
+        } else {
+            slotsCountBadge.classList.add('badge-red');
+        }
     }
 
     function toggleWholeTableSelection(tableNum) {
