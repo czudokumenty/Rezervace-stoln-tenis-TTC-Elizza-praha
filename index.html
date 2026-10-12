@@ -9,6 +9,7 @@
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
+        /* Světlý režim (výchozí) */
         :root {
             --primary: #0d6efd;
             --primary-hover: #0b5ed7;
@@ -25,6 +26,31 @@
             --non-res: #e2e3e5;
             --non-res-text: #41464b;
             --danger: #dc3545;
+            --header-title: #1a252f;
+            --subtext: #6c757d;
+            --input-bg: #ffffff;
+        }
+
+        /* Tmavý režim (Dark Mode) */
+        [data-theme="dark"] {
+            --primary: #0d6efd;
+            --primary-hover: #3b82f6;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --border: #333333;
+            --available: #1b4332;
+            --available-text: #75e6da;
+            --occupied: #4a121a;
+            --occupied-text: #ff99a8;
+            --selected: #0d6efd;
+            --selected-text: #ffffff;
+            --non-res: #2d3748;
+            --non-res-text: #cbd5e1;
+            --danger: #dc3545;
+            --header-title: #ffffff;
+            --subtext: #a0aec0;
+            --input-bg: #2d2d2d;
         }
 
         * {
@@ -32,6 +58,7 @@
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         body {
@@ -54,21 +81,78 @@
             background: var(--card-bg);
             padding: 20px 25px;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             margin-bottom: 25px;
             flex-wrap: wrap;
             gap: 15px;
         }
 
         .header-title h1 {
-            color: #1a252f;
+            color: var(--header-title);
             font-size: 1.8rem;
             margin-bottom: 4px;
         }
 
         .header-title p {
-            color: #6c757d;
+            color: var(--subtext);
             font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Styl pro Dark Mode Switch */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            user-select: none;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
         }
 
         .admin-login-btn {
@@ -79,7 +163,6 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
         .admin-login-btn:hover {
@@ -94,7 +177,7 @@
             padding: 15px 20px;
             border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             flex-wrap: wrap;
             gap: 15px;
         }
@@ -109,11 +192,13 @@
             font-weight: 600;
         }
 
-        input[type="date"] {
+        input[type="date"], input[type="text"], input[type="email"], input[type="tel"] {
             padding: 8px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text);
         }
 
         .notice-badge {
@@ -123,6 +208,12 @@
             border-radius: 6px;
             font-size: 0.85rem;
             border: 1px solid #ffe69c;
+        }
+
+        [data-theme="dark"] .notice-badge {
+            background-color: #3d3200;
+            color: #ffecb3;
+            border-color: #665200;
         }
 
         .legend {
@@ -142,6 +233,21 @@
             width: 16px;
             height: 16px;
             border-radius: 4px;
+        }
+
+        .cancel-banner {
+            display: none;
+            background: #fff3cd;
+            border: 2px solid #ffe69c;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            color: #333;
+        }
+
+        .cancel-banner.active {
+            display: block;
         }
 
         .grid-section {
@@ -165,7 +271,7 @@
             background: var(--card-bg);
             border-radius: 10px;
             padding: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
         }
 
@@ -190,17 +296,12 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s;
             text-align: center;
         }
 
         .slot-btn.available {
             background-color: var(--available);
             color: var(--available-text);
-        }
-
-        .slot-btn.available:hover {
-            filter: brightness(0.95);
         }
 
         .slot-btn.occupied {
@@ -227,40 +328,18 @@
             border-radius: 10px;
             padding: 15px;
             text-align: center;
-            border: 1px solid #ced4da;
-        }
-
-        .non-reservable-card.occupied-onsite {
-            background: var(--occupied);
-            color: var(--occupied-text);
-            border-color: #f5c2c7;
-        }
-
-        .non-reservable-card h4 {
-            margin-bottom: 5px;
-        }
-
-        .admin-toggle-btn {
-            margin-top: 10px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: none;
-            background: #495057;
-            color: white;
-            font-size: 0.8rem;
-            cursor: pointer;
+            border: 1px solid var(--border);
         }
 
         .booking-panel {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             background: var(--card-bg);
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
             padding: 15px;
             display: none;
             z-index: 100;
+            border-top: 1px solid var(--border);
         }
 
         .booking-panel.active {
@@ -290,12 +369,6 @@
             flex-wrap: wrap;
         }
 
-        .booking-form input {
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-        }
-
         .btn-confirm {
             background-color: #198754;
             color: white;
@@ -320,22 +393,13 @@
             background: var(--card-bg);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             margin-top: 30px;
-            border: 2px solid #343a40;
+            border: 2px solid var(--border);
         }
 
         .admin-section.active {
             display: block;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
         }
 
         .admin-table {
@@ -352,7 +416,7 @@
         }
 
         .admin-table th {
-            background-color: #f1f3f5;
+            background-color: var(--non-res);
         }
 
         .btn-delete {
@@ -373,8 +437,25 @@
             <h1>TTC Elizza Praha – rezervace veřejnosti</h1>
             <p>Rezervace stolů na stolní tenis | Neděle 17:00 – 21:00 (sloty po 30 min) | Cena: 150 Kč / hodina (75 Kč za 30 min)</p>
         </div>
-        <button class="admin-login-btn" id="admin-login-btn">🔒 Admin přihlášení</button>
+        <div class="header-actions">
+            <button class="admin-login-btn" id="admin-login-btn">🔒 Admin přihlášení</button>
+            <div class="theme-switch-wrapper">
+                <span>☀️</span>
+                <label class="theme-switch" for="checkbox-theme">
+                    <input type="checkbox" id="checkbox-theme" />
+                    <div class="slider"></div>
+                </label>
+                <span>🌙</span>
+            </div>
+        </div>
     </header>
+
+    <!-- Banner pro storno z e-mailu -->
+    <div class="cancel-banner" id="cancel-banner">
+        <h3>❌ Žádost o zrušení rezervace</h3>
+        <div class="cancel-details" id="cancel-details-text">Načítám detaily rezervace...</div>
+        <button class="btn-delete" style="padding: 8px 16px; font-size: 1rem;" id="btn-execute-cancel">Zrušit tuto rezervaci</button>
+    </div>
 
     <div class="controls">
         <div class="date-picker-group">
@@ -447,6 +528,27 @@
 </div>
 
 <script>
+    // --- SKRIPT PRO SWITCHOVÁNÍ LIGHT / DARK MÓDU ---
+    const toggleSwitch = document.getElementById('checkbox-theme');
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        if (currentTheme === 'dark') {
+            toggleSwitch.checked = true;
+        }
+    }
+
+    toggleSwitch.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
     // --- NASTAVENÍ SUPABASE ---
     const SUPABASE_URL = "https://vhpcohumorvazjnnlapb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_ev_vWlw02eL8T57zhoEbDA_neYEcuH4";
@@ -490,6 +592,10 @@
     const adminLoginBtn = document.getElementById('admin-login-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
     const adminBookingList = document.getElementById('admin-booking-list');
+
+    const cancelBanner = document.getElementById('cancel-banner');
+    const cancelDetailsText = document.getElementById('cancel-details-text');
+    const btnExecuteCancel = document.getElementById('btn-execute-cancel');
 
     function getNextSunday(d = new Date()) {
         const date = new Date(d);
@@ -566,7 +672,8 @@
                 phone: details.phone,
                 date: details.date,
                 reservation_details: details.reservationText,
-                total_price: details.totalPrice
+                total_price: details.totalPrice,
+                cancel_link: details.cancelLink
             });
         } catch (err) {
             console.error('Chyba odesílání e-mailu:', err);
@@ -583,6 +690,62 @@
             alert('Chyba při mazání: ' + error.message);
         } else {
             loadAndRender();
+        }
+    }
+
+    async function checkCancelParam() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const cancelEmail = urlParams.get('cancel_email');
+        const cancelDate = urlParams.get('cancel_date');
+
+        if (cancelEmail && cancelDate) {
+            selectedDate = cancelDate;
+            dateInput.value = cancelDate;
+
+            const { data, error } = await supabaseClient
+                .from('rezervace')
+                .select('*')
+                .eq('datum', cancelDate)
+                .eq('email', cancelEmail);
+
+            if (data && data.length > 0) {
+                const name = data[0].jmeno;
+                const groupedByTable = {};
+                data.forEach(b => {
+                    if (!groupedByTable[b.stul]) groupedByTable[b.stul] = [];
+                    groupedByTable[b.stul].push(b.cas);
+                });
+
+                const detailsList = Object.keys(groupedByTable)
+                    .map(t => `Stůl ${t}: ${groupedByTable[t].join(', ')}`)
+                    .join(' | ');
+
+                cancelDetailsText.innerHTML = `<strong>Jméno:</strong> ${name}<br><strong>Datum:</strong> ${cancelDate}<br><strong>Rezervované sloty:</strong> ${detailsList}`;
+                cancelBanner.classList.add('active');
+
+                btnExecuteCancel.onclick = async () => {
+                    const confirmed = confirm("Opravdu chcete doopravdy zrušit tuto rezervaci?");
+                    if (confirmed) {
+                        const idsToDelete = data.map(b => b.id);
+                        const { error: delErr } = await supabaseClient
+                            .from('rezervace')
+                            .delete()
+                            .in('id', idsToDelete);
+
+                        if (!delErr) {
+                            alert("Vaše rezervace byla úspěšně zrušena!");
+                            cancelBanner.classList.remove('active');
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            loadAndRender();
+                        } else {
+                            alert("Chyba při rušení rezervace: " + delErr.message);
+                        }
+                    }
+                };
+            } else {
+                alert("Rezervace nebyla nalezena nebo již byla dříve zrušena.");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         }
     }
 
@@ -640,7 +803,7 @@
             card.innerHTML = `
                 <h4>Stůl ${t}</h4>
                 <p>${isOccupied ? '🔴 Obsazeno na místě' : '🟢 Volno pro příchozí (bez rezervace)'}</p>
-                ${isAdminLoggedIn ? `<button class="admin-toggle-btn" onclick="toggleOnsiteStatus(${t})">Změnit stav (Admin)</button>` : ''}
+                ${isAdminLoggedIn ? `<button class="btn-cancel" style="margin-top:10px; font-size:0.8rem;" onclick="toggleOnsiteStatus(${t})">Změnit stav (Admin)</button>` : ''}
             `;
             nonReservableGrid.appendChild(card);
         }
@@ -663,7 +826,7 @@
         adminBookingList.innerHTML = '';
 
         if (currentBookings.length === 0) {
-            adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#6c757d;">Žádné rezervace pro tento den.</td></tr>`;
+            adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--subtext);">Žádné rezervace pro tento den.</td></tr>`;
             return;
         }
 
@@ -761,7 +924,6 @@
         submitBtn.disabled = true;
         submitBtn.textContent = "KONTROLUJI DOSTUPNOST...";
 
-        // --- BLESKOVÁ KONTROLA KOLIZÍ TĚSNĚ PŘED ULOŽENÍM ---
         const freshBookings = await fetchBookings();
         const conflicts = selectedSelections.filter(sel => 
             freshBookings.some(b => b.stul === sel.table && b.cas === sel.slot)
@@ -810,14 +972,16 @@
                 .map(t => `• Stůl ${t}: ${groupedByTable[t].sort((a,b) => timeSlots.indexOf(a) - timeSlots.indexOf(b)).join(', ')}`)
                 .join('\n');
 
-            // Odeslání e-mailu přes EmailJS
+            const cancelLink = `${window.location.origin}${window.location.pathname}?cancel_email=${encodeURIComponent(email)}&cancel_date=${encodeURIComponent(selectedDate)}`;
+
             await sendConfirmationEmail({
                 name,
                 email,
                 phone,
                 date: selectedDate,
                 reservationText,
-                totalPrice
+                totalPrice,
+                cancelLink
             });
 
             alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nPočet slotů: ${selectedSelections.length}\nDatum: ${selectedDate}\nCelková cena: ${totalPrice} Kč`);
@@ -832,6 +996,7 @@
 
     initDatePicker();
     loadAndRender();
+    checkCancelParam();
 </script>
 </body>
 </html>
