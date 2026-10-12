@@ -214,7 +214,14 @@
             gap: 10px;
         }
 
-        /* BADGE PRO STAV KAPACITY S DYNAMICKÝMI BARVAMI */
+        /* VEDLE SEBE U MÍSTNÍHO INDIKÁTORU */
+        .badges-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .slots-count-badge {
             padding: 6px 12px;
             border-radius: 6px;
@@ -224,7 +231,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Zelená - hodně místa */
+        /* Barvy pro indikátory */
         .badge-green {
             background-color: #d1e7dd;
             color: #0f5132;
@@ -236,19 +243,28 @@
             border-color: #2d6a4f;
         }
 
-        /* Oranžová - středně obsazeno */
-        .badge-orange {
+        .badge-yellow {
             background-color: #fff3cd;
             color: #664d03;
             border-color: #ffecb5;
         }
-        [data-theme="dark"] .badge-orange {
+        [data-theme="dark"] .badge-yellow {
             background-color: #4a3b00;
             color: #ffe066;
             border-color: #665200;
         }
 
-        /* Červená - zbývá málo místa */
+        .badge-orange {
+            background-color: #ffe5d0;
+            color: #843900;
+            border-color: #ffd0a8;
+        }
+        [data-theme="dark"] .badge-orange {
+            background-color: #5c2800;
+            color: #ffb380;
+            border-color: #803700;
+        }
+
         .badge-red {
             background-color: #f8d7da;
             color: #842029;
@@ -567,8 +583,13 @@
             <label for="res-date">Vyberte neděli:</label>
             <input type="date" id="res-date">
         </div>
-        <div class="slots-count-badge badge-green" id="slots-count-badge">
-            🏓 Volné sloty: -- / 48
+        <div class="badges-group">
+            <div class="slots-count-badge badge-green" id="slots-count-badge">
+                🏓 Volné sloty na rezervaci: -- / 48
+            </div>
+            <div class="slots-count-badge badge-green" id="walkin-count-badge">
+                🏓 Stoly bez rezervace: 3/3
+            </div>
         </div>
         <div class="legend">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
@@ -752,6 +773,7 @@
     const adminCancelledList = document.getElementById('admin-cancelled-list');
     const adminPastList = document.getElementById('admin-past-list');
     const slotsCountBadge = document.getElementById('slots-count-badge');
+    const walkinCountBadge = document.getElementById('walkin-count-badge');
 
     const inputName = document.getElementById('cust-name');
     const inputEmail = document.getElementById('cust-email');
@@ -995,8 +1017,9 @@
         renderAdminPanel();
     }
 
-    // DYNAMICKÁ ZMĚNA BARVY BADGE DLE VYBRANÝCH A OBSAZENÝCH SLOTŮ
+    // AKTUALIZACE OBOU BADGES DLE BAREVNÝCH PRAHŮ
     function updateSlotsCount() {
+        // --- 1. REZERVOVATELNÉ SLOTY (STŮL 1–6) ---
         const occupiedCount = currentBookings.length;
         const selectedCount = selectedSelections.length;
         const remainingCount = Math.max(0, TOTAL_SLOTS - occupiedCount - selectedCount);
@@ -1007,19 +1030,41 @@
 
         const detailsText = detailsPart.length > 0 ? ` (${detailsPart.join(', ')})` : '';
 
-        slotsCountBadge.textContent = `🏓 Volné sloty: ${remainingCount} / ${TOTAL_SLOTS}${detailsText}`;
+        slotsCountBadge.textContent = `🏓 Volné sloty na rezervaci: ${remainingCount} / ${TOTAL_SLOTS}${detailsText}`;
 
-        // Nastavení dynamické barvy
-        slotsCountBadge.classList.remove('badge-green', 'badge-orange', 'badge-red');
+        slotsCountBadge.classList.remove('badge-green', 'badge-yellow', 'badge-orange', 'badge-red');
 
         const freePercentage = (remainingCount / TOTAL_SLOTS) * 100;
 
-        if (freePercentage > 50) {
+        if (freePercentage > 60) {
             slotsCountBadge.classList.add('badge-green');
-        } else if (freePercentage >= 20) {
+        } else if (freePercentage >= 30) {
+            slotsCountBadge.classList.add('badge-yellow');
+        } else if (remainingCount > 0) {
             slotsCountBadge.classList.add('badge-orange');
         } else {
             slotsCountBadge.classList.add('badge-red');
+        }
+
+        // --- 2. STOLY BEZ REZERVACE (STŮL 7–9) ---
+        const onsiteStatus = JSON.parse(localStorage.getItem('ttc_elizza_onsite') || '{}');
+        let occupiedWalkin = 0;
+        for (let t = 7; t <= 9; t++) {
+            if (onsiteStatus[t]) occupiedWalkin++;
+        }
+        const freeWalkin = 3 - occupiedWalkin;
+
+        walkinCountBadge.textContent = `🏓 Stoly bez rezervace: ${freeWalkin}/3`;
+        walkinCountBadge.classList.remove('badge-green', 'badge-yellow', 'badge-orange', 'badge-red');
+
+        if (freeWalkin === 3) {
+            walkinCountBadge.classList.add('badge-green');
+        } else if (freeWalkin === 2) {
+            walkinCountBadge.classList.add('badge-yellow');
+        } else if (freeWalkin === 1) {
+            walkinCountBadge.classList.add('badge-orange');
+        } else {
+            walkinCountBadge.classList.add('badge-red');
         }
     }
 
@@ -1121,6 +1166,8 @@
             `;
             nonReservableGrid.appendChild(card);
         }
+
+        updateSlotsCount();
     }
 
     function toggleOnsiteStatus(tableNum) {
@@ -1229,7 +1276,7 @@
             });
         }
 
-        // --- 3. RENDER ZRUSTENÝCH REZERVACÍ (HISTORIE) ---
+        // --- 3. RENDER ZRUŠENÝCH REZERVACÍ (HISTORIE) ---
         if (cancelledBookings.length === 0) {
             adminCancelledList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--subtext);">Žádné zrušené rezervace pro tento den.</td></tr>`;
         } else {
