@@ -66,7 +66,7 @@
             color: var(--text);
             padding: 20px;
             line-height: 1.5;
-            padding-bottom: 140px;
+            padding-bottom: 160px;
         }
 
         .container {
@@ -104,7 +104,6 @@
             gap: 15px;
         }
 
-        /* Styl pro Dark Mode Switch */
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
@@ -214,6 +213,22 @@
             background-color: #3d3200;
             color: #ffecb3;
             border-color: #665200;
+        }
+
+        .slots-count-badge {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #badbcc;
+        }
+
+        [data-theme="dark"] .slots-count-badge {
+            background-color: #1b4332;
+            color: #75e6da;
+            border-color: #2d6a4f;
         }
 
         .legend {
@@ -365,8 +380,24 @@
 
         .booking-form {
             display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .inputs-row {
+            display: flex;
             gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--subtext);
+            user-select: none;
+            cursor: pointer;
         }
 
         .btn-confirm {
@@ -462,8 +493,8 @@
             <label for="res-date">Vyberte neděli:</label>
             <input type="date" id="res-date">
         </div>
-        <div class="notice-badge">
-            📅 Rezervace jsou dostupné pouze v neděli.
+        <div class="slots-count-badge" id="slots-count-badge">
+            🏓 Na tuto neděli zbývá ještě -- volných slotů
         </div>
         <div class="legend">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
@@ -518,11 +549,17 @@
             <div class="price-tag" id="summary-price">Celková cena: 0 Kč</div>
         </div>
         <form class="booking-form" id="booking-form">
-            <input type="text" id="cust-name" placeholder="Jméno a příjmení" required>
-            <input type="email" id="cust-email" placeholder="E-mail" required>
-            <input type="tel" id="cust-phone" placeholder="Telefon" required>
-            <button type="submit" class="btn-confirm" id="btn-confirm-submit">Potvrdit rezervaci</button>
-            <button type="button" class="btn-cancel" id="btn-cancel">Zrušit výběr</button>
+            <div class="inputs-row">
+                <input type="text" id="cust-name" placeholder="Jméno a příjmení" required>
+                <input type="email" id="cust-email" placeholder="E-mail" required>
+                <input type="tel" id="cust-phone" placeholder="Telefon" required>
+                <button type="submit" class="btn-confirm" id="btn-confirm-submit">Potvrdit rezervaci</button>
+                <button type="button" class="btn-cancel" id="btn-cancel">Zrušit výběr</button>
+            </div>
+            <label class="checkbox-container">
+                <input type="checkbox" id="save-data-checkbox" checked>
+                Uložit mé údaje v tomto prohlížeči pro příští rezervaci
+            </label>
         </form>
     </div>
 </div>
@@ -576,6 +613,7 @@
     ];
 
     const PRICE_PER_SLOT = 75;
+    const TOTAL_SLOTS = 6 * timeSlots.length; // 6 stolů * 8 časů = 48 slotů celkem
 
     let selectedSelections = [];
     let selectedDate = null;
@@ -592,10 +630,19 @@
     const adminLoginBtn = document.getElementById('admin-login-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
     const adminBookingList = document.getElementById('admin-booking-list');
+    const slotsCountBadge = document.getElementById('slots-count-badge');
 
     const cancelBanner = document.getElementById('cancel-banner');
     const cancelDetailsText = document.getElementById('cancel-details-text');
     const btnExecuteCancel = document.getElementById('btn-execute-cancel');
+
+    // --- NAČTENÍ ULOŽENÝCH ÚDAJŮ Z LOCALSTORAGE ---
+    function loadSavedUserData() {
+        const savedData = JSON.parse(localStorage.getItem('ttc_elizza_user_data') || '{}');
+        if (savedData.name) document.getElementById('cust-name').value = savedData.name;
+        if (savedData.email) document.getElementById('cust-email').value = savedData.email;
+        if (savedData.phone) document.getElementById('cust-phone').value = savedData.phone;
+    }
 
     function getNextSunday(d = new Date()) {
         const date = new Date(d);
@@ -751,9 +798,16 @@
 
     async function loadAndRender() {
         currentBookings = await fetchBookings();
+        updateSlotsCount();
         renderGrid();
         renderNonReservable();
         renderAdminPanel();
+    }
+
+    function updateSlotsCount() {
+        const occupiedCount = currentBookings.length;
+        const remainingCount = Math.max(0, TOTAL_SLOTS - occupiedCount);
+        slotsCountBadge.textContent = `🏓 Na tuto neděli zbývá ještě ${remainingCount} volných slotů`;
     }
 
     function renderGrid() {
@@ -946,6 +1000,14 @@
         const name = document.getElementById('cust-name').value;
         const email = document.getElementById('cust-email').value;
         const phone = document.getElementById('cust-phone').value;
+        const shouldSaveData = document.getElementById('save-data-checkbox').checked;
+
+        // Uložení/smazání údajů z localStorage
+        if (shouldSaveData) {
+            localStorage.setItem('ttc_elizza_user_data', JSON.stringify({ name, email, phone }));
+        } else {
+            localStorage.removeItem('ttc_elizza_user_data');
+        }
 
         const bookingsToSave = selectedSelections.map(s => ({
             table: s.table,
@@ -985,7 +1047,6 @@
             });
 
             alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nPočet slotů: ${selectedSelections.length}\nDatum: ${selectedDate}\nCelková cena: ${totalPrice} Kč`);
-            document.getElementById('booking-form').reset();
             clearSelection();
             loadAndRender();
         }
@@ -995,6 +1056,7 @@
     });
 
     initDatePicker();
+    loadSavedUserData();
     loadAndRender();
     checkCancelParam();
 </script>
