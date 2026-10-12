@@ -674,6 +674,28 @@
     const adminPastList = document.getElementById('admin-past-list');
     const slotsCountBadge = document.getElementById('slots-count-badge');
 
+    const inputName = document.getElementById('cust-name');
+    const inputEmail = document.getElementById('cust-email');
+    const inputPhone = document.getElementById('cust-phone');
+
+    function updateFormValidationForAdmin() {
+        if (isAdminLoggedIn) {
+            inputName.required = false;
+            inputEmail.required = false;
+            inputPhone.required = false;
+            inputName.placeholder = "Jméno (volitelné pro Admina)";
+            inputEmail.placeholder = "E-mail (volitelný pro Admina)";
+            inputPhone.placeholder = "Telefon (volitelný pro Admina)";
+        } else {
+            inputName.required = true;
+            inputEmail.required = true;
+            inputPhone.required = true;
+            inputName.placeholder = "Jméno a příjmení";
+            inputEmail.placeholder = "E-mail";
+            inputPhone.placeholder = "Telefon";
+        }
+    }
+
     function formatCzechDate(isoDateStr) {
         if (!isoDateStr) return '';
         const parts = isoDateStr.split('-');
@@ -714,9 +736,9 @@
 
     function loadSavedUserData() {
         const savedData = JSON.parse(localStorage.getItem('ttc_elizza_user_data') || '{}');
-        if (savedData.name) document.getElementById('cust-name').value = savedData.name;
-        if (savedData.email) document.getElementById('cust-email').value = savedData.email;
-        if (savedData.phone) document.getElementById('cust-phone').value = savedData.phone;
+        if (savedData.name && !isAdminLoggedIn) inputName.value = savedData.name;
+        if (savedData.email && !isAdminLoggedIn) inputEmail.value = savedData.email;
+        if (savedData.phone && !isAdminLoggedIn) inputPhone.value = savedData.phone;
     }
 
     function getNextSunday(d = new Date()) {
@@ -755,7 +777,6 @@
 
         const todayStr = new Date().toISOString().split('T')[0];
 
-        // 1. Načtení rezervací pro vybraný den
         const { data: selectedData, error: errSelected } = await supabaseClient
             .from('rezervace')
             .select('*')
@@ -765,7 +786,6 @@
             console.error('Chyba při načítání vybraného dne:', errSelected);
         }
 
-        // 2. Načtení proběhlých minulých rezervací (datum < dnes) pouze pokud je správce přihlášen
         let pastData = [];
         if (isAdminLoggedIn) {
             const { data: pastRes, error: errPast } = await supabaseClient
@@ -809,7 +829,7 @@
     }
 
     async function sendConfirmationEmail(details) {
-        if (!window.emailjs) return;
+        if (!window.emailjs || details.email.includes('bez-emailu')) return;
 
         try {
             await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -1119,6 +1139,7 @@
             isAdminLoggedIn = true;
             adminLoginBtn.textContent = '✅ Správce přihlášen';
             alert('Přihlášení úspěšné!');
+            updateFormValidationForAdmin();
             await loadAndRender();
         } else if (pwd !== null) {
             alert('Nesprávné heslo!');
@@ -1128,6 +1149,7 @@
     adminLogoutBtn.addEventListener('click', async () => {
         isAdminLoggedIn = false;
         adminLoginBtn.textContent = '🔒 Admin přihlášení';
+        updateFormValidationForAdmin();
         await loadAndRender();
     });
 
@@ -1162,17 +1184,23 @@
             return;
         }
 
-        submitBtn.textContent = "Ukládám a odesílám e-mail...";
+        submitBtn.textContent = "Ukládám...";
 
-        const name = document.getElementById('cust-name').value;
-        const email = document.getElementById('cust-email').value;
-        const phone = document.getElementById('cust-phone').value;
+        let name = inputName.value.trim();
+        let email = inputEmail.value.trim();
+        let phone = inputPhone.value.trim();
+
+        // Výchozí hodnoty pro admina, pokud pole nevyplnil
+        if (isAdminLoggedIn) {
+            if (!name) name = "Příchozí / Obsluha";
+            if (!email) email = "bez-emailu@elizza.cz";
+            if (!phone) phone = "-";
+        }
+
         const shouldSaveData = document.getElementById('save-data-checkbox').checked;
 
-        if (shouldSaveData) {
+        if (shouldSaveData && !isAdminLoggedIn) {
             localStorage.setItem('ttc_elizza_user_data', JSON.stringify({ name, email, phone }));
-        } else {
-            localStorage.removeItem('ttc_elizza_user_data');
         }
 
         const bookingsToSave = selectedSelections.map(s => ({
@@ -1202,17 +1230,19 @@
 
             const formattedCzechDate = formatCzechDate(selectedDate);
 
-            await sendConfirmationEmail({
-                name,
-                email,
-                phone,
-                date: selectedDate,
-                formattedDate: formattedCzechDate,
-                reservationText,
-                totalPrice
-            });
+            if (!isAdminLoggedIn || (email && !email.includes('bez-emailu'))) {
+                await sendConfirmationEmail({
+                    name,
+                    email,
+                    phone,
+                    date: selectedDate,
+                    formattedDate: formattedCzechDate,
+                    reservationText,
+                    totalPrice
+                });
+            }
 
-            alert(`Rezervace byla úspěšně vytvořena!\nPotvrzení bylo odesláno na e-mail ${email}.\n\nDatum: ${formattedCzechDate}\nCelková cena: ${totalPrice} Kč`);
+            alert(`Rezervace byla úspěšně vytvořena!\n\nDatum: ${formattedCzechDate}\nCelková cena: ${totalPrice} Kč`);
             clearSelection();
             loadAndRender();
         }
@@ -1222,6 +1252,7 @@
     });
 
     initDatePicker();
+    updateFormValidationForAdmin();
     loadSavedUserData();
     loadAndRender();
 </script>
