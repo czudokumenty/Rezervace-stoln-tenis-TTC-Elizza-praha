@@ -230,7 +230,7 @@
             font-weight: 600;
         }
 
-        input[type="date"], input[type="text"], input[type="email"], input[type="tel"] {
+        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] {
             padding: 8px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
@@ -617,8 +617,11 @@
 
     <!-- Admin Panel -->
     <div class="admin-section" id="admin-section">
-        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3>⚙️ Administrace pro obsluhu</h3>
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <h3 style="margin: 0;">⚙️ Administrace pro obsluhu</h3>
+                <button type="button" class="btn-cancel" id="toggle-contacts-btn" style="font-size: 0.85rem; padding: 6px 12px;">👁️ Zobrazit kontakty</button>
+            </div>
             <button class="btn-cancel" id="admin-logout-btn">Odhlásit správce</button>
         </div>
         
@@ -715,6 +718,27 @@
                 Odesláním rezervace berete na vědomí zpracování osobních údajů pro účely vyřízení rezervace. 
                 <button type="button" class="gdpr-link" id="open-gdpr-btn">Zásady ochrany osobních údajů (GDPR)</button>
             </p>
+        </form>
+    </div>
+</div>
+
+<!-- VYSKAKOVACÍ OKNO (MODAL) PRO BEZPEČNÉ ADMIN PŘIHLÁŠENÍ -->
+<div class="modal-overlay" id="admin-login-modal">
+    <div class="modal-card" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>🔒 Přihlášení správce</h3>
+            <button class="modal-close-btn" id="close-admin-login-modal-btn">&times;</button>
+        </div>
+        <form id="admin-login-form">
+            <div class="modal-body">
+                <label for="admin-pwd-input" style="font-weight: 600;">Heslo pro správce:</label>
+                <input type="password" id="admin-pwd-input" placeholder="Zadejte heslo..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-top: 5px;" required>
+                <div id="login-lockout-msg" style="color: var(--danger); font-size: 0.85rem; font-weight: 600; display: none; margin-top: 8px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="btn-cancel-admin-login">Zrušit</button>
+                <button type="submit" class="btn-confirm" id="btn-submit-admin-login">Přihlásit</button>
+            </div>
         </form>
     </div>
 </div>
@@ -842,8 +866,8 @@
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    const ADMIN_PASSWORD = "elizza2026";
     let isAdminLoggedIn = false;
+    let showAdminContacts = false; // Výchozí skrytí kontaktů v adminu
 
     const timeSlots = [
         "17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00",
@@ -869,6 +893,7 @@
     const adminSection = document.getElementById('admin-section');
     const adminLoginBtn = document.getElementById('admin-login-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
+    const toggleContactsBtn = document.getElementById('toggle-contacts-btn');
     const adminBookingList = document.getElementById('admin-booking-list');
     const adminCancelledList = document.getElementById('admin-cancelled-list');
     const adminPastList = document.getElementById('admin-past-list');
@@ -880,6 +905,15 @@
     const mobileSummarySlots = document.getElementById('mobile-summary-slots');
     const btnExpandMobile = document.getElementById('btn-expand-mobile');
     const btnCollapseMobile = document.getElementById('btn-collapse-mobile');
+
+    // Elementy pro Admin Login Modal
+    const adminLoginModal = document.getElementById('admin-login-modal');
+    const adminLoginForm = document.getElementById('admin-login-form');
+    const adminPwdInput = document.getElementById('admin-pwd-input');
+    const loginLockoutMsg = document.getElementById('login-lockout-msg');
+    const closeAdminLoginModalBtn = document.getElementById('close-admin-login-modal-btn');
+    const btnCancelAdminLogin = document.getElementById('btn-cancel-admin-login');
+    const btnSubmitAdminLogin = document.getElementById('btn-submit-admin-login');
 
     // Elementy pro GDPR Modaly
     const gdprModal = document.getElementById('gdpr-modal');
@@ -894,7 +928,7 @@
     const btnCancelGdprDelete = document.getElementById('btn-cancel-gdpr-delete');
     const btnExecuteGdprDelete = document.getElementById('btn-execute-gdpr-delete');
 
-    // Single item delete modal elements
+    // Elementy pro jednotlivý vymazávací modal
     const singleDeleteConfirmModal = document.getElementById('single-delete-confirm-modal');
     const singleDeletePromptText = document.getElementById('single-delete-prompt-text');
     const closeSingleDeleteModalBtn = document.getElementById('close-single-delete-modal-btn');
@@ -906,10 +940,89 @@
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
 
+    // --- BEZPEČNÉ PŘIHLÁŠENÍ S GLOBÁLNÍ BRUTE-FORCE OCHRANOU V SUPABASE ---
+    async function openAdminLoginModal() {
+        if (isAdminLoggedIn) {
+            alert('Již jste přihlášeni jako správce.');
+            return;
+        }
+        
+        adminPwdInput.value = '';
+        loginLockoutMsg.style.display = 'none';
+
+        // Ověříme rovnou v Supabase bez posílání hesla
+        const { data, error } = await supabaseClient.rpc('verify_admin_password', { p_password: '' });
+        
+        if (!error && data && data.length > 0 && data[0].is_locked) {
+            const sec = data[0].remaining_seconds;
+            loginLockoutMsg.textContent = `⚠️ Mnoho neúspěšných pokusů! Přihlášení je zablokováno pro všechna zařízení. Zkuste to za ${sec} s.`;
+            loginLockoutMsg.style.display = 'block';
+            adminPwdInput.disabled = true;
+            btnSubmitAdminLogin.disabled = true;
+        } else {
+            adminPwdInput.disabled = false;
+            btnSubmitAdminLogin.disabled = false;
+        }
+
+        adminLoginModal.classList.add('active');
+        setTimeout(() => adminPwdInput.focus(), 100);
+    }
+
+    function closeAdminLoginModal() {
+        adminLoginModal.classList.remove('active');
+    }
+
+    adminLoginBtn.addEventListener('click', openAdminLoginModal);
+    closeAdminLoginModalBtn.addEventListener('click', closeAdminLoginModal);
+    btnCancelAdminLogin.addEventListener('click', closeAdminLoginModal);
+
+    adminLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        btnSubmitAdminLogin.disabled = true;
+        btnSubmitAdminLogin.textContent = "Ověřuji...";
+
+        const pwd = adminPwdInput.value;
+
+        // Volání cloudové funkce Supabase pro ověření hesla
+        const { data, error } = await supabaseClient.rpc('verify_admin_password', { p_password: pwd });
+
+        if (error) {
+            alert('Chyba při komunikaci s databází: ' + error.message);
+        } else if (data && data.length > 0) {
+            const res = data[0];
+            if (res.is_locked) {
+                alert(`Přihlášení zablokováno z důvodu mnoha neúspěšných pokusů!\nZkuste to za ${res.remaining_seconds} sekund.`);
+                closeAdminLoginModal();
+            } else if (res.is_valid) {
+                isAdminLoggedIn = true;
+                adminLoginBtn.textContent = '✅ Správce přihlášen';
+                closeAdminLoginModal();
+                alert('Přihlášení správce bylo úspěšné!');
+                updateFormValidationForAdmin();
+                await loadAndRender();
+            } else {
+                alert('Nesprávné heslo!');
+                adminPwdInput.value = '';
+                adminPwdInput.focus();
+            }
+        }
+
+        btnSubmitAdminLogin.disabled = false;
+        btnSubmitAdminLogin.textContent = "Přihlásit";
+    });
+
+    // TLAČÍTKO PRO SKRÝVÁNÍ / ZOBRAZOVÁNÍ KONTAKTŮ V ADMINU
+    toggleContactsBtn.addEventListener('click', () => {
+        showAdminContacts = !showAdminContacts;
+        toggleContactsBtn.textContent = showAdminContacts ? '🙈 Skrýt kontakty' : '👁️ Zobrazit kontakty';
+        renderAdminPanel();
+    });
+
     // --- LOGIKA AUTOMATICKÉHO UPOZORNĚNÍ NA ROČNÍ MAZÁNÍ (1. ČERVNA AŽ 1. ČERVENCE) ---
     function checkGdprNoticeDate() {
         const now = new Date();
-        const month = now.getMonth(); // 5 = Červen (indexováno od 0)
+        const month = now.getMonth(); // 5 = Červen
         
         if (month === 5) {
             gdprAlertTopbar.style.display = 'block';
@@ -918,19 +1031,10 @@
         }
     }
 
-    triggerGdprDeleteBtn.addEventListener('click', () => {
+    triggerGdprDeleteBtn.addEventListener('click', async () => {
         if (!isAdminLoggedIn) {
             alert('Pro roční vymazání osobních údajů se musíte nejprve přihlásit jako správce!');
-            const pwd = prompt('Zadejte heslo pro správce:');
-            if (pwd === ADMIN_PASSWORD) {
-                isAdminLoggedIn = true;
-                adminLoginBtn.textContent = '✅ Správce přihlášen';
-                updateFormValidationForAdmin();
-                loadAndRender();
-                gdprDeleteConfirmModal.classList.add('active');
-            } else if (pwd !== null) {
-                alert('Nesprávné heslo!');
-            }
+            await openAdminLoginModal();
         } else {
             gdprDeleteConfirmModal.classList.add('active');
         }
@@ -952,13 +1056,11 @@
 
         const todayStr = new Date().toISOString().split('T')[0];
 
-        // 1. Smazat pouze minulé rezervace (před dneškem)
         const { error: errPast } = await supabaseClient
             .from('rezervace')
             .delete()
             .lt('datum', todayStr);
 
-        // 2. Smazat zrušené (stornované) rezervace
         const { error: errCancelled } = await supabaseClient
             .from('rezervace')
             .delete()
@@ -1317,6 +1419,18 @@
         adminSection.classList.add('active');
         adminBookingList.innerHTML = ''; adminCancelledList.innerHTML = ''; adminPastList.innerHTML = '';
 
+        const displayEmail = (email) => {
+            if (!email) return '-';
+            if (showAdminContacts) return `<a href="mailto:${email}" style="color:var(--primary);">${email}</a>`;
+            return '••••••••';
+        };
+
+        const displayPhone = (phone) => {
+            if (!phone) return '-';
+            if (showAdminContacts) return `<a href="tel:${phone}" style="color:var(--text); text-decoration:none;">${phone}</a>`;
+            return '••••••••';
+        };
+
         // 1. AKTIVNÍ REZERVACE
         if (currentBookings.length === 0) { 
             adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center;">Žádné aktivní rezervace pro tento den.</td></tr>`; 
@@ -1325,8 +1439,14 @@
             Object.values(groupedActive).forEach(customer => {
                 const tablesSummary = Object.keys(customer.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(customer.tables[t])}`).join('<br>');
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td><strong>${customer.name}</strong></td><td>${customer.email}</td><td>${customer.phone}</td><td>${tablesSummary}</td><td><strong>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
-                <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Zrušit vše</button></td>`;
+                tr.innerHTML = `
+                    <td><strong>${customer.name}</strong></td>
+                    <td>${displayEmail(customer.email)}</td>
+                    <td>${displayPhone(customer.phone)}</td>
+                    <td>${tablesSummary}</td>
+                    <td><strong>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
+                    <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Zrušit vše</button></td>
+                `;
                 adminBookingList.appendChild(tr);
             });
         }
@@ -1341,8 +1461,8 @@
                 tr.innerHTML = `
                     <td><strong>${formatCzechDate(customer.date)}</strong></td>
                     <td>${customer.name}</td>
-                    <td>${customer.email}</td>
-                    <td>${customer.phone}</td>
+                    <td>${displayEmail(customer.email)}</td>
+                    <td>${displayPhone(customer.phone)}</td>
                     <td>${tablesSummary}</td>
                     <td><strong>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
                     <td><button class="btn-delete" onclick='promptSingleDelete(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Vymazat z databáze</button></td>
@@ -1360,8 +1480,8 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><span style="text-decoration: line-through;">${customer.name}</span></td>
-                    <td>${customer.email}</td>
-                    <td>${customer.phone}</td>
+                    <td>${displayEmail(customer.email)}</td>
+                    <td>${displayPhone(customer.phone)}</td>
                     <td>${tablesSummary}</td>
                     <td>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</td>
                     <td>
@@ -1412,18 +1532,13 @@
         renderGrid();
     }
 
-    adminLoginBtn.addEventListener('click', async () => {
-        if (isAdminLoggedIn) { alert('Již jste přihlášeni jako správce.'); return; }
-        const pwd = prompt('Zadejte heslo pro správce:');
-        if (pwd === ADMIN_PASSWORD) {
-            isAdminLoggedIn = true; adminLoginBtn.textContent = '✅ Správce přihlášen';
-            alert('Přihlášení úspěšné!'); updateFormValidationForAdmin(); await loadAndRender();
-        } else if (pwd !== null) { alert('Nesprávné heslo!'); }
-    });
-
     adminLogoutBtn.addEventListener('click', async () => {
-        isAdminLoggedIn = false; adminLoginBtn.textContent = '🔒 Admin přihlášení';
-        updateFormValidationForAdmin(); await loadAndRender();
+        isAdminLoggedIn = false;
+        showAdminContacts = false;
+        toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
+        adminLoginBtn.textContent = '🔒 Admin přihlášení';
+        updateFormValidationForAdmin();
+        await loadAndRender();
     });
 
     document.getElementById('btn-cancel').addEventListener('click', clearSelection);
