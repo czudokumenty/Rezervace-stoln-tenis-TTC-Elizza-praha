@@ -313,22 +313,19 @@
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .non-reservable-card { background: var(--non-res); color: var(--non-res-text); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid var(--border); }
 
-        /* -------------------------------------
-           REZervaČnÍ liŠta - novÝ styl pro mobil
-           ------------------------------------- */
+        /* REZERVAČNÍ LIŠTA */
         .booking-panel {
             position: fixed;
             bottom: 0; left: 0; right: 0;
             background: var(--card-bg);
             box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-            display: none; /* skryté úplně dokud se něco nevybere */
+            display: none;
             z-index: 100;
             border-top: 1px solid var(--border);
         }
 
         .booking-panel.active { display: block; }
 
-        /* Kompaktní pruh pro mobily */
         .mobile-summary-bar {
             display: flex;
             justify-content: space-between;
@@ -360,9 +357,8 @@
             box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
         }
 
-        /* Formulář a detaily - výchozí pro mobil je SKRYTO */
         .booking-content {
-            display: none; /* zobrazeno jen na PC nebo při rozbalení (expanded) */
+            display: none;
             padding: 15px 20px;
             max-width: 1200px;
             margin: 0 auto;
@@ -370,7 +366,6 @@
             gap: 15px;
         }
 
-        /* Tlačítko zpět na mobilu při rozbaleném okně */
         .btn-collapse-mobile {
             display: none;
             background: transparent;
@@ -383,7 +378,6 @@
             margin-bottom: -5px;
         }
 
-        /* TŘÍDA EXPANDED - Když uživatel na mobilu klikne na "Pokračovat" */
         .booking-panel.expanded .mobile-summary-bar { display: none; }
         .booking-panel.expanded .booking-content { display: flex; }
         .booking-panel.expanded .btn-collapse-mobile { display: block; }
@@ -396,10 +390,25 @@
         .inputs-row { display: flex; gap: 10px; flex-wrap: wrap; }
         .checkbox-container { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--subtext); user-select: none; cursor: pointer; }
 
+        .gdpr-notice-text {
+            font-size: 0.8rem;
+            color: var(--subtext);
+            margin-top: 4px;
+        }
+
+        .gdpr-link {
+            color: var(--primary);
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+        }
+
         .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
         .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
 
-        /* --- DESKTOP RESPONZIVITA --- */
         @media (min-width: 768px) {
             .mobile-summary-bar { display: none !important; }
             .booking-content { display: flex !important; }
@@ -414,7 +423,81 @@
             }
         }
 
-        /* Administrace styly (zachováno) */
+        /* STYLY PRO VYSKAKOVACÍ OKNO (MODAL) GDPR */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.65);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .modal-body {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-body ul {
+            padding-left: 20px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Administrace styly */
         .admin-section { display: none; background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 30px; border: 2px solid var(--border); }
         .admin-section.active { display: block; }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
@@ -546,9 +629,8 @@
     </div>
 </div>
 
-<!-- Rezervační lišta dole s dvoufázovým rozbalením pro mobil -->
+<!-- Rezervační lišta dole -->
 <div class="booking-panel" id="booking-panel">
-    <!-- Mobilní tenký pruh (zobrazí se pouze na malých displejích v první fázi) -->
     <div class="mobile-summary-bar">
         <div class="mobile-summary-info">
             <span class="m-price" id="mobile-summary-price">0 Kč</span>
@@ -560,9 +642,7 @@
         </div>
     </div>
 
-    <!-- Hlavní formulář a detail (na PC viditelné rovnou, na mobilu po kliknutí na Pokračovat) -->
     <div class="booking-content" id="booking-content">
-        <!-- Tlačítko zpět pro mobil -->
         <button type="button" class="btn-collapse-mobile" id="btn-collapse-mobile">⬇ Zpět k výběru stolů</button>
 
         <div class="summary-info-grid">
@@ -582,7 +662,55 @@
                 <input type="checkbox" id="save-data-checkbox" checked>
                 Uložit mé údaje v tomto prohlížeči pro příští rezervaci
             </label>
+            <p class="gdpr-notice-text">
+                Odesláním rezervace berete na vědomí zpracování osobních údajů pro účely vyřízení rezervace. 
+                <button type="button" class="gdpr-link" id="open-gdpr-btn">Zásady ochrany osobních údajů (GDPR)</button>
+            </p>
         </form>
+    </div>
+</div>
+
+<!-- VYSKAKOVACÍ OKNO (MODAL) PRO GDPR -->
+<div class="modal-overlay" id="gdpr-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>🛡️ Zásady ochrany osobních údajů (GDPR)</h3>
+            <button class="modal-close-btn" id="close-gdpr-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>Správce osobních údajů:</strong><br>
+            <strong>TTC ELIZZA PRAHA, z.s.</strong>, se sídlem v Praze, IČO: 45251304.</p>
+
+            <p><strong>Jaké osobní údaje zpracováváme?</strong><br>
+            Pro účely rezervace stolů na stolní tenis zpracováváme pouze údaje, které nám sami poskytnete ve formuláři:
+            <ul>
+                <li>Jméno a příjmení</li>
+                <li>E-mailová adresa</li>
+                <li>Telefonní číslo</li>
+            </ul></p>
+
+            <p><strong>Za jakým účelem údaje zpracováváme?</strong><br>
+            Údaje zpracováváme výhradně za účelem vytvoření, správy a kontroly rezervace stolů pro veřejnost a pro zaslání potvrzovacího e-mailu s detaily rezervace. Právním základem je plnění smlouvy / poskytnutí služby na žádost uživatele (čl. 6 odst. 1 písm. b) GDPR).</p>
+
+            <p><strong>Doba uchovávání údajů:</strong><br>
+            Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července</strong> následujícího po odehrání rezervace (tedy do oficiálního konce sezóny pro veřejnost). K tomuto datu dochází k jejich kompletnímu automatickému výmazu.</p>
+
+            <p><strong>Kdo má k údajům přístup (Zpracovatelé):</strong><br>
+            Osobní údaje nejsou předávány třetím stranám pro marketingové účely. K technickému zpracování využíváme tyto prověřené služby:
+            <ul>
+                <li><strong>Supabase Inc.</strong> – zabezpečená cloudová databáze pro uložení rezervací.</li>
+                <li><strong>EmailJS</strong> – služba pro automatické odesílání potvrzovacích e-mailů.</li>
+            </ul></p>
+
+            <p><strong>Ukládání dat v prohlížeči (LocalStorage):</strong><br>
+            Pokud necháte zaškrtnuté políčko <em>„Uložit mé údaje v tomto prohlížeči pro příští rezervaci“</em>, vaše kontaktní údaje se uloží výhradně v paměti vašeho vlastního zařízení. Tyto údaje neodesíláme na server, dokud neodeslete novou rezervaci.</p>
+
+            <p><strong>Vaše práva:</strong><br>
+            Máte právo požadovat přístup ke svým osobním údajům, jejich opravu nebo výmaz před řádným termínem (1. července). S jakýmkoliv dotazem či žádostí o výmaz se můžete obrátit na správce na e-mailu: <a href="mailto:rezervacestolnitenis@gmail.com" style="color: var(--primary);">rezervacestolnitenis@gmail.com</a>.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="close-gdpr-footer-btn">Zavřít</button>
+        </div>
     </div>
 </div>
 
@@ -665,9 +793,33 @@
     const btnExpandMobile = document.getElementById('btn-expand-mobile');
     const btnCollapseMobile = document.getElementById('btn-collapse-mobile');
 
+    // Elementy pro GDPR Modal
+    const gdprModal = document.getElementById('gdpr-modal');
+    const openGdprBtn = document.getElementById('open-gdpr-btn');
+    const closeGdprBtn = document.getElementById('close-gdpr-btn');
+    const closeGdprFooterBtn = document.getElementById('close-gdpr-footer-btn');
+
     const inputName = document.getElementById('cust-name');
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
+
+    // LOGIKA PRO GDPR MODAL
+    openGdprBtn.addEventListener('click', () => {
+        gdprModal.classList.add('active');
+    });
+
+    function closeGdprModal() {
+        gdprModal.classList.remove('active');
+    }
+
+    closeGdprBtn.addEventListener('click', closeGdprModal);
+    closeGdprFooterBtn.addEventListener('click', closeGdprModal);
+
+    gdprModal.addEventListener('click', (e) => {
+        if (e.target === gdprModal) {
+            closeGdprModal();
+        }
+    });
 
     // LOGIKA PRO ROZBALOVÁNÍ NA MOBILU
     btnExpandMobile.addEventListener('click', () => {
@@ -677,7 +829,6 @@
     btnCollapseMobile.addEventListener('click', () => {
         bookingPanel.classList.remove('expanded');
     });
-
 
     function updateFormValidationForAdmin() {
         if (isAdminLoggedIn) {
@@ -1000,12 +1151,10 @@
         const uniqueTablesCount = Object.keys(groupedByTable).length;
         const detailsText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `Stůl ${t}: (${formatTimeRanges(groupedByTable[t])})`).join(' | ');
 
-        // Desktop / Otevřený detail
         summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} stole(ch)`;
         summaryDetails.textContent = `Datum: ${formatCzechDate(selectedDate)} | ${detailsText}`;
         summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
 
-        // Mobilní pruh
         mobileSummaryPrice.textContent = `${totalPrice} Kč`;
         mobileSummarySlots.textContent = `Vybráno: ${selectedSelections.length} slotů`;
 
@@ -1022,7 +1171,7 @@
 
     function clearSelection() {
         selectedSelections = [];
-        bookingPanel.classList.remove('active', 'expanded'); // zavře lištu i rozbalený stav
+        bookingPanel.classList.remove('active', 'expanded');
         updateSlotsCount();
         renderGrid();
     }
