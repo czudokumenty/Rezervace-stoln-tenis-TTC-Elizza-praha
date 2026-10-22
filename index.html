@@ -527,7 +527,7 @@
     btnExecuteGdprDelete.addEventListener('click', async () => {
         if (!supabaseClient) return;
         btnExecuteGdprDelete.disabled = true; btnExecuteGdprDelete.textContent = "Mazání...";
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getLocalIsoDate();
         const { error: errPast } = await supabaseClient.from('rezervace').delete().lt('datum', todayStr);
         const { error: errCancelled } = await supabaseClient.from('rezervace').delete().eq('zruseno', true);
         if (errPast || errCancelled) alert('Chyba. Nemáte oprávnění.');
@@ -599,32 +599,47 @@
         if (savedData.phone && !isAdminLoggedIn) inputPhone.value = savedData.phone;
     }
 
+    function getLocalIsoDate(d = new Date()) {
+        const date = new Date(d);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function getNextSunday(d = new Date()) {
         const date = new Date(d);
         const day = date.getDay();
         date.setDate(date.getDate() + (day === 0 ? 0 : 7 - day));
-        return date.toISOString().split('T')[0];
+        return getLocalIsoDate(date);
     }
 
     function initDatePicker() {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today;
         const defaultSunday = getNextSunday();
-        dateInput.value = defaultSunday; selectedDate = defaultSunday;
+        
+        dateInput.min = defaultSunday;
+        dateInput.step = "7";
+        
+        dateInput.value = defaultSunday; 
+        selectedDate = defaultSunday;
+        
         dateInput.addEventListener('change', (e) => {
             const picked = new Date(e.target.value);
             if (picked.getDay() !== 0) {
                 alert('Rezervace jsou možné pouze na neděli!');
                 const correctedSunday = getNextSunday(picked);
-                dateInput.value = correctedSunday; selectedDate = correctedSunday;
-            } else selectedDate = e.target.value;
+                dateInput.value = correctedSunday; 
+                selectedDate = correctedSunday;
+            } else {
+                selectedDate = e.target.value;
+            }
             clearSelection(); loadAndRender();
         });
     }
 
     async function fetchBookings() {
         if (!supabaseClient) return { active: [], cancelled: [], past: [] };
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getLocalIsoDate();
         
         let active = []; let cancelled = []; let pastData = [];
 
