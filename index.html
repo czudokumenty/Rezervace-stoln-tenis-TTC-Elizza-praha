@@ -53,298 +53,65 @@
             --input-bg: #2d2d2d;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 20px;
-            line-height: 1.5;
-            padding-bottom: 180px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; padding-bottom: 180px; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
         /* ROČNÍ UPOZORŇOVACÍ LIŠTA NA MAZÁNÍ GDPR */
-        .gdpr-alert-topbar {
-            display: none; /* Zobrazí se automaticky pouze v červnu */
-            background-color: #fff3cd;
-            color: #664d03;
-            border: 1px solid #ffecb5;
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        [data-theme="dark"] .gdpr-alert-topbar {
-            background-color: #4a3b00;
-            color: #ffe066;
-            border-color: #665200;
-        }
+        .gdpr-alert-topbar { display: none; background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        [data-theme="dark"] .gdpr-alert-topbar { background-color: #4a3b00; color: #ffe066; border-color: #665200; }
+        .gdpr-alert-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .btn-gdpr-delete { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+        .btn-gdpr-delete:hover { background-color: #bb2d3b; }
 
-        .gdpr-alert-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
+        .header-title p { color: var(--subtext); font-size: 0.95rem; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
 
-        .btn-gdpr-delete {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .btn-gdpr-delete:hover {
-            background-color: #bb2d3b;
-        }
+        .theme-switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; user-select: none; }
+        .theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 20px 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+        .admin-login-btn { background-color: #343a40; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .admin-login-btn:hover { background-color: #212529; }
 
-        .header-title h1 {
-            color: var(--header-title);
-            font-size: 1.8rem;
-            margin-bottom: 4px;
-        }
+        .controls { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 15px; }
+        .date-picker-group { display: flex; align-items: center; gap: 10px; }
+        .date-picker-group label { font-weight: 600; }
+        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; background-color: var(--input-bg); color: var(--text); }
 
-        .header-title p {
-            color: var(--subtext);
-            font-size: 0.95rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.1rem;
-            user-select: none;
-        }
-
-        .theme-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-
-        .theme-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: 0.3s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(24px);
-        }
-
-        .admin-login-btn {
-            background-color: #343a40;
-            color: #fff;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .admin-login-btn:hover {
-            background-color: #212529;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .date-picker-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .date-picker-group label {
-            font-weight: 600;
-        }
-
-        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] {
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-            background-color: var(--input-bg);
-            color: var(--text);
-        }
-
-        .info-notice-banner {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--primary);
-            padding: 12px 18px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .badges-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .slots-count-badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-        }
+        .info-notice-banner { background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .badges-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .slots-count-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; transition: all 0.3s ease; }
 
         .badge-green { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
         [data-theme="dark"] .badge-green { background-color: #1b4332; color: #75e6da; border-color: #2d6a4f; }
-
         .badge-yellow { background-color: #fff3cd; color: #664d03; border-color: #ffecb5; }
         [data-theme="dark"] .badge-yellow { background-color: #4a3b00; color: #ffe066; border-color: #665200; }
-
         .badge-orange { background-color: #ffe5d0; color: #843900; border-color: #ffd0a8; }
         [data-theme="dark"] .badge-orange { background-color: #5c2800; color: #ffb380; border-color: #803700; }
-
         .badge-red { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
         [data-theme="dark"] .badge-red { background-color: #4a121a; color: #ff99a8; border-color: #7a1f2b; }
 
-        .legend {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            font-size: 0.85rem;
-        }
-
+        .legend { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.85rem; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; }
 
         .grid-section { margin-bottom: 30px; }
         .section-title { font-size: 1.2rem; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid var(--primary); }
 
-        .table-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 15px;
-        }
-
-        .table-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .table-header-btn {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 12px;
-            width: 100%;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .table-header-btn:hover, .table-header-btn.all-selected {
-            background-color: var(--primary);
-            color: white;
-        }
+        .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
+        .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
+        .table-header-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; width: 100%; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .table-header-btn:hover, .table-header-btn.all-selected { background-color: var(--primary); color: white; }
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
-
-        .slot-btn {
-            padding: 8px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-align: center;
-        }
-
+        .slot-btn { padding: 8px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; }
         .slot-btn.available { background-color: var(--available); color: var(--available-text); }
         .slot-btn.occupied { background-color: var(--occupied); color: var(--occupied-text); cursor: not-allowed; opacity: 0.7; }
         .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); }
@@ -353,98 +120,25 @@
         .non-reservable-card { background: var(--non-res); color: var(--non-res-text); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid var(--border); }
 
         /* REZERVAČNÍ LIŠTA */
-        .booking-panel {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--card-bg);
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-            display: none;
-            z-index: 100;
-            border-top: 1px solid var(--border);
-        }
-
+        .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); }
         .booking-panel.active { display: block; }
-
-        .mobile-summary-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-        }
-
-        .mobile-summary-info .m-price {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #198754;
-            display: block;
-        }
-
-        .mobile-summary-info .m-slots {
-            font-size: 0.85rem;
-            color: var(--subtext);
-        }
-
-        .btn-continue-mobile {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
-        }
-
-        .booking-content {
-            display: none;
-            padding: 15px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .btn-collapse-mobile {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-align: left;
-            cursor: pointer;
-            margin-bottom: -5px;
-        }
-
+        .mobile-summary-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .mobile-summary-info .m-price { font-size: 1.15rem; font-weight: 700; color: #198754; display: block; }
+        .mobile-summary-info .m-slots { font-size: 0.85rem; color: var(--subtext); }
+        .btn-continue-mobile { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); }
+        .booking-content { display: none; padding: 15px 20px; max-width: 1200px; margin: 0 auto; flex-direction: column; gap: 15px; }
+        .btn-collapse-mobile { display: none; background: transparent; border: none; color: var(--primary); font-weight: 600; font-size: 0.95rem; text-align: left; cursor: pointer; margin-bottom: -5px; }
         .booking-panel.expanded .mobile-summary-bar { display: none; }
         .booking-panel.expanded .booking-content { display: flex; }
         .booking-panel.expanded .btn-collapse-mobile { display: block; }
-
         .summary-info-grid h4 { margin: 0; font-size: 1.05rem; white-space: nowrap; }
         .summary-info-grid p { margin: 0; color: var(--text); font-size: 0.95rem; }
         .price-tag { color: #198754; font-weight: bold; font-size: 1.1rem; white-space: nowrap; }
-
         .booking-form { display: flex; flex-direction: column; gap: 8px; }
         .inputs-row { display: flex; gap: 10px; flex-wrap: wrap; }
         .checkbox-container { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--subtext); user-select: none; cursor: pointer; }
-
-        .gdpr-notice-text {
-            font-size: 0.8rem;
-            color: var(--subtext);
-            margin-top: 4px;
-        }
-
-        .gdpr-link {
-            color: var(--primary);
-            text-decoration: underline;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-            font-size: inherit;
-        }
-
+        .gdpr-notice-text { font-size: 0.8rem; color: var(--subtext); margin-top: 4px; }
+        .gdpr-link { color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; }
         .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
         .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
 
@@ -452,90 +146,19 @@
             .mobile-summary-bar { display: none !important; }
             .booking-content { display: flex !important; }
             .btn-collapse-mobile { display: none !important; }
-            .summary-info-grid {
-                display: grid;
-                grid-template-columns: auto 1fr auto;
-                align-items: center;
-                gap: 25px;
-                padding-bottom: 8px;
-                border-bottom: 1px solid var(--border);
-            }
+            .summary-info-grid { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 25px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         }
 
         /* MODALY (VYSKAKOVACÍ OKNA) */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.65);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-card {
-            background: var(--card-bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            max-width: 650px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 25px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .modal-close-btn {
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text);
-            cursor: pointer;
-            padding: 0 5px;
-        }
-
-        .modal-body {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .modal-body ul {
-            padding-left: 20px;
-        }
-
-        .modal-footer {
-            border-top: 1px solid var(--border);
-            padding-top: 12px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; gap: 15px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; }
+        .modal-close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: 0 5px; }
+        .modal-body { font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: 12px; }
+        .modal-body ul { padding-left: 20px; }
+        .modal-footer { border-top: 1px solid var(--border); padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px; }
 
         /* Administrace styly */
         .admin-section { display: none; background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 30px; border: 2px solid var(--border); }
@@ -551,7 +174,6 @@
 <body>
 
 <div class="container">
-    <!-- HORNÍ LIŠTA PRO SEZÓNNÍ MAZÁNÍ GDPR (ZOBRAZÍ SE AUTOMATICKY V ČERVNU) -->
     <div class="gdpr-alert-topbar" id="gdpr-alert-topbar">
         <div class="gdpr-alert-content">
             <span>⚠️ <strong>Nutné vymazání údajů:</strong> Běží období pro roční promazání proběhlých a stornovaných rezervací (termín do 1. července). Aktivní rezervace zůstanou zachovány.</span>
@@ -583,12 +205,8 @@
             <input type="date" id="res-date">
         </div>
         <div class="badges-group">
-            <div class="slots-count-badge badge-green" id="slots-count-badge">
-                🏓 Volné sloty na rezervaci: -- / 48
-            </div>
-            <div class="slots-count-badge badge-green" id="walkin-count-badge">
-                🏓 Stoly bez rezervace: 3/3
-            </div>
+            <div class="slots-count-badge badge-green" id="slots-count-badge">🏓 Volné sloty na rezervaci: -- / 48</div>
+            <div class="slots-count-badge badge-green" id="walkin-count-badge">🏓 Stoly bez rezervace: 3/3</div>
         </div>
         <div class="legend">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
@@ -597,19 +215,16 @@
         </div>
     </div>
 
-    <!-- Informativní banner o zrušení rezervace -->
     <div class="info-notice-banner">
         <span>ℹ️</span>
         <span><strong>Informace ke stornu:</strong> Pro zrušení rezervace odpovězte na potvrzovací e-mail s vaší rezervací, nebo napište na: <a href="mailto:rezervacestolnitenis@gmail.com" style="color: var(--primary);">rezervacestolnitenis@gmail.com</a>.</span>
     </div>
 
-    <!-- Stoly 1-6 -->
     <div class="grid-section">
         <h2 class="section-title">Rezervovatelné stoly (Stůl 1 – Stůl 6)</h2>
         <div class="table-grid" id="reservable-grid"></div>
     </div>
 
-    <!-- Stoly 7-9 -->
     <div class="grid-section">
         <h2 class="section-title">Volná hra bez rezervace (Stůl 7 – Stůl 9)</h2>
         <div class="non-reservable-grid" id="non-reservable-grid"></div>
@@ -628,60 +243,29 @@
         <h4>Aktivní rezervace na vybraný den</h4>
         <div style="overflow-x: auto; margin-top: 10px;">
             <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Jméno a příjmení</th>
-                        <th>E-mail</th>
-                        <th>Telefon</th>
-                        <th>Rezervované stoly a časy</th>
-                        <th>Celkem Kč</th>
-                        <th>Akce</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Jméno a příjmení</th><th>E-mail</th><th>Telefon</th><th>Rezervované stoly a časy</th><th>Celkem Kč</th><th>Akce</th></tr></thead>
                 <tbody id="admin-booking-list"></tbody>
             </table>
         </div>
 
-        <!-- Sekce s proběhlými rezervacemi z minulosti -->
         <h4 class="history-title">📜 Proběhlé rezervace (minulé neděle)</h4>
         <div style="overflow-x: auto; margin-top: 10px;">
             <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Datum</th>
-                        <th>Jméno a příjmení</th>
-                        <th>E-mail</th>
-                        <th>Telefon</th>
-                        <th>Odehrané stoly a časy</th>
-                        <th>Částka</th>
-                        <th>Akce</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Datum</th><th>Jméno a příjmení</th><th>E-mail</th><th>Telefon</th><th>Odehrané stoly a časy</th><th>Částka</th><th>Akce</th></tr></thead>
                 <tbody id="admin-past-list"></tbody>
             </table>
         </div>
 
-        <!-- Sekce s historií zrušených rezervací -->
         <h4 class="history-title">🗑️ Historie zrušených rezervací na vybraný den</h4>
         <div style="overflow-x: auto; margin-top: 10px;">
             <table class="admin-table" style="opacity: 0.85;">
-                <thead>
-                    <tr>
-                        <th>Jméno a příjmení</th>
-                        <th>E-mail</th>
-                        <th>Telefon</th>
-                        <th>Bývalé stoly a časy</th>
-                        <th>Částka</th>
-                        <th>Akce</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Jméno a příjmení</th><th>E-mail</th><th>Telefon</th><th>Bývalé stoly a časy</th><th>Částka</th><th>Akce</th></tr></thead>
                 <tbody id="admin-cancelled-list"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Rezervační lišta dole -->
 <div class="booking-panel" id="booking-panel">
     <div class="mobile-summary-bar">
         <div class="mobile-summary-info">
@@ -696,7 +280,6 @@
 
     <div class="booking-content" id="booking-content">
         <button type="button" class="btn-collapse-mobile" id="btn-collapse-mobile">⬇ Zpět k výběru stolů</button>
-
         <div class="summary-info-grid">
             <h4 id="summary-title">Vybráno: 0 slotů</h4>
             <p id="summary-details">Datum: -- | Vybrané stoly a časy: --</p>
@@ -722,7 +305,7 @@
     </div>
 </div>
 
-<!-- VYSKAKOVACÍ OKNO (MODAL) PRO BEZPEČNÉ ADMIN PŘIHLÁŠENÍ -->
+<!-- MODAL: ADMIN PŘIHLÁŠENÍ S PODPOROU SUPABASE AUTH -->
 <div class="modal-overlay" id="admin-login-modal">
     <div class="modal-card" style="max-width: 400px;">
         <div class="modal-header">
@@ -733,7 +316,6 @@
             <div class="modal-body">
                 <label for="admin-pwd-input" style="font-weight: 600;">Heslo pro správce:</label>
                 <input type="password" id="admin-pwd-input" placeholder="Zadejte heslo..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-top: 5px;" required>
-                <div id="login-lockout-msg" style="color: var(--danger); font-size: 0.85rem; font-weight: 600; display: none; margin-top: 8px;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" id="btn-cancel-admin-login">Zrušit</button>
@@ -743,63 +325,27 @@
     </div>
 </div>
 
-<!-- VYSKAKOVACÍ OKNO (MODAL) PRO GDPR INFORMACE -->
+<!-- OSTATNÍ MODALY ZŮSTÁVAJÍ STEJNÉ -->
 <div class="modal-overlay" id="gdpr-modal">
     <div class="modal-card">
-        <div class="modal-header">
-            <h3>🛡️ Zásady ochrany osobních údajů (GDPR)</h3>
-            <button class="modal-close-btn" id="close-gdpr-btn">&times;</button>
-        </div>
+        <div class="modal-header"><h3>🛡️ Zásady ochrany osobních údajů (GDPR)</h3><button class="modal-close-btn" id="close-gdpr-btn">&times;</button></div>
         <div class="modal-body">
-            <p><strong>Správce osobních údajů:</strong><br>
-            <strong>TTC ELIZZA PRAHA, z.s.</strong>, se sídlem v Praze, IČO: 45251304.</p>
-
-            <p><strong>Jaké osobní údaje zpracováváme?</strong><br>
-            Pro účely rezervace stolů na stolní tenis zpracováváme pouze údaje, které nám sami poskytnete ve formuláři:
-            <ul>
-                <li>Jméno a příjmení</li>
-                <li>E-mailová adresa</li>
-                <li>Telefonní číslo</li>
-            </ul></p>
-
-            <p><strong>Za jakým účelem údaje zpracováváme?</strong><br>
-            Údaje zpracováváme výhradně za účelem vytvoření, správy a kontroly rezervace stolů pro veřejnost a pro zaslání potvrzovacího e-mailu s detaily rezervace. Právním základem je plnění smlouvy / poskytnutí služby na žádost uživatele (čl. 6 odst. 1 písm. b) GDPR).</p>
-
-            <p><strong>Doba uchovávání údajů:</strong><br>
-            Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července</strong> následujícího po odehrání rezervace (tedy do oficiálního konce sezóny pro veřejnost). K tomuto datu dochází k jejich kompletnímu výmazu.</p>
-
-            <p><strong>Kdo má k údajům přístup (Zpracovatelé):</strong><br>
-            Osobní údaje nejsou předávány třetím stranám pro marketingové účely. K technickému zpracování využíváme tyto prověřené služby:
-            <ul>
-                <li><strong>Supabase Inc.</strong> – zabezpečená cloudová databáze pro uložení rezervací.</li>
-                <li><strong>EmailJS</strong> – služba pro automatické odesílání potvrzovacích e-mailů.</li>
-            </ul></p>
-
-            <p><strong>Ukládání dat v prohlížeči (LocalStorage):</strong><br>
-            Pokud necháte zaškrtnuté políčko <em>„Uložit mé údaje v tomto prohlížeči pro příští rezervaci“</em>, vaše kontaktní údaje se uloží výhradně v paměti vašeho vlastního zařízení. Tyto údaje neodesíláme na server, dokud neodešlete novou rezervaci.</p>
-
-            <p><strong>Vaše práva:</strong><br>
-            Máte právo požadovat přístup ke svým osobním údajům, jejich opravu nebo výmaz před řádným termínem (1. července). S jakýmkoliv dotazem či žádostí o výmaz se můžete obrátit na správce na e-mailu: <a href="mailto:rezervacestolnitenis@gmail.com" style="color: var(--primary);">rezervacestolnitenis@gmail.com</a>.</p>
+            <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong>, se sídlem v Praze, IČO: 45251304.</p>
+            <p><strong>Jaké osobní údaje zpracováváme?</strong><br>Pro účely rezervace stolů zpracováváme: Jméno a příjmení, E-mail, Telefon.</p>
+            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou uchovávány nejdéle do <strong>1. července</strong>.</p>
+            <p><strong>Ukládání dat v prohlížeči (LocalStorage):</strong><br>Vaše kontaktní údaje se uloží výhradně v paměti vašeho vlastního zařízení, dokud neodešlete rezervaci.</p>
+            <p><strong>Vaše práva:</strong><br>Máte právo požadovat přístup, opravu nebo výmaz na e-mailu: rezervacestolnitenis@gmail.com.</p>
         </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="close-gdpr-footer-btn">Zavřít</button>
-        </div>
+        <div class="modal-footer"><button class="btn-cancel" id="close-gdpr-footer-btn">Zavřít</button></div>
     </div>
 </div>
 
-<!-- VYSKAKOVACÍ OKNO (MODAL) PRO POTVRZENÍ HROMADNÉHO VYMAZÁNÍ SEZÓNY -->
 <div class="modal-overlay" id="gdpr-delete-confirm-modal">
     <div class="modal-card" style="max-width: 480px;">
-        <div class="modal-header">
-            <h3 style="color: var(--danger);">⚠️ Potvrzení vymazání dat sezóny</h3>
-            <button class="modal-close-btn" id="close-delete-modal-btn">&times;</button>
-        </div>
+        <div class="modal-header"><h3 style="color: var(--danger);">⚠️ Potvrzení vymazání dat sezóny</h3><button class="modal-close-btn" id="close-delete-modal-btn">&times;</button></div>
         <div class="modal-body">
             <p>Určitě chcete odstranit proběhlé a stornované rezervace z databáze?</p>
-
-            <p style="font-size: 0.85rem; color: var(--subtext);">
-                Tato akce trvale vymaže všechny minulé a zrušené rezervace. <strong>Aktivní nadcházející rezervace zůstanou netknuté.</strong> Tuto akci nelze vzít zpět!
-            </p>
+            <p style="font-size: 0.85rem; color: var(--subtext);">Tato akce trvale vymaže všechny minulé a zrušené rezervace. <strong>Aktivní nadcházející rezervace zůstanou netknuté.</strong> Tuto akci nelze vzít zpět!</p>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" id="btn-cancel-gdpr-delete">Ne, zrušit</button>
@@ -808,13 +354,9 @@
     </div>
 </div>
 
-<!-- VYSKAKOVACÍ OKNO (MODAL) PRO JEDNOTLIVÉ VYMAZÁNÍ REZERVAČNÍHO ZÁZNAMU Z DATABÁZE -->
 <div class="modal-overlay" id="single-delete-confirm-modal">
     <div class="modal-card" style="max-width: 480px;">
-        <div class="modal-header">
-            <h3 style="color: var(--danger);">🗑️ Vymazání z databáze</h3>
-            <button class="modal-close-btn" id="close-single-delete-modal-btn">&times;</button>
-        </div>
+        <div class="modal-header"><h3 style="color: var(--danger);">🗑️ Vymazání z databáze</h3><button class="modal-close-btn" id="close-single-delete-modal-btn">&times;</button></div>
         <div class="modal-body">
             <p id="single-delete-prompt-text">Opravdu chcete vymazat rezervaci z databáze?</p>
             <p style="font-size: 0.85rem; color: var(--subtext);">Tato akce nenávratně odstraní záznam z databáze Supabase.</p>
@@ -827,61 +369,42 @@
 </div>
 
 <script>
-    // --- SKRIPT PRO SWITCHOVÁNÍ LIGHT / DARK MÓDU ---
-    const toggleSwitch = document.getElementById('checkbox-theme');
-    const currentTheme = localStorage.getItem('theme');
-
-    if (currentTheme) {
-        document.documentElement.setAttribute('data-theme', currentTheme);
-        if (currentTheme === 'dark') {
-            toggleSwitch.checked = true;
-        }
+    // --- BEZPEČNOSTNÍ FUNKCE PROTI XSS ÚTOKŮM ---
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>'"]/g, match => {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+            return map[match];
+        });
     }
 
+    const toggleSwitch = document.getElementById('checkbox-theme');
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) { document.documentElement.setAttribute('data-theme', currentTheme); if (currentTheme === 'dark') toggleSwitch.checked = true; }
     toggleSwitch.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        }
+        if (e.target.checked) { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+        else { document.documentElement.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); }
     });
 
-    // --- NASTAVENÍ SUPABASE ---
     const SUPABASE_URL = "https://vhpcohumorvazjnnlapb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_ev_vWlw02eL8T57zhoEbDA_neYEcuH4";
-    
-    // --- NASTAVENÍ EMAILJS ---
     const EMAILJS_PUBLIC_KEY = "fmAgxrv_9uGRVVNFk";
     const EMAILJS_SERVICE_ID = "service_enwd33s";
     const EMAILJS_TEMPLATE_ID = "template_i7dbjbi";
 
-    if (window.emailjs) {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-    }
-
+    if (window.emailjs) emailjs.init(EMAILJS_PUBLIC_KEY);
     let supabaseClient = null;
-    if (window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
+    if (window.supabase) supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let isAdminLoggedIn = false;
-    let showAdminContacts = false; // Výchozí skrytí kontaktů v adminu
+    let showAdminContacts = false;
 
-    const timeSlots = [
-        "17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00",
-        "19:00-19:30", "19:30-20:00", "20:00-20:30", "20:30-21:00"
-    ];
-
+    const timeSlots = ["17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00", "19:00-19:30", "19:30-20:00", "20:00-20:30", "20:30-21:00"];
     const PRICE_PER_SLOT = 75;
-    const TOTAL_SLOTS = 6 * timeSlots.length; // 48 slotů celkem
+    const TOTAL_SLOTS = 6 * timeSlots.length;
 
-    let selectedSelections = [];
-    let selectedDate = null;
-    let currentBookings = [];
-    let cancelledBookings = [];
-    let pastBookings = [];
+    let selectedSelections = []; let selectedDate = null;
+    let currentBookings = []; let cancelledBookings = []; let pastBookings = [];
 
     const dateInput = document.getElementById('res-date');
     const reservableGrid = document.getElementById('reservable-grid');
@@ -900,22 +423,18 @@
     const slotsCountBadge = document.getElementById('slots-count-badge');
     const walkinCountBadge = document.getElementById('walkin-count-badge');
 
-    // Elementy pro mobilní pruh
     const mobileSummaryPrice = document.getElementById('mobile-summary-price');
     const mobileSummarySlots = document.getElementById('mobile-summary-slots');
     const btnExpandMobile = document.getElementById('btn-expand-mobile');
     const btnCollapseMobile = document.getElementById('btn-collapse-mobile');
 
-    // Elementy pro Admin Login Modal
     const adminLoginModal = document.getElementById('admin-login-modal');
     const adminLoginForm = document.getElementById('admin-login-form');
     const adminPwdInput = document.getElementById('admin-pwd-input');
-    const loginLockoutMsg = document.getElementById('login-lockout-msg');
     const closeAdminLoginModalBtn = document.getElementById('close-admin-login-modal-btn');
     const btnCancelAdminLogin = document.getElementById('btn-cancel-admin-login');
     const btnSubmitAdminLogin = document.getElementById('btn-submit-admin-login');
 
-    // Elementy pro GDPR Modaly
     const gdprModal = document.getElementById('gdpr-modal');
     const openGdprBtn = document.getElementById('open-gdpr-btn');
     const closeGdprBtn = document.getElementById('close-gdpr-btn');
@@ -928,7 +447,6 @@
     const btnCancelGdprDelete = document.getElementById('btn-cancel-gdpr-delete');
     const btnExecuteGdprDelete = document.getElementById('btn-execute-gdpr-delete');
 
-    // Elementy pro jednotlivý vymazávací modal
     const singleDeleteConfirmModal = document.getElementById('single-delete-confirm-modal');
     const singleDeletePromptText = document.getElementById('single-delete-prompt-text');
     const closeSingleDeleteModalBtn = document.getElementById('close-single-delete-modal-btn');
@@ -940,224 +458,117 @@
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
 
-    // --- BEZPEČNÉ PŘIHLÁŠENÍ S GLOBÁLNÍ BRUTE-FORCE OCHRANOU V SUPABASE ---
+    // --- BEZPEČNÉ SUPABASE AUTH PŘIHLÁŠENÍ ---
     async function openAdminLoginModal() {
-        if (isAdminLoggedIn) {
-            alert('Již jste přihlášeni jako správce.');
-            return;
-        }
-        
+        if (isAdminLoggedIn) { alert('Již jste přihlášeni jako správce.'); return; }
         adminPwdInput.value = '';
-        loginLockoutMsg.style.display = 'none';
-
-        // Ověříme rovnou v Supabase bez posílání hesla
-        const { data, error } = await supabaseClient.rpc('verify_admin_password', { p_password: '' });
-        
-        if (!error && data && data.length > 0 && data[0].is_locked) {
-            const sec = data[0].remaining_seconds;
-            loginLockoutMsg.textContent = `⚠️ Mnoho neúspěšných pokusů! Přihlášení je zablokováno pro všechna zařízení. Zkuste to za ${sec} s.`;
-            loginLockoutMsg.style.display = 'block';
-            adminPwdInput.disabled = true;
-            btnSubmitAdminLogin.disabled = true;
-        } else {
-            adminPwdInput.disabled = false;
-            btnSubmitAdminLogin.disabled = false;
-        }
-
+        adminPwdInput.disabled = false;
+        btnSubmitAdminLogin.disabled = false;
         adminLoginModal.classList.add('active');
         setTimeout(() => adminPwdInput.focus(), 100);
     }
-
-    function closeAdminLoginModal() {
-        adminLoginModal.classList.remove('active');
-    }
-
+    function closeAdminLoginModal() { adminLoginModal.classList.remove('active'); }
     adminLoginBtn.addEventListener('click', openAdminLoginModal);
     closeAdminLoginModalBtn.addEventListener('click', closeAdminLoginModal);
     btnCancelAdminLogin.addEventListener('click', closeAdminLoginModal);
 
     adminLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         btnSubmitAdminLogin.disabled = true;
         btnSubmitAdminLogin.textContent = "Ověřuji...";
 
         const pwd = adminPwdInput.value;
-
-        // Volání cloudové funkce Supabase pro ověření hesla
-        const { data, error } = await supabaseClient.rpc('verify_admin_password', { p_password: pwd });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: 'rezervacestolnitenis@gmail.com', // POUŽIT SKUTEČNÝ E-MAIL ZDE
+            password: pwd
+        });
 
         if (error) {
-            alert('Chyba při komunikaci s databází: ' + error.message);
-        } else if (data && data.length > 0) {
-            const res = data[0];
-            if (res.is_locked) {
-                alert(`Přihlášení zablokováno z důvodu mnoha neúspěšných pokusů!\nZkuste to za ${res.remaining_seconds} sekund.`);
-                closeAdminLoginModal();
-            } else if (res.is_valid) {
-                isAdminLoggedIn = true;
-                adminLoginBtn.textContent = '✅ Správce přihlášen';
-                closeAdminLoginModal();
-                alert('Přihlášení správce bylo úspěšné!');
-                updateFormValidationForAdmin();
-                await loadAndRender();
-            } else {
-                alert('Nesprávné heslo!');
-                adminPwdInput.value = '';
-                adminPwdInput.focus();
-            }
+            alert('Nesprávné heslo nebo zablokováno (při mnoha pokusech systém dočasně omezí přihlašování).');
+            adminPwdInput.value = '';
+            adminPwdInput.focus();
+        } else {
+            isAdminLoggedIn = true;
+            adminLoginBtn.textContent = '✅ Správce přihlášen';
+            closeAdminLoginModal();
+            alert('Přihlášení správce bylo úspěšné!');
+            updateFormValidationForAdmin();
+            await loadAndRender();
         }
-
         btnSubmitAdminLogin.disabled = false;
         btnSubmitAdminLogin.textContent = "Přihlásit";
     });
 
-    // TLAČÍTKO PRO SKRÝVÁNÍ / ZOBRAZOVÁNÍ KONTAKTŮ V ADMINU
     toggleContactsBtn.addEventListener('click', () => {
         showAdminContacts = !showAdminContacts;
         toggleContactsBtn.textContent = showAdminContacts ? '🙈 Skrýt kontakty' : '👁️ Zobrazit kontakty';
         renderAdminPanel();
     });
 
-    // --- LOGIKA AUTOMATICKÉHO UPOZORNĚNÍ NA ROČNÍ MAZÁNÍ (1. ČERVNA AŽ 1. ČERVENCE) ---
     function checkGdprNoticeDate() {
         const now = new Date();
-        const month = now.getMonth(); // 5 = Červen
-        
-        if (month === 5) {
-            gdprAlertTopbar.style.display = 'block';
-        } else {
-            gdprAlertTopbar.style.display = 'none';
-        }
+        if (now.getMonth() === 5) gdprAlertTopbar.style.display = 'block';
+        else gdprAlertTopbar.style.display = 'none';
     }
 
     triggerGdprDeleteBtn.addEventListener('click', async () => {
-        if (!isAdminLoggedIn) {
-            alert('Pro roční vymazání osobních údajů se musíte nejprve přihlásit jako správce!');
-            await openAdminLoginModal();
-        } else {
-            gdprDeleteConfirmModal.classList.add('active');
-        }
+        if (!isAdminLoggedIn) { alert('Musíte se nejprve přihlásit jako správce!'); await openAdminLoginModal(); } 
+        else gdprDeleteConfirmModal.classList.add('active');
     });
 
-    function closeDeleteConfirmModal() {
-        gdprDeleteConfirmModal.classList.remove('active');
-    }
-
+    function closeDeleteConfirmModal() { gdprDeleteConfirmModal.classList.remove('active'); }
     closeDeleteModalBtn.addEventListener('click', closeDeleteConfirmModal);
     btnCancelGdprDelete.addEventListener('click', closeDeleteConfirmModal);
 
-    // HROMADNÉ SEZÓNNÍ VYMAZÁNÍ (MAŽE JEN MINULÉ A ZRUŠENÉ REZERVACE)
     btnExecuteGdprDelete.addEventListener('click', async () => {
         if (!supabaseClient) return;
-
-        btnExecuteGdprDelete.disabled = true;
-        btnExecuteGdprDelete.textContent = "Mazání...";
-
+        btnExecuteGdprDelete.disabled = true; btnExecuteGdprDelete.textContent = "Mazání...";
         const todayStr = new Date().toISOString().split('T')[0];
 
-        const { error: errPast } = await supabaseClient
-            .from('rezervace')
-            .delete()
-            .lt('datum', todayStr);
+        const { error: errPast } = await supabaseClient.from('rezervace').delete().lt('datum', todayStr);
+        const { error: errCancelled } = await supabaseClient.from('rezervace').delete().eq('zruseno', true);
 
-        const { error: errCancelled } = await supabaseClient
-            .from('rezervace')
-            .delete()
-            .eq('zruseno', true);
-
-        if (errPast || errCancelled) {
-            alert('Chyba při mazání dat: ' + ((errPast && errPast.message) || (errCancelled && errCancelled.message)));
-        } else {
-            alert('Proběhlé a stornované rezervace byly úspěšně vymazány! Aktivní nadcházející rezervace zůstaly zachovány.');
-            closeDeleteConfirmModal();
-            loadAndRender();
-        }
-
-        btnExecuteGdprDelete.disabled = false;
-        btnExecuteGdprDelete.textContent = "Ano, vymazat data";
+        if (errPast || errCancelled) alert('Chyba. Možná vám vypršela relace přihlášení.');
+        else { alert('Proběhlé a stornované rezervace byly vymazány.'); closeDeleteConfirmModal(); loadAndRender(); }
+        btnExecuteGdprDelete.disabled = false; btnExecuteGdprDelete.textContent = "Ano, vymazat data";
     });
 
-    // JEDNOTLIVÉ VYMAZÁNÍ REZERVACE Z DATABÁZE
     function promptSingleDelete(idsArray, customerName) {
         pendingSingleDeleteIds = idsArray;
-        singleDeletePromptText.textContent = `Opravdu chcete vymazat rezervaci pro "${customerName}" z databáze?`;
+        singleDeletePromptText.textContent = `Opravdu chcete vymazat rezervaci pro "${escapeHTML(customerName)}" z databáze?`;
         singleDeleteConfirmModal.classList.add('active');
     }
-
-    function closeSingleDeleteModal() {
-        singleDeleteConfirmModal.classList.remove('active');
-        pendingSingleDeleteIds = [];
-    }
-
+    function closeSingleDeleteModal() { singleDeleteConfirmModal.classList.remove('active'); pendingSingleDeleteIds = []; }
     closeSingleDeleteModalBtn.addEventListener('click', closeSingleDeleteModal);
     btnCancelSingleDelete.addEventListener('click', closeSingleDeleteModal);
 
     btnExecuteSingleDelete.addEventListener('click', async () => {
         if (!supabaseClient || pendingSingleDeleteIds.length === 0) return;
-
-        btnExecuteSingleDelete.disabled = true;
-        btnExecuteSingleDelete.textContent = "Mazání...";
-
-        const { error } = await supabaseClient
-            .from('rezervace')
-            .delete()
-            .in('id', pendingSingleDeleteIds);
-
-        if (error) {
-            alert('Chyba při vymazání z databáze: ' + error.message);
-        } else {
-            alert('Rezervace byla úspěšně vymazána z databáze.');
-            closeSingleDeleteModal();
-            loadAndRender();
-        }
-
-        btnExecuteSingleDelete.disabled = false;
-        btnExecuteSingleDelete.textContent = "Ano";
+        btnExecuteSingleDelete.disabled = true; btnExecuteSingleDelete.textContent = "Mazání...";
+        
+        const { error } = await supabaseClient.from('rezervace').delete().in('id', pendingSingleDeleteIds);
+        if (error) alert('Chyba při vymazání z databáze. Nemáte oprávnění.');
+        else { alert('Rezervace byla vymazána.'); closeSingleDeleteModal(); loadAndRender(); }
+        
+        btnExecuteSingleDelete.disabled = false; btnExecuteSingleDelete.textContent = "Ano";
     });
 
-    // LOGIKA PRO GDPR MODAL
-    openGdprBtn.addEventListener('click', () => {
-        gdprModal.classList.add('active');
-    });
-
-    function closeGdprModal() {
-        gdprModal.classList.remove('active');
-    }
-
+    openGdprBtn.addEventListener('click', () => gdprModal.classList.add('active'));
+    function closeGdprModal() { gdprModal.classList.remove('active'); }
     closeGdprBtn.addEventListener('click', closeGdprModal);
     closeGdprFooterBtn.addEventListener('click', closeGdprModal);
+    gdprModal.addEventListener('click', (e) => { if (e.target === gdprModal) closeGdprModal(); });
 
-    gdprModal.addEventListener('click', (e) => {
-        if (e.target === gdprModal) {
-            closeGdprModal();
-        }
-    });
-
-    // LOGIKA PRO ROZBALOVÁNÍ NA MOBILU
-    btnExpandMobile.addEventListener('click', () => {
-        bookingPanel.classList.add('expanded');
-    });
-
-    btnCollapseMobile.addEventListener('click', () => {
-        bookingPanel.classList.remove('expanded');
-    });
+    btnExpandMobile.addEventListener('click', () => bookingPanel.classList.add('expanded'));
+    btnCollapseMobile.addEventListener('click', () => bookingPanel.classList.remove('expanded'));
 
     function updateFormValidationForAdmin() {
         if (isAdminLoggedIn) {
-            inputName.required = false;
-            inputEmail.required = false;
-            inputPhone.required = false;
-            inputName.placeholder = "Jméno (volitelné pro Admina)";
-            inputEmail.placeholder = "E-mail (volitelný pro Admina)";
-            inputPhone.placeholder = "Telefon (volitelný pro Admina)";
+            inputName.required = false; inputEmail.required = false; inputPhone.required = false;
+            inputName.placeholder = "Jméno (volitelné pro Admina)"; inputEmail.placeholder = "E-mail (volitelný)"; inputPhone.placeholder = "Telefon (volitelný)";
         } else {
-            inputName.required = true;
-            inputEmail.required = true;
-            inputPhone.required = true;
-            inputName.placeholder = "Jméno a příjmení";
-            inputEmail.placeholder = "E-mail";
-            inputPhone.placeholder = "Telefon";
+            inputName.required = true; inputEmail.required = true; inputPhone.required = true;
+            inputName.placeholder = "Jméno a příjmení"; inputEmail.placeholder = "E-mail"; inputPhone.placeholder = "Telefon";
         }
     }
 
@@ -1171,16 +582,13 @@
     function formatTimeRanges(slotList) {
         if (!slotList || slotList.length === 0) return '';
         const sortedSlots = [...slotList].sort((a, b) => timeSlots.indexOf(a) - timeSlots.indexOf(b));
-        const ranges = [];
-        let currentStart = null;
-        let currentEnd = null;
-
+        const ranges = []; let currentStart = null; let currentEnd = null;
         sortedSlots.forEach((slot, index) => {
             const [start, end] = slot.split('-');
             if (!currentStart) { currentStart = start; currentEnd = end; }
             else if (start === currentEnd) { currentEnd = end; }
             else { ranges.push(`${currentStart}–${currentEnd}`); currentStart = start; currentEnd = end; }
-            if (index === sortedSlots.length - 1) { ranges.push(`${currentStart}–${currentEnd}`); }
+            if (index === sortedSlots.length - 1) ranges.push(`${currentStart}–${currentEnd}`);
         });
         return ranges.join(', ');
     }
@@ -1203,41 +611,31 @@
     function initDatePicker() {
         const today = new Date().toISOString().split('T')[0];
         dateInput.min = today;
-
         const defaultSunday = getNextSunday();
-        dateInput.value = defaultSunday;
-        selectedDate = defaultSunday;
-
+        dateInput.value = defaultSunday; selectedDate = defaultSunday;
         dateInput.addEventListener('change', (e) => {
             const picked = new Date(e.target.value);
             if (picked.getDay() !== 0) {
-                alert('Rezervace jsou možné pouze na neděli! Automaticky nastavuji nejbližší neděli.');
+                alert('Rezervace jsou možné pouze na neděli!');
                 const correctedSunday = getNextSunday(picked);
-                dateInput.value = correctedSunday;
-                selectedDate = correctedSunday;
-            } else {
-                selectedDate = e.target.value;
-            }
-            clearSelection();
-            loadAndRender();
+                dateInput.value = correctedSunday; selectedDate = correctedSunday;
+            } else selectedDate = e.target.value;
+            clearSelection(); loadAndRender();
         });
     }
 
     async function fetchBookings() {
         if (!supabaseClient) return { active: [], cancelled: [], past: [] };
-
         const todayStr = new Date().toISOString().split('T')[0];
-        const { data: selectedData, error: errSelected } = await supabaseClient.from('rezervace').select('*').eq('datum', selectedDate);
+        const { data: selectedData } = await supabaseClient.from('rezervace').select('*').eq('datum', selectedDate);
         
         let pastData = [];
         if (isAdminLoggedIn) {
-            const { data: pastRes, error: errPast } = await supabaseClient.from('rezervace').select('*').lt('datum', todayStr).order('datum', { ascending: false });
-            if (!errPast && pastRes) pastData = pastRes.filter(b => !b.zruseno);
+            const { data: pastRes } = await supabaseClient.from('rezervace').select('*').lt('datum', todayStr).order('datum', { ascending: false });
+            if (pastRes) pastData = pastRes.filter(b => !b.zruseno);
         }
-
         const active = (selectedData || []).filter(b => !b.zruseno);
         const cancelled = (selectedData || []).filter(b => b.zruseno === true);
-
         return { active, cancelled, past: pastData };
     }
 
@@ -1256,44 +654,31 @@
                 to_name: details.name, to_email: details.email, phone: details.phone,
                 date: details.formattedDate, reservation_details: details.reservationText, total_price: details.totalPrice
             });
-        } catch (err) { console.error('Chyba odesílání e-mailu:', err); }
+        } catch (err) {}
     }
 
     async function cancelGroupInCloud(idsArray, customerName) {
         if (!supabaseClient || !idsArray || idsArray.length === 0) return;
-        if (!confirm(`Opravdu chcete zrušit kompletní rezervaci pro zákazníka ${customerName}?`)) return;
-
+        if (!confirm(`Opravdu chcete zrušit rezervaci pro zákazníka ${customerName}?`)) return;
         const { error } = await supabaseClient.from('rezervace').update({ zruseno: true }).in('id', idsArray);
-        if (!error) { alert('Rezervace byla zrušena.'); loadAndRender(); }
+        if (!error) { alert('Rezervace zrušena.'); loadAndRender(); } else alert('Odepřeno.');
     }
 
     async function restoreGroupInCloud(idsArray, customerName) {
         if (!supabaseClient || !idsArray || idsArray.length === 0) return;
-        if (!confirm(`Opravdu chcete obnovit rezervaci pro zákazníka ${customerName}?`)) return;
-
+        if (!confirm(`Opravdu chcete obnovit rezervaci pro ${customerName}?`)) return;
         const { data: toRestore } = await supabaseClient.from('rezervace').select('*').in('id', idsArray);
         const freshBookings = await fetchBookings();
         const conflicts = toRestore.filter(res => freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas));
-
-        if (conflicts.length > 0) {
-            alert(`Nelze obnovit! Slot(y) jsou již obsazené:\n${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
-            return;
-        }
-
+        if (conflicts.length > 0) { alert(`Nelze obnovit! Sloty obsazené:\n${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`); return; }
         const { error } = await supabaseClient.from('rezervace').update({ zruseno: false }).in('id', idsArray);
-        if (!error) { alert('Rezervace byla obnovena!'); loadAndRender(); }
+        if (!error) { alert('Rezervace obnovena!'); loadAndRender(); }
     }
 
     async function loadAndRender() {
         const fetched = await fetchBookings();
-        currentBookings = fetched.active;
-        cancelledBookings = fetched.cancelled;
-        pastBookings = fetched.past;
-
-        updateSlotsCount();
-        renderGrid();
-        renderNonReservable();
-        renderAdminPanel();
+        currentBookings = fetched.active; cancelledBookings = fetched.cancelled; pastBookings = fetched.past;
+        updateSlotsCount(); renderGrid(); renderNonReservable(); renderAdminPanel();
     }
 
     function updateSlotsCount() {
@@ -1333,9 +718,8 @@
         if (availableSlotsForTable.length === 0) { alert(`Stůl ${tableNum} je plně obsazen.`); return; }
 
         const allAvailableSelected = availableSlotsForTable.every(slot => selectedSelections.some(s => s.table === tableNum && s.slot === slot));
-        if (allAvailableSelected) {
-            selectedSelections = selectedSelections.filter(s => s.table !== tableNum);
-        } else {
+        if (allAvailableSelected) { selectedSelections = selectedSelections.filter(s => s.table !== tableNum); } 
+        else {
             availableSlotsForTable.forEach(slot => {
                 if (!selectedSelections.some(s => s.table === tableNum && s.slot === slot)) selectedSelections.push({ table: tableNum, slot: slot });
             });
@@ -1346,34 +730,27 @@
     function renderGrid() {
         reservableGrid.innerHTML = '';
         for (let t = 1; t <= 6; t++) {
-            const card = document.createElement('div');
-            card.className = 'table-card';
-
+            const card = document.createElement('div'); card.className = 'table-card';
             const availableSlotsForTable = timeSlots.filter(slot => !currentBookings.some(b => b.stul === t && b.cas === slot));
             const isAllSelected = availableSlotsForTable.length > 0 && availableSlotsForTable.every(slot => selectedSelections.some(s => s.table === t && s.slot === slot));
 
-            const headerBtn = document.createElement('button');
-            headerBtn.type = 'button';
+            const headerBtn = document.createElement('button'); headerBtn.type = 'button';
             headerBtn.className = `table-header-btn ${isAllSelected ? 'all-selected' : ''}`;
             headerBtn.innerHTML = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
             headerBtn.onclick = () => toggleWholeTableSelection(t);
             card.appendChild(headerBtn);
 
-            const slotList = document.createElement('div');
-            slotList.className = 'slot-list';
-
+            const slotList = document.createElement('div'); slotList.className = 'slot-list';
             timeSlots.forEach(slot => {
                 const isOccupied = currentBookings.some(b => b.stul === t && b.cas === slot);
                 const isSelected = selectedSelections.some(s => s.table === t && s.slot === slot);
                 const btn = document.createElement('button');
                 btn.className = `slot-btn ${isOccupied ? 'occupied' : (isSelected ? 'selected' : 'available')}`;
-                btn.textContent = slot;
-                btn.disabled = isOccupied;
+                btn.textContent = slot; btn.disabled = isOccupied;
                 if (!isOccupied) btn.addEventListener('click', () => toggleSlotSelection(t, slot));
                 slotList.appendChild(btn);
             });
-            card.appendChild(slotList);
-            reservableGrid.appendChild(card);
+            card.appendChild(slotList); reservableGrid.appendChild(card);
         }
     }
 
@@ -1384,11 +761,8 @@
             const isOccupied = !!onsiteStatus[t];
             const card = document.createElement('div');
             card.className = `non-reservable-card ${isOccupied ? 'occupied-onsite' : ''}`;
-            card.innerHTML = `
-                <h4>Stůl ${t}</h4>
-                <p>${isOccupied ? '🔴 Obsazeno na místě' : '🟢 Volno pro příchozí (bez rezervace)'}</p>
-                ${isAdminLoggedIn ? `<button class="btn-cancel" style="margin-top:10px; font-size:0.8rem;" onclick="toggleOnsiteStatus(${t})">Změnit stav (Admin)</button>` : ''}
-            `;
+            card.innerHTML = `<h4>Stůl ${t}</h4><p>${isOccupied ? '🔴 Obsazeno na místě' : '🟢 Volno pro příchozí (bez rezervace)'}</p>
+                ${isAdminLoggedIn ? `<button class="btn-cancel" style="margin-top:10px; font-size:0.8rem;" onclick="toggleOnsiteStatus(${t})">Změnit stav (Admin)</button>` : ''}`;
             nonReservableGrid.appendChild(card);
         }
         updateSlotsCount();
@@ -1421,74 +795,51 @@
 
         const displayEmail = (email) => {
             if (!email) return '-';
-            if (showAdminContacts) return `<a href="mailto:${email}" style="color:var(--primary);">${email}</a>`;
+            const safe = escapeHTML(email);
+            if (showAdminContacts) return `<a href="mailto:${safe}" style="color:var(--primary);">${safe}</a>`;
             return '••••••••';
         };
 
         const displayPhone = (phone) => {
             if (!phone) return '-';
-            if (showAdminContacts) return `<a href="tel:${phone}" style="color:var(--text); text-decoration:none;">${phone}</a>`;
+            const safe = escapeHTML(phone);
+            if (showAdminContacts) return `<a href="tel:${safe}" style="color:var(--text); text-decoration:none;">${safe}</a>`;
             return '••••••••';
         };
 
-        // 1. AKTIVNÍ REZERVACE
-        if (currentBookings.length === 0) { 
-            adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center;">Žádné aktivní rezervace pro tento den.</td></tr>`; 
-        } else {
-            const groupedActive = groupBookings(currentBookings);
-            Object.values(groupedActive).forEach(customer => {
-                const tablesSummary = Object.keys(customer.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(customer.tables[t])}`).join('<br>');
+        if (currentBookings.length === 0) { adminBookingList.innerHTML = `<tr><td colspan="6" style="text-align:center;">Žádné aktivní rezervace.</td></tr>`; } 
+        else {
+            Object.values(groupBookings(currentBookings)).forEach(c => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${customer.name}</strong></td>
-                    <td>${displayEmail(customer.email)}</td>
-                    <td>${displayPhone(customer.phone)}</td>
-                    <td>${tablesSummary}</td>
-                    <td><strong>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
-                    <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Zrušit vše</button></td>
-                `;
+                tr.innerHTML = `<td><strong>${escapeHTML(c.name)}</strong></td><td>${displayEmail(c.email)}</td><td>${displayPhone(c.phone)}</td>
+                    <td>${Object.keys(c.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(c.tables[t])}`).join('<br>')}</td>
+                    <td><strong>${c.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
+                    <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Zrušit vše</button></td>`;
                 adminBookingList.appendChild(tr);
             });
         }
         
-        // 2. PROBĚHLÉ REZERVACE z minulých nedělí
-        if (pastBookings.length === 0) {
-            adminPastList.innerHTML = `<tr><td colspan="7" style="text-align:center;">Zatím žádné odehrané rezervace v historii.</td></tr>`;
-        } else {
-            Object.values(groupBookings(pastBookings, true)).forEach(customer => {
-                const tablesSummary = Object.keys(customer.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(customer.tables[t])}`).join('<br>');
+        if (pastBookings.length === 0) { adminPastList.innerHTML = `<tr><td colspan="7" style="text-align:center;">Zatím žádné odehrané rezervace.</td></tr>`; } 
+        else {
+            Object.values(groupBookings(pastBookings, true)).forEach(c => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${formatCzechDate(customer.date)}</strong></td>
-                    <td>${customer.name}</td>
-                    <td>${displayEmail(customer.email)}</td>
-                    <td>${displayPhone(customer.phone)}</td>
-                    <td>${tablesSummary}</td>
-                    <td><strong>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
-                    <td><button class="btn-delete" onclick='promptSingleDelete(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Vymazat z databáze</button></td>
-                `;
+                tr.innerHTML = `<td><strong>${formatCzechDate(c.date)}</strong></td><td>${escapeHTML(c.name)}</td><td>${displayEmail(c.email)}</td><td>${displayPhone(c.phone)}</td>
+                    <td>${Object.keys(c.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(c.tables[t])}`).join('<br>')}</td>
+                    <td><strong>${c.totalSlotsCount * PRICE_PER_SLOT} Kč</strong></td>
+                    <td><button class="btn-delete" onclick='promptSingleDelete(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Vymazat</button></td>`;
                 adminPastList.appendChild(tr);
             });
         }
 
-        // 3. ZRUŠENÉ REZERVACE (HISTORIE)
-        if (cancelledBookings.length === 0) {
-            adminCancelledList.innerHTML = `<tr><td colspan="6" style="text-align:center;">Žádné zrušené rezervace pro tento den.</td></tr>`;
-        } else {
-            Object.values(groupBookings(cancelledBookings)).forEach(customer => {
-                const tablesSummary = Object.keys(customer.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(customer.tables[t])}`).join('<br>');
+        if (cancelledBookings.length === 0) { adminCancelledList.innerHTML = `<tr><td colspan="6" style="text-align:center;">Žádné zrušené rezervace.</td></tr>`; } 
+        else {
+            Object.values(groupBookings(cancelledBookings)).forEach(c => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><span style="text-decoration: line-through;">${customer.name}</span></td>
-                    <td>${displayEmail(customer.email)}</td>
-                    <td>${displayPhone(customer.phone)}</td>
-                    <td>${tablesSummary}</td>
-                    <td>${customer.totalSlotsCount * PRICE_PER_SLOT} Kč</td>
-                    <td>
-                        <button class="btn-restore" onclick='restoreGroupInCloud(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Obnovit</button>
-                        <button class="btn-delete" style="margin-left: 6px;" onclick='promptSingleDelete(${JSON.stringify(customer.ids)}, "${customer.name.replace(/"/g, '&quot;')}")'>Vymazat z databáze</button>
-                    </td>
-                `;
+                tr.innerHTML = `<td><span style="text-decoration: line-through;">${escapeHTML(c.name)}</span></td><td>${displayEmail(c.email)}</td><td>${displayPhone(c.phone)}</td>
+                    <td>${Object.keys(c.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(c.tables[t])}`).join('<br>')}</td>
+                    <td>${c.totalSlotsCount * PRICE_PER_SLOT} Kč</td>
+                    <td><button class="btn-restore" onclick='restoreGroupInCloud(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Obnovit</button>
+                    <button class="btn-delete" style="margin-left: 6px;" onclick='promptSingleDelete(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Vymazat</button></td>`;
                 adminCancelledList.appendChild(tr);
             });
         }
@@ -1497,12 +848,8 @@
     function updateBookingSummary() {
         const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
         const totalHours = (selectedSelections.length * 0.5).toString().replace('.', ',');
-
         const groupedByTable = {};
-        selectedSelections.forEach(s => {
-            if (!groupedByTable[s.table]) groupedByTable[s.table] = [];
-            groupedByTable[s.table].push(s.slot);
-        });
+        selectedSelections.forEach(s => { if (!groupedByTable[s.table]) groupedByTable[s.table] = []; groupedByTable[s.table].push(s.slot); });
 
         const uniqueTablesCount = Object.keys(groupedByTable).length;
         const detailsText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `Stůl ${t}: (${formatTimeRanges(groupedByTable[t])})`).join(' | ');
@@ -1510,12 +857,10 @@
         summaryTitle.textContent = `Vybráno: ${selectedSelections.length}x slot na ${uniqueTablesCount} stole(ch)`;
         summaryDetails.textContent = `Datum: ${formatCzechDate(selectedDate)} | ${detailsText}`;
         summaryPrice.textContent = `Celková cena: ${totalPrice} Kč (${totalHours} hod celkem)`;
-
         mobileSummaryPrice.textContent = `${totalPrice} Kč`;
         mobileSummarySlots.textContent = `Vybráno: ${selectedSelections.length} slotů`;
 
-        bookingPanel.classList.add('active');
-        updateSlotsCount();
+        bookingPanel.classList.add('active'); updateSlotsCount();
     }
 
     function toggleSlotSelection(tableNum, slot) {
@@ -1526,19 +871,14 @@
     }
 
     function clearSelection() {
-        selectedSelections = [];
-        bookingPanel.classList.remove('active', 'expanded');
-        updateSlotsCount();
-        renderGrid();
+        selectedSelections = []; bookingPanel.classList.remove('active', 'expanded');
+        updateSlotsCount(); renderGrid();
     }
 
     adminLogoutBtn.addEventListener('click', async () => {
-        isAdminLoggedIn = false;
-        showAdminContacts = false;
-        toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
-        adminLoginBtn.textContent = '🔒 Admin přihlášení';
-        updateFormValidationForAdmin();
-        await loadAndRender();
+        await supabaseClient.auth.signOut();
+        isAdminLoggedIn = false; showAdminContacts = false; toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
+        adminLoginBtn.textContent = '🔒 Admin přihlášení'; updateFormValidationForAdmin(); await loadAndRender();
     });
 
     document.getElementById('btn-cancel').addEventListener('click', clearSelection);
@@ -1546,7 +886,6 @@
     document.getElementById('booking-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (selectedSelections.length === 0) { alert('Vyberte prosím alespoň jeden časový slot.'); return; }
-
         const submitBtn = document.getElementById('btn-confirm-submit');
         submitBtn.disabled = true; submitBtn.textContent = "KONTROLUJI...";
 
@@ -1561,12 +900,8 @@
 
         submitBtn.textContent = "Ukládám...";
         let name = inputName.value.trim(); let email = inputEmail.value.trim(); let phone = inputPhone.value.trim();
-
         if (isAdminLoggedIn && !name) name = `Test ${Date.now().toString().slice(-4)}`;
-
-        if (document.getElementById('save-data-checkbox').checked && !isAdminLoggedIn) {
-            localStorage.setItem('ttc_elizza_user_data', JSON.stringify({ name, email, phone }));
-        }
+        if (document.getElementById('save-data-checkbox').checked && !isAdminLoggedIn) localStorage.setItem('ttc_elizza_user_data', JSON.stringify({ name, email, phone }));
 
         const bookingsToSave = selectedSelections.map(s => ({ table: s.table, slot: s.slot, date: selectedDate, name, email, phone }));
         const success = await saveBookingsToCloud(bookingsToSave);
@@ -1576,21 +911,31 @@
             const groupedByTable = {};
             selectedSelections.forEach(s => { if (!groupedByTable[s.table]) groupedByTable[s.table] = []; groupedByTable[s.table].push(s.slot); });
             const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('\n');
-
             if (email) await sendConfirmationEmail({ name, email, phone, date: selectedDate, formattedDate: formatCzechDate(selectedDate), reservationText, totalPrice });
-
             alert(`Rezervace byla úspěšně vytvořena!\nDatum: ${formatCzechDate(selectedDate)}\nCena: ${totalPrice} Kč`);
             clearSelection(); loadAndRender();
         }
-
         submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci";
     });
 
-    initDatePicker();
-    updateFormValidationForAdmin();
-    loadSavedUserData();
-    checkGdprNoticeDate();
-    loadAndRender();
+    // --- FUNKCE SPUSŤUJÍCÍ SE PŘI NAČTENÍ STRÁNKY ---
+    async function initApp() {
+        initDatePicker();
+        updateFormValidationForAdmin();
+        loadSavedUserData();
+        checkGdprNoticeDate();
+
+        // Zkontroluje, zda není administrátor už přihlášen z minula
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            isAdminLoggedIn = true;
+            adminLoginBtn.textContent = '✅ Správce přihlášen';
+            updateFormValidationForAdmin();
+        }
+        loadAndRender();
+    }
+    
+    initApp();
 </script>
 </body>
 </html>
