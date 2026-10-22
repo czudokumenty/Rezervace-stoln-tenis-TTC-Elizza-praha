@@ -64,7 +64,7 @@
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
         .header-title p { color: var(--subtext); font-size: 0.95rem; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
 
         .theme-switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; user-select: none; }
         .theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
@@ -185,6 +185,7 @@
         </div>
         <div class="header-actions">
             <button class="admin-login-btn" id="admin-login-btn">🔒 Admin přihlášení</button>
+            <button class="btn-cancel" id="admin-logout-btn-header" style="display: none;">Odhlásit správce</button>
             <div class="theme-switch-wrapper">
                 <span>☀️</span>
                 <label class="theme-switch" for="checkbox-theme">
@@ -326,10 +327,11 @@
         <div class="modal-header"><h3>🛡️ Zásady ochrany osobních údajů (GDPR)</h3><button class="modal-close-btn" id="close-gdpr-btn">&times;</button></div>
         <div class="modal-body">
             <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong>, se sídlem v Praze, IČO: 45251304.</p>
+            <p><strong>Účel a právní základ zpracování:</strong><br>Osobní údaje zpracováváme za účelem vyřízení a správy rezervace stolů na stolní tenis (plnění smlouvy).</p>
             <p><strong>Jaké osobní údaje zpracováváme?</strong><br>Pro účely rezervace stolů zpracováváme: Jméno a příjmení, E-mail, Telefon.</p>
-            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou uchovávány nejdéle do <strong>1. července</strong>.</p>
-            <p><strong>Ukládání dat v prohlížeči (LocalStorage):</strong><br>Vaše kontaktní údaje se uloží výhradně v paměti vašeho vlastního zařízení, dokud neodešlete rezervaci.</p>
-            <p><strong>Vaše práva:</strong><br>Máte právo požadovat přístup, opravu nebo výmaz na e-mailu: rezervacestolnitenis@gmail.com.</p>
+            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července</strong> pro účely každoročního promazání proběhlých a stornovaných rezervací.</p>
+            <p><strong>Ukládání dat:</strong><br>Vaše kontaktní údaje se pro usnadnění příští rezervace mohou uložit do paměti vašeho zařízení (LocalStorage). Pro samotné odeslání rezervace a potvrzení e-mailem jsou data bezpečně zpracována v naší cloudové databázi a rezervačním systému.</p>
+            <p><strong>Vaše práva:</strong><br>Máte právo požadovat přístup k vašim údajům, jejich opravu nebo výmaz na e-mailu: rezervacestolnitenis@gmail.com.</p>
         </div>
         <div class="modal-footer"><button class="btn-cancel" id="close-gdpr-footer-btn">Zavřít</button></div>
     </div>
@@ -393,7 +395,7 @@
 
     let isAdminLoggedIn = false;
     let showAdminContacts = false;
-    let onsiteStatus = { 7: false, 8: false, 9: false }; // Nahrazuje zranitelný lokální stav
+    let onsiteStatus = { 7: false, 8: false, 9: false };
 
     const timeSlots = ["17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00", "19:00-19:30", "19:30-20:00", "20:00-20:30", "20:30-21:00"];
     const PRICE_PER_SLOT = 75;
@@ -412,6 +414,7 @@
     const adminSection = document.getElementById('admin-section');
     const adminLoginBtn = document.getElementById('admin-login-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
+    const adminLogoutBtnHeader = document.getElementById('admin-logout-btn-header');
     const toggleContactsBtn = document.getElementById('toggle-contacts-btn');
     const adminBookingList = document.getElementById('admin-booking-list');
     const adminCancelledList = document.getElementById('admin-cancelled-list');
@@ -479,10 +482,14 @@
         });
 
         if (error) {
-            alert('Nesprávné heslo nebo zablokováno (při mnoha pokusech systém dočasně omezí přihlašování).');
+            alert('Nesprávné heslo nebo zablokováno.');
             adminPwdInput.value = ''; adminPwdInput.focus();
         } else {
-            isAdminLoggedIn = true; adminLoginBtn.textContent = '✅ Správce přihlášen'; closeAdminLoginModal();
+            isAdminLoggedIn = true; 
+            adminLoginBtn.textContent = '✅ Správce přihlášen'; 
+            adminLoginBtn.style.backgroundColor = '#198754';
+            adminLogoutBtnHeader.style.display = 'block';
+            closeAdminLoginModal();
             updateFormValidationForAdmin(); await loadAndRender();
         }
         btnSubmitAdminLogin.disabled = false; btnSubmitAdminLogin.textContent = "Přihlásit";
@@ -607,7 +614,6 @@
         });
     }
 
-    // --- BEZPEČNÉ NAČÍTÁNÍ DAT ---
     async function fetchBookings() {
         if (!supabaseClient) return { active: [], cancelled: [], past: [] };
         const todayStr = new Date().toISOString().split('T')[0];
@@ -615,7 +621,6 @@
         let active = []; let cancelled = []; let pastData = [];
 
         if (isAdminLoggedIn) {
-            // Správce čte kompletní data včetně jmen a kontaktů (povoleno přes RLS)
             const { data: selectedData } = await supabaseClient.from('rezervace').select('*').eq('datum', selectedDate);
             const { data: pastRes } = await supabaseClient.from('rezervace').select('*').lt('datum', todayStr).order('datum', { ascending: false });
             
@@ -623,14 +628,12 @@
             cancelled = (selectedData || []).filter(b => b.zruseno === true);
             if (pastRes) pastData = pastRes.filter(b => !b.zruseno);
         } else {
-            // Návštěvníci čtou jen stoly a časy (díky naší bezpečné SQL funkci)
             const { data: publicData } = await supabaseClient.rpc('get_public_slots', { check_date: selectedDate });
             active = publicData || [];
         }
         return { active, cancelled, past: pastData };
     }
 
-    // --- CLOUDOVÁ SYNCHRONIZACE STOLŮ 7-9 ---
     async function fetchOnsiteStatus() {
         if (!supabaseClient) return;
         const { data } = await supabaseClient.from('stoly_volna_hra').select('*');
@@ -640,10 +643,9 @@
     async function toggleOnsiteStatus(tableNum) {
         if (!isAdminLoggedIn || !supabaseClient) return;
         const newState = !onsiteStatus[tableNum];
-        onsiteStatus[tableNum] = newState; // Rychlá změna pro UI
-        renderNonReservable(); // Překreslení
+        onsiteStatus[tableNum] = newState;
+        renderNonReservable();
 
-        // Odeslání změny do DB
         const { error } = await supabaseClient.from('stoly_volna_hra').update({ obsazeno: newState }).eq('stul', tableNum);
         if (error) { alert('Chyba uložení stavu.'); onsiteStatus[tableNum] = !newState; renderNonReservable(); }
     }
@@ -685,7 +687,7 @@
     }
 
     async function loadAndRender() {
-        await fetchOnsiteStatus(); // Stažení stavu volných stolů
+        await fetchOnsiteStatus();
         const fetched = await fetchBookings();
         currentBookings = fetched.active; cancelledBookings = fetched.cancelled; pastBookings = fetched.past;
         updateSlotsCount(); renderGrid(); renderNonReservable(); renderAdminPanel();
@@ -872,11 +874,20 @@
         updateSlotsCount(); renderGrid();
     }
 
-    adminLogoutBtn.addEventListener('click', async () => {
+    async function handleLogout() {
         await supabaseClient.auth.signOut();
-        isAdminLoggedIn = false; showAdminContacts = false; toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
-        adminLoginBtn.textContent = '🔒 Admin přihlášení'; updateFormValidationForAdmin(); await loadAndRender();
-    });
+        isAdminLoggedIn = false; 
+        showAdminContacts = false; 
+        toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
+        adminLoginBtn.textContent = '🔒 Admin přihlášení'; 
+        adminLoginBtn.style.backgroundColor = '';
+        adminLogoutBtnHeader.style.display = 'none';
+        updateFormValidationForAdmin(); 
+        await loadAndRender();
+    }
+
+    adminLogoutBtn.addEventListener('click', handleLogout);
+    adminLogoutBtnHeader.addEventListener('click', handleLogout);
 
     document.getElementById('btn-cancel').addEventListener('click', clearSelection);
 
@@ -886,7 +897,6 @@
         const submitBtn = document.getElementById('btn-confirm-submit');
         submitBtn.disabled = true; submitBtn.textContent = "KONTROLUJI...";
 
-        // Překontrolování databází těsně před uložením pro zabránění duplicitních rezervací
         const freshBookings = await fetchBookings();
         const conflicts = selectedSelections.filter(sel => freshBookings.active.some(b => b.stul === sel.table && b.cas === sel.slot));
 
@@ -926,6 +936,8 @@
         if (session) {
             isAdminLoggedIn = true;
             adminLoginBtn.textContent = '✅ Správce přihlášen';
+            adminLoginBtn.style.backgroundColor = '#198754';
+            adminLogoutBtnHeader.style.display = 'block';
             updateFormValidationForAdmin();
         }
         loadAndRender();
