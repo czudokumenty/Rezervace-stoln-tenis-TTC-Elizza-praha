@@ -154,7 +154,7 @@
         .modal-header h3 { margin: 0; font-size: 1.3rem; }
         .modal-close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: 0 5px; }
         .modal-body { font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: 12px; }
-        .modal-body ul { padding-left: 20px; }
+        .modal-body ul { padding-left: 20px; margin: 0; }
         .modal-footer { border-top: 1px solid var(--border); padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px; }
 
         /* Administrace styly */
@@ -326,12 +326,20 @@
     <div class="modal-card">
         <div class="modal-header"><h3>🛡️ Zásady ochrany osobních údajů (GDPR)</h3><button class="modal-close-btn" id="close-gdpr-btn">&times;</button></div>
         <div class="modal-body">
-            <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong>, se sídlem v Praze, IČO: 45251304.</p>
+            <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong>, sídlem Brandlova 1386/21, 149 00 Praha 11-Chodov, IČO: <strong>45251804</strong>.</p>
             <p><strong>Účel a právní základ zpracování:</strong><br>Osobní údaje zpracováváme za účelem vyřízení a správy rezervace stolů na stolní tenis (plnění smlouvy).</p>
             <p><strong>Jaké osobní údaje zpracováváme?</strong><br>Pro účely rezervace stolů zpracováváme: Jméno a příjmení, E-mail, Telefon.</p>
-            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července</strong> pro účely každoročního promazání proběhlých a stornovaných rezervací.</p>
-            <p><strong>Ukládání dat:</strong><br>Vaše kontaktní údaje se pro usnadnění příští rezervace mohou uložit do paměti vašeho zařízení (LocalStorage). Pro samotné odeslání rezervace a potvrzení e-mailem jsou data bezpečně zpracována v naší cloudové databázi a rezervačním systému.</p>
-            <p><strong>Vaše práva:</strong><br>Máte právo požadovat přístup k vašim údajům, jejich opravu nebo výmaz na e-mailu: rezervacestolnitenis@gmail.com.</p>
+            <p><strong>Příjemci osobních údajů (Cloud):</strong><br>Příjemcem osobních údajů je poskytovatel cloudových a hostingových služeb <strong>Supabase</strong>, který zajišťuje bezpečné uložení dat v naší cloudové databázi. Servery se nacházejí v Evropské unii (region: eu-west-1).</p>
+            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července následujícího roku</strong> pro účely každoročního promazání proběhlých a stornovaných rezervací.</p>
+            <p><strong>Ukládání dat (LocalStorage):</strong><br>Vaše kontaktní údaje se pro usnadnění příští rezervace mohou uložit do lokální paměti vašeho prohlížeče (LocalStorage). Toto technické ukládání probíhá na základě oprávněného zájmu pro zajištění rychlého fungování a pohodlí při opakované rezervaci. Ukládání dat ve svém prohlížeči můžete kdykoliv smazat v nastavení historie/dat webů.</p>
+            <p><strong>Vaše práva a lhůty:</strong><br>Máte právo požadovat přístup k vašim údajům, jejich opravu nebo výmaz. Dále máte k dispozici tato specifická práva:</p>
+            <ul>
+                <li><strong>Právo na omezení zpracování:</strong> Pokud máte pocit, že jsou data nepřesná, můžete žádat, abychom je dočasně nepoužívali, dokud chybu neprověříme.</li>
+                <li><strong>Právo vznést námitku proti zpracování:</strong> Můžete vznést námitku proti zpracování vašich osobních údajů, pokud je zpracováváme na základě oprávněného zájmu.</li>
+                <li><strong>Právo na přenositelnost údajů:</strong> Máte právo získat své údaje ve strojově čitelném formátu (např. CSV) a předat je jinému správci.</li>
+            </ul>
+            <p>Na vaše žádosti odpovíme ze zákona bez zbytečného odkladu, <strong>nejpozději do 1 měsíce</strong>. S požadavky se můžete obracet na e-mail: <a href="mailto:rezervacestolnitenis@gmail.com" style="color: var(--primary);">rezervacestolnitenis@gmail.com</a>.</p>
+            <p><strong>Právo podat stížnost:</strong><br>Máte právo podat stížnost u dozorového úřadu, kterým je v ČR <strong>Úřad pro ochranu osobních údajů</strong> (Pplk. Sochora 27, 170 00 Praha 7).</p>
         </div>
         <div class="modal-footer"><button class="btn-cancel" id="close-gdpr-footer-btn">Zavřít</button></div>
     </div>
