@@ -106,6 +106,7 @@
         .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
         .table-header-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; width: 100%; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .table-header-btn:hover, .table-header-btn.all-selected { background-color: var(--primary); color: white; }
+        .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.6; }
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
         .slot-btn { padding: 8px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; }
@@ -624,6 +625,10 @@
         selectedDate = defaultSunday;
         
         dateInput.addEventListener('change', (e) => {
+            if (!e.target.value) {
+                dateInput.value = selectedDate;
+                return;
+            }
             const picked = new Date(e.target.value);
             if (picked.getDay() !== 0) {
                 alert('Rezervace jsou možné pouze na neděli!');
@@ -766,12 +771,21 @@
         for (let t = 1; t <= 6; t++) {
             const card = document.createElement('div'); card.className = 'table-card';
             const availableSlotsForTable = timeSlots.filter(slot => !currentBookings.some(b => b.stul === t && b.cas === slot));
-            const isAllSelected = availableSlotsForTable.length > 0 && availableSlotsForTable.every(slot => selectedSelections.some(s => s.table === t && s.slot === slot));
+            
+            const isFullyBooked = availableSlotsForTable.length === 0;
+            const isAllSelected = !isFullyBooked && availableSlotsForTable.every(slot => selectedSelections.some(s => s.table === t && s.slot === slot));
 
             const headerBtn = document.createElement('button'); headerBtn.type = 'button';
             headerBtn.className = `table-header-btn ${isAllSelected ? 'all-selected' : ''}`;
-            headerBtn.innerHTML = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
-            headerBtn.onclick = () => toggleWholeTableSelection(t);
+            
+            if (isFullyBooked) {
+                headerBtn.innerHTML = `Stůl ${t} (Obsazeno)`;
+                headerBtn.disabled = true;
+            } else {
+                headerBtn.innerHTML = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
+                headerBtn.disabled = false;
+                headerBtn.onclick = () => toggleWholeTableSelection(t);
+            }
             card.appendChild(headerBtn);
 
             const slotList = document.createElement('div'); slotList.className = 'slot-list';
