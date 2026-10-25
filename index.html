@@ -16,7 +16,7 @@
             --card-bg: #ffffff;
             --text: #212529;
             --border: #dee2e6;
-            --available: #198754; /* Sytě zelená pro volné časy ve světlém režimu */
+            --available: #198754; 
             --available-text: #ffffff;
             --selected: #0d6efd;
             --selected-text: #ffffff;
@@ -37,7 +37,7 @@
             --card-bg: #1e1e1e;
             --text: #e0e0e0;
             --border: #333333;
-            --available: rgba(25, 135, 84, 0.25); /* Průhlednější zelená v tmavém režimu */
+            --available: rgba(25, 135, 84, 0.25);
             --available-text: #8fdfa4;
             --selected: #0d6efd;
             --selected-text: #ffffff;
@@ -126,7 +126,7 @@
         .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .slot-btn.admin-occupied span.time-txt { font-size: 0.85rem; font-weight: 600; }
 
-        /* VÝRAZNÉ A KONTRASTNÍ BARVY PRO UŽIVATELE (Světlý režim) */
+        /* UNIKÁTNÍ BARVY PRO REZERVACE */
         .uc-0 { background-color: #0d6efd; color: #ffffff; } /* Modrá */
         .uc-1 { background-color: #6f42c1; color: #ffffff; } /* Fialová */
         .uc-2 { background-color: #fd7e14; color: #ffffff; } /* Oranžová */
@@ -136,7 +136,6 @@
         .uc-6 { background-color: #dc3545; color: #ffffff; } /* Červená */
         .uc-7 { background-color: #6610f2; color: #ffffff; } /* Tmavě fialová */
         
-        /* Tmavý režim - pastelovější/čitelnější na tmavém pozadí */
         [data-theme="dark"] .uc-0 { background-color: #003366; color: #99ccff; border-color: #004080; }
         [data-theme="dark"] .uc-1 { background-color: #2b1747; color: #c4b5fd; border-color: #381f5c; }
         [data-theme="dark"] .uc-2 { background-color: #5c2800; color: #ffb380; border-color: #803700; }
@@ -146,7 +145,6 @@
         [data-theme="dark"] .uc-6 { background-color: #4a121a; color: #ff99a8; border-color: #631722; }
         [data-theme="dark"] .uc-7 { background-color: #311b92; color: #b39ddb; border-color: #4527a0; }
 
-        /* LIVE ZVÝRAZNĚNÍ BĚŽÍCÍHO SLOTU */
         @keyframes pulse-live {
             0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
             70% { box-shadow: 0 0 0 7px rgba(220, 53, 69, 0); }
@@ -160,7 +158,6 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
         }
 
-        /* Optimalizace pro mobily */
         @media (max-width: 768px) {
             .slot-list.fully-booked-mobile { display: none; }
             .table-card.fully-booked-card { justify-content: center; min-height: 50px; padding: 8px; }
@@ -170,7 +167,6 @@
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .non-reservable-card { background: var(--non-res); color: var(--non-res-text); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid var(--border); }
 
-        /* REZERVAČNÍ LIŠTA */
         .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); }
         .booking-panel.active { display: block; }
         .mobile-summary-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
@@ -200,7 +196,6 @@
             .summary-info-grid { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 25px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         }
 
-        /* MODALY */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
         .modal-card { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; gap: 15px; }
@@ -211,7 +206,6 @@
         .modal-body ul { padding-left: 20px; margin: 0; }
         .modal-footer { border-top: 1px solid var(--border); padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* Administrace styly */
         .admin-section { display: none; background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 30px; border: 2px solid var(--border); }
         .admin-section.active { display: block; }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
@@ -406,20 +400,9 @@
     <div class="modal-card">
         <div class="modal-header"><h3>🛡️ Zásady ochrany osobních údajů (GDPR)</h3><button class="modal-close-btn" id="close-gdpr-btn">&times;</button></div>
         <div class="modal-body">
-            <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong>, sídlem Brandlova 1386/21, 149 00 Praha 11-Chodov, IČO: <strong>45251804</strong>.</p>
+            <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong></p>
             <p><strong>Účel a právní základ zpracování:</strong><br>Osobní údaje zpracováváme za účelem vyřízení a správy rezervace stolů na stolní tenis (plnění smlouvy).</p>
             <p><strong>Jaké osobní údaje zpracováváme?</strong><br>Pro účely rezervace stolů zpracováváme: Jméno a příjmení, E-mail, Telefon.</p>
-            <p><strong>Příjemci osobních údajů (Cloud):</strong><br>Příjemcem osobních údajů je poskytovatel cloudových a hostingových služeb <strong>Supabase</strong>, který zajišťuje bezpečné uložení dat v naší cloudové databázi. Servery se nacházejí v Evropské unii (region: eu-west-1).</p>
-            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července následujícího roku</strong> pro účely každoročního promazání proběhlých a stornovaných rezervací.</p>
-            <p><strong>Ukládání dat (LocalStorage):</strong><br>Vaše kontaktní údaje se pro usnadnění příští rezervace mohou uložit do lokální paměti vašeho prohlížeče (LocalStorage). Toto technické ukládání probíhá na základě oprávněného zájmu pro zajištění rychlého fungování a pohodlí při opakované rezervaci. Ukládání dat ve svém prohlížeči můžete kdykoliv smazat v nastavení historie/dat webů.</p>
-            <p><strong>Vaše práva a lhůty:</strong><br>Máte právo požadovat přístup k vašim údajům, jejich opravu nebo výmaz. Dále máte k dispozici tato specifická práva:</p>
-            <ul>
-                <li><strong>Právo na omezení zpracování:</strong> Pokud máte pocit, že jsou data nepřesná, můžete žádat, abychom je dočasně nepoužívali, dokud chybu neprověříme.</li>
-                <li><strong>Právo vznést námitku proti zpracování:</strong> Můžete vznést námitku proti zpracování vašich osobních údajů, pokud je zpracováváme na základě oprávněného zájmu.</li>
-                <li><strong>Právo na přenositelnost údajů:</strong> Máte právo získat své údaje ve strojově čitelném formátu (např. CSV) a předat je jinému správci.</li>
-            </ul>
-            <p>Na vaše žádosti odpovíme ze zákona bez zbytečného odkladu, <strong>nejpozději do 1 měsíce</strong>. S požadavky se můžete obracet na e-mail: <a href="mailto:rezervacestolnitenis@gmail.com" style="color: var(--primary);">rezervacestolnitenis@gmail.com</a>.</p>
-            <p><strong>Právo podat stížnost:</strong><br>Máte právo podat stížnost u dozorového úřadu, kterým je v ČR <strong>Úřad pro ochranu osobních údajů</strong> (Pplk. Sochora 27, 170 00 Praha 7).</p>
         </div>
         <div class="modal-footer"><button class="btn-cancel" id="close-gdpr-footer-btn">Zavřít</button></div>
     </div>
@@ -430,7 +413,6 @@
         <div class="modal-header"><h3 style="color: var(--danger);">⚠️ Potvrzení vymazání dat sezóny</h3><button class="modal-close-btn" id="close-delete-modal-btn">&times;</button></div>
         <div class="modal-body">
             <p>Určitě chcete odstranit proběhlé a stornované rezervace z databáze?</p>
-            <p style="font-size: 0.85rem; color: var(--subtext);">Tato akce trvale vymaže všechny minulé a zrušené rezervace. <strong>Aktivní nadcházející rezervace zůstanou netknuté.</strong> Tuto akci nelze vzít zpět!</p>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" id="btn-cancel-gdpr-delete">Ne, zrušit</button>
@@ -444,7 +426,6 @@
         <div class="modal-header"><h3 style="color: var(--danger);">🗑️ Vymazání z databáze</h3><button class="modal-close-btn" id="close-single-delete-modal-btn">&times;</button></div>
         <div class="modal-body">
             <p id="single-delete-prompt-text">Opravdu chcete vymazat rezervaci z databáze?</p>
-            <p style="font-size: 0.85rem; color: var(--subtext);">Tato akce nenávratně odstraní záznam z databáze Supabase.</p>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" id="btn-cancel-single-delete">Ne</button>
@@ -505,7 +486,6 @@
     const PRICE_PER_SLOT = 75;
     const TOTAL_SLOTS = 6 * timeSlots.length;
 
-    // --- PŘIŘAZOVÁNÍ BAREV POUZE PODLE ID (BEZ NUTNOSTI ZNALOSTI EMAILU) ---
     let userColorMap = {};
     let nextColorIndex = 0;
 
@@ -513,10 +493,10 @@
         userColorMap = {};
         nextColorIndex = 0;
         bookings.forEach(b => {
-            // Použijeme booking_id nebo id (zajišťuje, že každý člověk/rezervace má své ID)
-            const idKey = b.booking_id || b.id || b.email || 'Neznámý';
+            // Použije se vygenerované group_id z nové databázové funkce, bez prozrazení osobních údajů.
+            const idKey = b.group_id || b.email || b.jmeno || b.id || 'Neznámý';
             if (userColorMap[idKey] === undefined) {
-                userColorMap[idKey] = nextColorIndex % 8; // Přidělí index barvy 0-7
+                userColorMap[idKey] = nextColorIndex % 8;
                 nextColorIndex++;
             }
         });
@@ -550,7 +530,6 @@
     const blockedDayBanner = document.getElementById('blocked-day-banner');
     const blockedDayReasonText = document.getElementById('blocked-day-reason-text');
     const infoNoticeBanner = document.getElementById('info-notice-banner');
-
     const bookingPanel = document.getElementById('booking-panel');
     const summaryTitle = document.getElementById('summary-title');
     const summaryDetails = document.getElementById('summary-details');
@@ -777,8 +756,11 @@
             cancelled = (selectedData || []).filter(b => b.zruseno === true);
             if (pastRes) pastData = pastRes.filter(b => !b.zruseno);
         } else {
-            // Veřejné načtení přes RPC, které teď vrací i booking_id (zabezpečené, bez e-mailů!)
-            const { data: publicData } = await supabaseClient.rpc('get_public_slots', { check_date: selectedDate });
+            const { data: publicData, error } = await supabaseClient.rpc('get_public_slots', { check_date: selectedDate });
+            if (error) {
+                console.error("Chyba při načítání dat z databáze:", error);
+                alert("POZOR: Rezervace se nepodařilo načíst! Zkontroluj si v Supabase, zda jsi správně vytvořil funkci 'get_public_slots'.");
+            }
             active = publicData || [];
         }
         return { active, cancelled, past: pastData };
@@ -799,8 +781,6 @@
 
     async function saveBookingsToCloud(bookingsArray) {
         if (!supabaseClient) return false;
-        // Vygenerujeme jedno jedinečné booking_id pro celou tuto odeslanou rezervaci (všechny vybrané stoly/časy)
-        const bookingId = 'bid_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
         
         const rows = bookingsArray.map(b => ({ 
             stul: b.table, 
@@ -809,8 +789,7 @@
             jmeno: b.name, 
             email: b.email, 
             telefon: b.phone, 
-            zruseno: false,
-            booking_id: bookingId 
+            zruseno: false
         }));
         
         const { error } = await supabaseClient.from('rezervace').insert(rows);
@@ -853,7 +832,6 @@
         cancelledBookings = fetched.cancelled.filter(b => b.stul > 0); 
         pastBookings = fetched.past.filter(b => b.stul > 0);
 
-        // Přiřazení barev výhradně přes ID rezervace
         assignColorsToUsers(currentBookings);
         
         if (isDayBlocked) {
@@ -966,8 +944,7 @@
                 const btn = document.createElement('button');
                 
                 if (isOccupied) {
-                    // Klíč pro barvu bereme čistě z booking_id nebo id (žádné citlivé údaje pro veřejnost)
-                    const idKey = bookingInfo.booking_id || bookingInfo.id || 'Neznámý';
+                    const idKey = bookingInfo.group_id || bookingInfo.email || bookingInfo.jmeno || bookingInfo.id || 'Neznámý';
                     const colorIndex = userColorMap[idKey] !== undefined ? userColorMap[idKey] : 0;
                     const colorClass = `uc-${colorIndex}`;
                     
@@ -1007,8 +984,7 @@
     function groupBookings(bookingsList, includeDate = false) {
         const grouped = {};
         bookingsList.forEach(b => {
-            // Seskupení pro admina podle booking_id, případně fallback na email/jméno
-            const key = b.booking_id || (includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`);
+            const key = b.group_id || (includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`);
             if (!grouped[key]) grouped[key] = { date: b.datum, name: b.jmeno||'', email: b.email||'', phone: b.telefon||'', tables: {}, ids: [], totalSlotsCount: 0 };
             if (!grouped[key].tables[b.stul]) grouped[key].tables[b.stul] = [];
             grouped[key].tables[b.stul].push(b.cas);
