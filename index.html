@@ -476,10 +476,13 @@
                 <button type="submit" class="btn-confirm" id="btn-confirm-submit">Dokončit rezervaci</button>
                 <button type="button" class="btn-cancel" id="btn-cancel">Zrušit výběr</button>
             </div>
-            <label class="checkbox-container">
-                <input type="checkbox" id="save-data-checkbox" checked>
-                Uložit mé údaje v tomto prohlížeči pro příští rezervaci
-            </label>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 2px;">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="save-data-checkbox" checked>
+                    Uložit mé údaje v tomto prohlížeči pro příští rezervaci
+                </label>
+                <button type="button" class="btn-cancel" onclick="clearStoredUserData()" style="font-size: 0.75rem; padding: 3px 8px; background-color: #495057;" title="Vymazat uložené údaje z prohlížeče">🗑️ Zapomenout moje údaje</button>
+            </div>
             <p class="gdpr-notice-text">
                 Odesláním rezervace berete na vědomí zpracování osobních údajů pro účely vyřízení rezervace. 
                 <button type="button" class="gdpr-link" id="open-gdpr-btn">Zásady ochrany osobních údajů (GDPR)</button>
@@ -735,6 +738,16 @@
     const inputName = document.getElementById('cust-name');
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
+
+    // Funkce pro smazání uložených údajů z LocalStorage
+    function clearStoredUserData() {
+        localStorage.removeItem('ttc_elizza_user_data');
+        localStorage.removeItem('ttc_elizza_lookup_email');
+        inputName.value = '';
+        inputEmail.value = '';
+        inputPhone.value = '';
+        alert('Vaše uložené údaje byly z tohoto prohlížeče vymazány.');
+    }
 
     document.getElementById('btn-copy-emails').addEventListener('click', () => {
         if (currentBookings.length === 0) {
@@ -1132,12 +1145,11 @@
             console.error("Chyba při načítání dat:", error.message);
         }
 
-        // ZABEZPEČENÍ: Pokud NENÍ přihlášený admin, úmyslně vymažeme jména, aby nedošlo k úniku informací!
         const processedData = (selectedData || []).map(item => {
             if (!isAdminLoggedIn) {
-                return { ...item, jmeno: 'Obsazeno' }; // Veřejnost vidí jen "Obsazeno"
+                return { ...item, jmeno: 'Obsazeno' }; 
             }
-            return item; // Admin vidí normálně jména
+            return item; 
         });
 
         active = processedData.filter(b => !b.zruseno);
