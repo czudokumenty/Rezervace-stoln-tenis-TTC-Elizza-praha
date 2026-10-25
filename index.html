@@ -143,7 +143,6 @@
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
         
-        /* UNIFORMNÍ VÝŠKA PRO VŠECHNY SLOTY NA PC, ABY BYLY V JEDNÉ ROVINĚ */
         .slot-btn { 
             padding: 6px 8px; 
             border: 1px solid transparent; 
@@ -168,15 +167,14 @@
         .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .slot-btn.admin-occupied span.time-txt { font-size: 0.8rem; font-weight: 600; }
 
-        /* UNIKÁTNÍ BARVY PRO REZERVACE */
-        .uc-0 { background-color: #0d6efd; color: #ffffff; } /* Modrá */
-        .uc-1 { background-color: #6f42c1; color: #ffffff; } /* Fialová */
-        .uc-2 { background-color: #fd7e14; color: #ffffff; } /* Oranžová */
-        .uc-3 { background-color: #e83e8c; color: #ffffff; } /* Růžová */
-        .uc-4 { background-color: #0dcaf0; color: #000000; } /* Tyrkysová */
-        .uc-5 { background-color: #ffc107; color: #000000; } /* Žlutá */
-        .uc-6 { background-color: #dc3545; color: #ffffff; } /* Červená */
-        .uc-7 { background-color: #6610f2; color: #ffffff; } /* Tmavě fialová */
+        .uc-0 { background-color: #0d6efd; color: #ffffff; }
+        .uc-1 { background-color: #6f42c1; color: #ffffff; }
+        .uc-2 { background-color: #fd7e14; color: #ffffff; }
+        .uc-3 { background-color: #e83e8c; color: #ffffff; }
+        .uc-4 { background-color: #0dcaf0; color: #000000; }
+        .uc-5 { background-color: #ffc107; color: #000000; }
+        .uc-6 { background-color: #dc3545; color: #ffffff; }
+        .uc-7 { background-color: #6610f2; color: #ffffff; }
         
         [data-theme="dark"] .uc-0 { background-color: #003366; color: #99ccff; border-color: #004080; }
         [data-theme="dark"] .uc-1 { background-color: #2b1747; color: #c4b5fd; border-color: #381f5c; }
@@ -593,7 +591,7 @@
         userColorMap = {};
         nextColorIndex = 0;
         bookings.forEach(b => {
-            const idKey = b.group_id || b.email || b.jmeno || b.id || 'Neznámý';
+            const idKey = b.email || b.jmeno || b.id || 'Neznámý';
             if (userColorMap[idKey] === undefined) {
                 userColorMap[idKey] = nextColorIndex % 8;
                 nextColorIndex++;
@@ -606,7 +604,7 @@
         if (dateStr !== todayStr) return false;
         
         const now = new Date();
-        const currentMins = now.getHours() * 60 + now.getMinutes();
+        const currentMins = now.getHours() * 65 + now.getMinutes();
         
         const [start, end] = slotStr.split('-');
         const [sH, sM] = start.split(':').map(Number);
@@ -797,27 +795,28 @@
         btnUnblockDay.disabled = false;
     });
 
-    // --- SPRÁVA A STORNO PRO UŽIVATELE POMOCÍ TOKENU ---
+    // --- SPRÁVA A STORNO POMOCÍ E-MAILU (BEZ NUTNOSTI NOVÝCH SLOUPCŮ) ---
     async function handleTokenFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        if (!token) return;
+        const emailToken = urlParams.get('email');
+        const dateToken = urlParams.get('date');
+        if (!emailToken || !dateToken) return;
 
-        const { data, error } = await supabaseClient.from('rezervace').select('*').eq('group_id', token).eq('zruseno', false);
+        const { data, error } = await supabaseClient.from('rezervace').select('*').eq('email', emailToken).eq('datum', dateToken).eq('zruseno', false);
         if (error || !data || data.length === 0) {
-            alert('Platnost odkazu vypršela nebo rezervace již neexistuje.');
+            alert('Nenalezeny žádné aktivní rezervace pro tento e-mail a datum.');
             return;
         }
 
         const customerName = data[0].jmeno || 'Zákazník';
-        userTokenModalTitle.textContent = `Správa rezervace: ${escapeHTML(customerName)}`;
+        userTokenModalTitle.textContent = `Správa rezervace: ${escapeHTML(customerName)} (${formatCzechDate(dateToken)})`;
         userTokenCheckboxes.innerHTML = '';
 
         data.forEach(item => {
             const label = document.createElement('label');
             label.className = 'checkbox-container';
             label.style.fontSize = '0.95rem';
-            label.innerHTML = `<input type="checkbox" value="${item.id}"> Stůl ${item.stul} (${item.cas}, dne ${formatCzechDate(item.datum)})`;
+            label.innerHTML = `<input type="checkbox" value="${item.id}"> Stůl ${item.stul} (${item.cas})`;
             userTokenCheckboxes.appendChild(label);
         });
 
@@ -825,11 +824,14 @@
     }
 
     openUserTokenModalBtn.addEventListener('click', async () => {
-        const tokenInput = prompt('Zadejte svůj rezervační kód (token / group_id z e-mailu):');
-        if (!tokenInput) return;
-        const { data, error } = await supabaseClient.from('rezervace').select('*').eq('group_id', tokenInput.trim()).eq('zruseno', false);
+        const emailInput = prompt('Zadejte svůj e-mail, pod kterým byla rezervace vytvořena:');
+        if (!emailInput) return;
+        const dateInputVal = prompt('Zadejte datum rezervace ve tvaru RRRR-MM-DD (např. 2026-11-01):', selectedDate);
+        if (!dateInputVal) return;
+
+        const { data, error } = await supabaseClient.from('rezervace').select('*').eq('email', emailInput.trim()).eq('datum', dateInputVal.trim()).eq('zruseno', false);
         if (error || !data || data.length === 0) {
-            alert('Rezervace s tímto kódem nebyla nalezena.');
+            alert('Rezervace pro tento e-mail a datum nebyla nalezena.');
             return;
         }
         const customerName = data[0].jmeno || 'Zákazník';
@@ -839,7 +841,7 @@
             const label = document.createElement('label');
             label.className = 'checkbox-container';
             label.style.fontSize = '0.95rem';
-            label.innerHTML = `<input type="checkbox" value="${item.id}"> Stůl ${item.stul} (${item.cas}, dne ${formatCzechDate(item.datum)})`;
+            label.innerHTML = `<input type="checkbox" value="${item.id}"> Stůl ${item.stul} (${item.cas})`;
             userTokenCheckboxes.appendChild(label);
         });
         userTokenModal.classList.add('active');
@@ -861,13 +863,11 @@
         else {
             alert('Vybrané sloty byly úspěšně zrušeny.');
             userTokenModal.classList.remove('active');
-            // Vyčistit URL parametr tokenu
             window.history.replaceState({}, document.title, window.location.pathname);
             loadAndRender();
         }
         btnConfirmUserTokenCancel.disabled = false; btnConfirmUserTokenCancel.textContent = "Zrušit vybrané sloty";
     };
-    // ----------------------------------------------------
 
     function openSelectiveCancelModal(itemsArray, customerName) {
         selCancelModalTitle.textContent = `Zrušení slotů: ${escapeHTML(customerName)}`;
@@ -1063,7 +1063,7 @@
         if (error) { alert('Chyba uložení stavu.'); onsiteStatus[tableNum] = !newState; renderNonReservable(); }
     }
 
-    async function saveBookingsToCloud(bookingsArray, groupId) {
+    async function saveBookingsToCloud(bookingsArray) {
         if (!supabaseClient) return false;
         
         const rows = bookingsArray.map(b => ({ 
@@ -1073,7 +1073,6 @@
             jmeno: b.name, 
             email: b.email, 
             telefon: b.phone, 
-            group_id: groupId,
             zruseno: false
         }));
         
@@ -1222,7 +1221,7 @@
                 const btn = document.createElement('button');
                 
                 if (isOccupied) {
-                    const idKey = bookingInfo.group_id || bookingInfo.email || bookingInfo.jmeno || bookingInfo.id || 'Neznámý';
+                    const idKey = bookingInfo.email || bookingInfo.jmeno || bookingInfo.id || 'Neznámý';
                     const colorIndex = userColorMap[idKey] !== undefined ? userColorMap[idKey] : 0;
                     const colorClass = `uc-${colorIndex}`;
                     
@@ -1263,7 +1262,7 @@
     function groupBookings(bookingsList, includeDate = false) {
         const grouped = {};
         bookingsList.forEach(b => {
-            const key = b.group_id || (includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`);
+            const key = includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`;
             if (!grouped[key]) {
                 grouped[key] = { date: b.datum, name: b.jmeno||'', email: b.email||'', phone: b.telefon||'', tables: {}, items: [], totalSlotsCount: 0 };
             }
@@ -1406,22 +1405,21 @@
         if (isAdminLoggedIn && !name) name = `Test ${Date.now().toString().slice(-4)}`;
         if (document.getElementById('save-data-checkbox').checked && !isAdminLoggedIn) localStorage.setItem('ttc_elizza_user_data', JSON.stringify({ name, email, phone }));
 
-        // Generování unikátního tajného tokenu (group_id) pro tuto rezervaci
-        const groupId = 'res_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
         const bookingsToSave = selectedSelections.map(s => ({ table: s.table, slot: s.slot, date: selectedDate, name, email, phone }));
-        const success = await saveBookingsToCloud(bookingsToSave, groupId);
+        const success = await saveBookingsToCloud(bookingsToSave);
 
         if (success) {
             const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
             const groupedByTable = {};
             selectedSelections.forEach(s => { if (!groupedByTable[s.table]) groupedByTable[s.table] = []; groupedByTable[s.table].push(s.slot); });
             const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('\n');
-            const manageUrl = `https://czudokumenty.github.io/Rezervace-stoln-tenis-TTC-Elizza-praha/?token=${groupId}`;
+            
+            // Odkaz pro správu využívá e-mail a datum (žádné nové sloupce v DB)
+            const manageUrl = `https://czudokumenty.github.io/Rezervace-stoln-tenis-TTC-Elizza-praha/?email=${encodeURIComponent(email)}&date=${selectedDate}`;
 
             if (email) await sendConfirmationEmail({ name, email, phone, date: selectedDate, formattedDate: formatCzechDate(selectedDate), reservationText, totalPrice, manageUrl });
             alert(`Rezervace byla úspěšně vytvořena!\nDatum: ${formatCzechDate(selectedDate)}\nCena: ${totalPrice} Kč`);
-            clearSection(); loadAndRender();
+            clearSelection(); loadAndRender();
         }
         submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci";
     });
@@ -1437,7 +1435,6 @@
             adminLogoutBtnHeader.style.display = 'block'; updateFormValidationForAdmin(); resetInactivityTimer();
         }
         await loadAndRender();
-        // Zkontrolovat URL na přítomnost tokenu pro správu rezervace
         await handleTokenFromUrl();
     }
     
