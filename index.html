@@ -272,13 +272,11 @@
         <span><strong>Informace ke stornu:</strong> Pro zrušení rezervace odpovězte na e-mail, nebo napište na: <a href="mailto:rezervacestolnitenis@gmail.com" style="color: var(--primary);">rezervacestolnitenis@gmail.com</a>.</span>
     </div>
 
-    <!-- BANNER PRO ZABLOKOVANÝ DEN -->
     <div class="blocked-day-banner" id="blocked-day-banner">
         <h2>🚫 Dnes není možné rezervovat</h2>
         <p id="blocked-day-reason-text">Herna je pro veřejnost uzavřena.</p>
     </div>
 
-    <!-- WRAPPER PRO MŘÍŽKY STOLŮ -->
     <div id="grids-wrapper">
         <div class="grid-section">
             <h2 class="section-title">Rezervovatelné stoly (Stůl 1 – Stůl 6)</h2>
@@ -507,7 +505,7 @@
     const PRICE_PER_SLOT = 75;
     const TOTAL_SLOTS = 6 * timeSlots.length;
 
-    // --- CHYTRÉ PŘIŘAZOVÁNÍ BAREV PRO UŽIVATELE ---
+    // --- PŘIŘAZOVÁNÍ BAREV POUZE PODLE ID (BEZ NUTNOSTI ZNALOSTI EMAILU) ---
     let userColorMap = {};
     let nextColorIndex = 0;
 
@@ -515,9 +513,10 @@
         userColorMap = {};
         nextColorIndex = 0;
         bookings.forEach(b => {
-            const userKey = b.email || b.jmeno || 'Neznámý';
-            if (userColorMap[userKey] === undefined) {
-                userColorMap[userKey] = nextColorIndex % 8; // Přidělí index od 0 do 7
+            // Použijeme booking_id nebo id (zajišťuje, že každý člověk/rezervace má své ID)
+            const idKey = b.booking_id || b.id || b.email || 'Neznámý';
+            if (userColorMap[idKey] === undefined) {
+                userColorMap[idKey] = nextColorIndex % 8; // Přidělí index barvy 0-7
                 nextColorIndex++;
             }
         });
@@ -778,6 +777,7 @@
             cancelled = (selectedData || []).filter(b => b.zruseno === true);
             if (pastRes) pastData = pastRes.filter(b => !b.zruseno);
         } else {
+            // Veřejné načtení přes RPC, které teď vrací i booking_id (zabezpečené, bez e-mailů!)
             const { data: publicData } = await supabaseClient.rpc('get_public_slots', { check_date: selectedDate });
             active = publicData || [];
         }
@@ -799,7 +799,20 @@
 
     async function saveBookingsToCloud(bookingsArray) {
         if (!supabaseClient) return false;
-        const rows = bookingsArray.map(b => ({ stul: b.table, cas: b.slot, datum: b.date, jmeno: b.name, email: b.email, telefon: b.phone, zruseno: false }));
+        // Vygenerujeme jedno jedinečné booking_id pro celou tuto odeslanou rezervaci (všechny vybrané stoly/časy)
+        const bookingId = 'bid_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+        
+        const rows = bookingsArray.map(b => ({ 
+            stul: b.table, 
+            cas: b.slot, 
+            datum: b.date, 
+            jmeno: b.name, 
+            email: b.email, 
+            telefon: b.phone, 
+            zruseno: false,
+            booking_id: bookingId 
+        }));
+        
         const { error } = await supabaseClient.from('rezervace').insert(rows);
         if (error) { alert('Chyba při ukládání: ' + error.message); return false; }
         return true;
@@ -840,7 +853,7 @@
         cancelledBookings = fetched.cancelled.filter(b => b.stul > 0); 
         pastBookings = fetched.past.filter(b => b.stul > 0);
 
-        // Přiřazení barev ke každé rezervaci před vykreslením tabulky
+        // Přiřazení barev výhradně přes ID rezervace
         assignColorsToUsers(currentBookings);
         
         if (isDayBlocked) {
@@ -953,8 +966,9 @@
                 const btn = document.createElement('button');
                 
                 if (isOccupied) {
-                    const userKey = bookingInfo.email || bookingInfo.jmeno || 'Neznámý';
-                    const colorIndex = userColorMap[userKey] !== undefined ? userColorMap[userKey] : 0;
+                    // Klíč pro barvu bereme čistě z booking_id nebo id (žádné citlivé údaje pro veřejnost)
+                    const idKey = bookingInfo.booking_id || bookingInfo.id || 'Neznámý';
+                    const colorIndex = userColorMap[idKey] !== undefined ? userColorMap[idKey] : 0;
                     const colorClass = `uc-${colorIndex}`;
                     
                     if (isAdminLoggedIn) {
@@ -993,7 +1007,8 @@
     function groupBookings(bookingsList, includeDate = false) {
         const grouped = {};
         bookingsList.forEach(b => {
-            const key = includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`;
+            // Seskupení pro admina podle booking_id, případně fallback na email/jméno
+            const key = b.booking_id || (includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`);
             if (!grouped[key]) grouped[key] = { date: b.datum, name: b.jmeno||'', email: b.email||'', phone: b.telefon||'', tables: {}, ids: [], totalSlotsCount: 0 };
             if (!grouped[key].tables[b.stul]) grouped[key].tables[b.stul] = [];
             grouped[key].tables[b.stul].push(b.cas);
