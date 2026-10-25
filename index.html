@@ -53,20 +53,21 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; padding-bottom: 180px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
 
-        .gdpr-alert-topbar { display: none; background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .gdpr-alert-topbar { display: none; background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.1); width: 100%; text-align: center; }
         [data-theme="dark"] .gdpr-alert-topbar { background-color: #4a3b00; color: #ffe066; border-color: #665200; }
-        .gdpr-alert-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .btn-gdpr-delete { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+        .gdpr-alert-content { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%; text-align: center; }
+        .btn-gdpr-delete { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-gdpr-delete:hover { background-color: #bb2d3b; }
 
-        header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
-        .header-title p { color: var(--subtext); font-size: 0.95rem; }
-        .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        header { display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; width: 100%; text-align: center; gap: 15px; }
+        .header-title { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; }
+        .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; text-align: center; }
+        .header-title p { color: var(--subtext); font-size: 0.95rem; text-align: center; }
+        .header-actions { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; width: 100%; text-align: center; }
 
-        .theme-switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; user-select: none; }
+        .theme-switch-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.1rem; user-select: none; }
         .theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .theme-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px; }
@@ -74,19 +75,19 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .admin-login-btn { background-color: #343a40; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .admin-login-btn { background-color: #343a40; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .admin-login-btn:hover { background-color: #212529; }
 
-        .controls { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 15px; }
-        .date-picker-group { display: flex; align-items: center; gap: 10px; }
-        .date-picker-group label { font-weight: 600; }
+        .controls { display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; text-align: center; gap: 15px; }
+        .date-picker-group { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; text-align: center; }
+        .date-picker-group label { font-weight: 600; text-align: center; }
         
         input[type="date"]::-webkit-clear-button { display: none; }
-        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; background-color: var(--input-bg); color: var(--text); }
+        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; background-color: var(--input-bg); color: var(--text); text-align: center; }
 
-        .info-notice-banner { background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-        .badges-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .slots-count-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; transition: all 0.3s ease; }
+        .info-notice-banner { background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; gap: 10px; }
+        .badges-group { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; text-align: center; }
+        .slots-count-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; transition: all 0.3s ease; text-align: center; }
 
         .badge-green { background-color: #198754; color: #ffffff; border-color: #146c43; }
         .badge-yellow { background-color: #ffc107; color: #000000; border-color: #cc9a06; }
@@ -98,20 +99,20 @@
         [data-theme="dark"] .badge-orange { background-color: #5c2800; color: #ffb380; border-color: #803700; }
         [data-theme="dark"] .badge-red { background-color: #4a121a; color: #ff99a8; border-color: #7a1f2b; }
 
-        .blocked-day-banner { display: none; text-align: center; padding: 40px 20px; background: var(--occupied-blocked); color: var(--occupied-blocked-text); border-radius: 12px; margin: 20px 0; border: 2px solid var(--danger); box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2); }
-        .blocked-day-banner h2 { margin-bottom: 10px; font-size: 1.8rem; }
-        .blocked-day-banner p { font-size: 1.1rem; font-weight: 600; }
+        .blocked-day-banner { display: none; text-align: center; padding: 40px 20px; background: var(--occupied-blocked); color: var(--occupied-blocked-text); border-radius: 12px; margin: 20px 0; border: 2px solid var(--danger); box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2); width: 100%; }
+        .blocked-day-banner h2 { margin-bottom: 10px; font-size: 1.8rem; text-align: center; }
+        .blocked-day-banner p { font-size: 1.1rem; font-weight: 600; text-align: center; }
         .blocked-day-banner.active { display: block; }
 
-        .legend { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.85rem; }
-        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend { display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; font-size: 0.85rem; width: 100%; text-align: center; }
+        .legend-item { display: flex; align-items: center; justify-content: center; gap: 6px; text-align: center; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 
-        .grid-section { margin-bottom: 30px; }
-        .section-title { font-size: 1.2rem; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid var(--primary); }
+        .grid-section { margin-bottom: 30px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .section-title { font-size: 1.2rem; margin-bottom: 12px; border-left: none; text-align: center; width: 100%; }
 
-        .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
-        .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
+        .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; justify-content: center; width: 100%; }
+        .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
         
         .table-header-btn { 
             background: transparent; 
@@ -130,7 +131,7 @@
             align-items: center; 
             justify-content: center; 
             gap: 2px;
-            min-height: 54px;
+            height: 54px; /* Fixní výška – zabrání poskakování na PC */
         }
         .table-header-btn:hover:not(:disabled), .table-header-btn.all-selected { background-color: var(--primary); color: white; }
         .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.8; }
@@ -139,9 +140,10 @@
             font-size: 0.75rem;
             font-weight: 600;
             line-height: 1;
+            text-align: center;
         }
 
-        .slot-list { display: flex; flex-direction: column; gap: 6px; }
+        .slot-list { display: flex; flex-direction: column; gap: 6px; width: 100%; align-items: center; justify-content: center; }
         
         .slot-btn { 
             padding: 6px 8px; 
@@ -152,7 +154,8 @@
             cursor: pointer; 
             text-align: center; 
             transition: background-color 0.2s; 
-            height: 44px; 
+            height: 48px; /* Fixní výška – zabrání poskakování na PC */
+            width: 100%;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -164,7 +167,7 @@
         .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); }
         
         .slot-btn.admin-occupied { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 2px 4px; cursor: not-allowed; border: 1px solid rgba(0,0,0,0.1); }
-        .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-align: center; }
         .slot-btn.admin-occupied span.time-txt { font-size: 0.8rem; font-weight: 600; }
 
         .uc-0 { background-color: #0d6efd; color: #ffffff; }
@@ -201,61 +204,66 @@
         @media (max-width: 768px) {
             .slot-list.fully-booked-mobile { display: none; }
             .table-card.fully-booked-card { justify-content: center; min-height: 50px; padding: 8px; }
-            .table-card.fully-booked-card .table-header-btn { margin-bottom: 0; min-height: auto; }
+            .table-card.fully-booked-card .table-header-btn { margin-bottom: 0; min-height: auto; height: auto; }
             .slot-btn { height: auto !important; padding: 8px !important; }
         }
 
-        .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .non-reservable-card { background: var(--non-res); color: var(--non-res-text); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid var(--border); }
+        .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; justify-content: center; width: 100%; }
+        .non-reservable-card { background: var(--non-res); color: var(--non-res-text); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
 
-        .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); }
+        .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); text-align: center; }
         .booking-panel.active { display: block; }
-        .mobile-summary-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
-        .mobile-summary-info .m-price { font-size: 1.15rem; font-weight: 700; color: #198754; display: block; }
-        .mobile-summary-info .m-slots { font-size: 0.85rem; color: var(--subtext); }
-        .btn-continue-mobile { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); }
-        .booking-content { display: none; padding: 15px 20px; max-width: 1200px; margin: 0 auto; flex-direction: column; gap: 15px; }
-        .btn-collapse-mobile { display: none; background: transparent; border: none; color: var(--primary); font-weight: 600; font-size: 0.95rem; text-align: left; cursor: pointer; margin-bottom: -5px; }
+        .mobile-summary-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; width: 100%; }
+        .mobile-summary-info { text-align: center; width: 100%; }
+        .mobile-summary-info .m-price { font-size: 1.15rem; font-weight: 700; color: #198754; display: block; text-align: center; }
+        .mobile-summary-info .m-slots { font-size: 0.85rem; color: var(--subtext); text-align: center; }
+        .btn-continue-mobile { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); display: flex; align-items: center; justify-content: center; }
+        .booking-content { display: none; padding: 15px 20px; max-width: 1200px; margin: 0 auto; flex-direction: column; align-items: center; justify-content: center; gap: 15px; text-align: center; width: 100%; }
+        .btn-collapse-mobile { display: none; background: transparent; border: none; color: var(--primary); font-weight: 600; font-size: 0.95rem; text-align: center; cursor: pointer; margin-bottom: -5px; }
         .booking-panel.expanded .mobile-summary-bar { display: none; }
         .booking-panel.expanded .booking-content { display: flex; }
         .booking-panel.expanded .btn-collapse-mobile { display: block; }
-        .summary-info-grid h4 { margin: 0; font-size: 1.05rem; white-space: nowrap; }
-        .summary-info-grid p { margin: 0; color: var(--text); font-size: 0.95rem; }
-        .price-tag { color: #198754; font-weight: bold; font-size: 1.1rem; white-space: nowrap; }
-        .booking-form { display: flex; flex-direction: column; gap: 8px; }
-        .inputs-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .checkbox-container { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--subtext); user-select: none; cursor: pointer; }
-        .gdpr-notice-text { font-size: 0.8rem; color: var(--subtext); margin-top: 4px; }
-        .gdpr-link { color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; }
-        .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .summary-info-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; gap: 5px; }
+        .summary-info-grid h4 { margin: 0; font-size: 1.05rem; text-align: center; }
+        .summary-info-grid p { margin: 0; color: var(--text); font-size: 0.95rem; text-align: center; }
+        .price-tag { color: #198754; font-weight: bold; font-size: 1.1rem; text-align: center; }
+        .booking-form { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; text-align: center; }
+        .inputs-row { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; text-align: center; }
+        .checkbox-container { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; color: var(--subtext); user-select: none; cursor: pointer; text-align: center; width: 100%; }
+        .gdpr-notice-text { font-size: 0.8rem; color: var(--subtext); margin-top: 4px; text-align: center; width: 100%; }
+        .gdpr-link { color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; text-align: center; }
+        .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         @media (min-width: 768px) {
             .mobile-summary-bar { display: none !important; }
             .booking-content { display: flex !important; }
             .btn-collapse-mobile { display: none !important; }
-            .summary-info-grid { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 25px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+            .summary-info-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-content: space-between; width: 100%; gap: 25px; padding-bottom: 8px; border-bottom: 1px solid var(--border); text-align: left; }
+            .summary-info-grid h4 { text-align: left; }
+            .summary-info-grid p { text-align: center; }
+            .price-tag { text-align: right; }
         }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; text-align: center; }
         .modal-overlay.active { display: flex; }
-        .modal-card { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; gap: 15px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .modal-header h3 { margin: 0; font-size: 1.3rem; }
+        .modal-card { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; text-align: center; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; width: 100%; text-align: center; }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; text-align: center; width: 100%; }
         .modal-close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: 0 5px; }
-        .modal-body { font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: 12px; }
-        .modal-body ul { padding-left: 20px; margin: 0; }
-        .modal-footer { border-top: 1px solid var(--border); padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-body { font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; width: 100%; text-align: center; }
+        .modal-body ul { padding-left: 0; list-style: none; margin: 0; width: 100%; text-align: center; }
+        .modal-footer { border-top: 1px solid var(--border); padding-top: 12px; display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; text-align: center; }
 
-        .admin-section { display: none; background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 30px; border: 2px solid var(--border); }
+        .admin-section { display: none; background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 30px; border: 2px solid var(--border); width: 100%; text-align: center; }
         .admin-section.active { display: block; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        .admin-table th, .admin-table td { padding: 10px; border: 1px solid var(--border); text-align: left; }
-        .admin-table th { background-color: var(--non-res); }
-        .btn-delete { background-color: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .btn-restore { background-color: #0d6efd; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .history-title { margin-top: 30px; padding-top: 15px; border-top: 2px dashed var(--border); color: var(--subtext); }
-        .total-row td { border-top: 3px solid var(--text) !important; background-color: var(--non-res); font-size: 1.05rem; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; text-align: center; }
+        .admin-table th, .admin-table td { padding: 10px; border: 1px solid var(--border); text-align: center; }
+        .admin-table th { background-color: var(--non-res); text-align: center; }
+        .btn-delete { background-color: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-restore { background-color: #0d6efd; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+        .history-title { margin-top: 30px; padding-top: 15px; border-top: 2px dashed var(--border); color: var(--subtext); text-align: center; width: 100%; }
+        .total-row td { border-top: 3px solid var(--text) !important; background-color: var(--non-res); font-size: 1.05rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -305,9 +313,9 @@
     <div class="info-notice-banner" id="info-notice-banner">
         <div>
             <span>ℹ️</span>
-            <span><strong>Informace ke stornu:</strong> Pro zrušení rezervace odpovězte na e-mail, nebo využijte odkaz pro správu v potvrzovacím e-mailu.</span>
+            <span>Pro částečné nebo úplné zrušení rezervace použijte <strong>Změnit rezervaci</strong>.</span>
         </div>
-        <button type="button" class="btn-cancel" id="open-user-token-modal-btn" style="font-size: 0.85rem; padding: 6px 12px; background-color: var(--primary);">⚙️ Správa mé rezervace</button>
+        <button type="button" class="btn-cancel" id="open-user-token-modal-btn" style="font-size: 0.85rem; padding: 6px 12px; background-color: var(--primary);">Změnit rezervaci</button>
     </div>
 
     <div class="blocked-day-banner" id="blocked-day-banner">
@@ -315,7 +323,7 @@
         <p id="blocked-day-reason-text">Herna je pro veřejnost uzavřena.</p>
     </div>
 
-    <div id="grids-wrapper">
+    <div id="grids-wrapper" style="width: 100%;">
         <div class="grid-section">
             <h2 class="section-title">Rezervovatelné stoly (Stůl 1 – Stůl 6)</h2>
             <div class="table-grid" id="reservable-grid"></div>
@@ -329,31 +337,31 @@
 
     <!-- Admin Panel -->
     <div class="admin-section" id="admin-section">
-        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; width: 100%;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
                 <h3 style="margin: 0;">⚙️ Administrace pro obsluhu</h3>
                 <button type="button" class="btn-cancel" id="toggle-contacts-btn" style="font-size: 0.85rem; padding: 6px 12px;">👁️ Zobrazit kontakty</button>
             </div>
             <button class="btn-cancel" id="admin-logout-btn">Odhlásit správce</button>
         </div>
 
-        <div style="background: var(--non-res); padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--border);">
+        <div style="background: var(--non-res); padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--border); text-align: center;">
             <h4 style="margin-top: 0; margin-bottom: 6px;">🚫 Zablokování hracího dne (Turnaj / Údržba)</h4>
             <p style="font-size: 0.85rem; color: var(--subtext); margin-bottom: 12px;">Skryje rezervační mřížku pro tento den a zobrazí upozornění veřejnosti.</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <input type="text" id="admin-block-reason" placeholder="Důvod (např. Probíhá mistrovský turnaj)..." style="flex: 1; min-width: 250px;">
+            <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="admin-block-reason" placeholder="Důvod (např. Probíhá mistrovský turnaj)..." style="flex: 1; min-width: 250px; text-align: center;">
                 <button class="btn-delete" id="btn-block-day">Zablokovat tento den</button>
                 <button class="btn-restore" id="btn-unblock-day" style="display: none;">Obnovit provoz</button>
             </div>
         </div>
         
         <h4>Aktivní rezervace na vybraný den</h4>
-        <div style="overflow-x: auto; margin-top: 10px;">
+        <div style="overflow-x: auto; margin-top: 10px; width: 100%;">
             <table class="admin-table">
                 <thead>
                     <tr>
                         <th>Jméno a příjmení</th>
-                        <th>E-mail <button type="button" class="btn-cancel" id="btn-copy-emails" style="padding: 2px 8px; font-size: 0.8rem; margin-left: 5px; background: #6c757d; border-radius: 4px;" title="Zkopírovat všechny unikátní e-maily">📋 Copy</button></th>
+                        <th>E-mail <button type="button" class="btn-cancel" id="btn-copy-emails" style="padding: 2px 8px; font-size: 0.8rem; margin-left: 5px; background: #6c757d; border-radius: 4px; display: inline-flex; align-items: center;" title="Zkopírovat všechny unikátní e-maily">📋 Copy</button></th>
                         <th>Telefon</th>
                         <th>Rezervované stoly a časy</th>
                         <th>Celkem Kč</th>
@@ -365,7 +373,7 @@
         </div>
 
         <h4 class="history-title">📜 Proběhlé rezervace (minulé neděle)</h4>
-        <div style="overflow-x: auto; margin-top: 10px;">
+        <div style="overflow-x: auto; margin-top: 10px; width: 100%;">
             <table class="admin-table">
                 <thead><tr><th>Datum</th><th>Jméno a příjmení</th><th>E-mail</th><th>Telefon</th><th>Odehrané stoly a časy</th><th>Částka</th><th>Akce</th></tr></thead>
                 <tbody id="admin-past-list"></tbody>
@@ -373,7 +381,7 @@
         </div>
 
         <h4 class="history-title">🗑️ Historie zrušených rezervací na vybraný den</h4>
-        <div style="overflow-x: auto; margin-top: 10px;">
+        <div style="overflow-x: auto; margin-top: 10px; width: 100%;">
             <table class="admin-table" style="opacity: 0.85;">
                 <thead><tr><th>Jméno a příjmení</th><th>E-mail</th><th>Telefon</th><th>Bývalé stoly a časy</th><th>Částka</th><th>Akce</th></tr></thead>
                 <tbody id="admin-cancelled-list"></tbody>
@@ -382,16 +390,16 @@
     </div>
 </div>
 
-<!-- MODAL PRO UŽIVATELSKÉ SELEKTIVNÍ STORNO (SPRÁVA REZERVACE) -->
+<!-- MODAL PRO UŽIVATELSKÉ SELEKTIVNÍ STORNO (ZMĚNIT REZERVACI) -->
 <div class="modal-overlay" id="user-token-modal">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
-            <h3 id="user-token-modal-title">⚙️ Správa mé rezervace</h3>
+            <h3 id="user-token-modal-title">Změnit rezervaci</h3>
             <button class="modal-close-btn" id="close-user-token-modal">&times;</button>
         </div>
         <div class="modal-body" id="user-token-modal-body">
             <p style="font-size: 0.9rem; color: var(--subtext);">Zde můžete spravovat své rezervované sloty. Zaškrtněte sloty, které chcete <strong>zrušit</strong>:</p>
-            <div id="user-token-checkboxes" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+            <div id="user-token-checkboxes" style="display: flex; flex-direction: column; align-items: center; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; width: 100%;"></div>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" id="btn-cancel-user-token">Zpět</button>
@@ -409,7 +417,7 @@
         </div>
         <div class="modal-body">
             <p style="font-size: 0.9rem; color: var(--subtext);">Zaškrtněte sloty, které chcete <strong>zrušit</strong>:</p>
-            <div id="sel-cancel-checkboxes" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+            <div id="sel-cancel-checkboxes" style="display: flex; flex-direction: column; align-items: center; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; width: 100%;"></div>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" id="btn-cancel-sel-modal">Zpět</button>
@@ -427,7 +435,7 @@
         </div>
         <div class="modal-body">
             <p style="font-size: 0.9rem; color: var(--subtext);">Zaškrtněte sloty, které chcete <strong>obnovit</strong>:</p>
-            <div id="sel-restore-checkboxes" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+            <div id="sel-restore-checkboxes" style="display: flex; flex-direction: column; align-items: center; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; width: 100%;"></div>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" id="btn-cancel-sel-restore">Zpět</button>
@@ -442,7 +450,7 @@
             <span class="m-price" id="mobile-summary-price">0 Kč</span>
             <span class="m-slots" id="mobile-summary-slots">Vybráno: 0 slotů</span>
         </div>
-        <div style="display: flex; gap: 8px;">
+        <div style="display: flex; justify-content: center; gap: 8px;">
             <button type="button" class="btn-cancel" style="padding: 10px;" onclick="clearSelection()" title="Zrušit">✖</button>
             <button type="button" class="btn-continue-mobile" id="btn-expand-mobile">Pokračovat</button>
         </div>
@@ -481,10 +489,10 @@
             <h3>🔒 Přihlášení správce</h3>
             <button class="modal-close-btn" id="close-admin-login-modal-btn">&times;</button>
         </div>
-        <form id="admin-login-form">
+        <form id="admin-login-form" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
             <div class="modal-body">
                 <label for="admin-pwd-input" style="font-weight: 600;">Heslo pro správce:</label>
-                <input type="password" id="admin-pwd-input" placeholder="Zadejte heslo..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-top: 5px;" required>
+                <input type="password" id="admin-pwd-input" placeholder="Zadejte heslo..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-top: 5px; text-align: center;" required>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" id="btn-cancel-admin-login">Zrušit</button>
@@ -604,7 +612,7 @@
         if (dateStr !== todayStr) return false;
         
         const now = new Date();
-        const currentMins = now.getHours() * 65 + now.getMinutes();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
         
         const [start, end] = slotStr.split('-');
         const [sH, sM] = start.split(':').map(Number);
@@ -795,7 +803,7 @@
         btnUnblockDay.disabled = false;
     });
 
-    // --- SPRÁVA A STORNO POMOCÍ E-MAILU (BEZ NUTNOSTI NOVÝCH SLOUPCŮ) ---
+    // --- SPRÁVA A STORNO POMOCÍ KALENDÁŘE (Změnit rezervaci) ---
     async function handleTokenFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         const emailToken = urlParams.get('email');
@@ -809,7 +817,7 @@
         }
 
         const customerName = data[0].jmeno || 'Zákazník';
-        userTokenModalTitle.textContent = `Správa rezervace: ${escapeHTML(customerName)} (${formatCzechDate(dateToken)})`;
+        userTokenModalTitle.textContent = `Změnit rezervaci: ${escapeHTML(customerName)} (${formatCzechDate(dateToken)})`;
         userTokenCheckboxes.innerHTML = '';
 
         data.forEach(item => {
@@ -826,8 +834,16 @@
     openUserTokenModalBtn.addEventListener('click', async () => {
         const emailInput = prompt('Zadejte svůj e-mail, pod kterým byla rezervace vytvořena:');
         if (!emailInput) return;
-        const dateInputVal = prompt('Zadejte datum rezervace ve tvaru RRRR-MM-DD (např. 2026-11-01):', selectedDate);
+        
+        // Použití normálního kalendáře (vybrání neděle)
+        const dateInputVal = prompt('Zadejte datum rezervace (neděli) ve tvaru RRRR-MM-DD:', selectedDate);
         if (!dateInputVal) return;
+
+        const picked = new Date(dateInputVal);
+        if (picked.getDay() !== 0) {
+            alert('Rezervace je možné spravovat pouze pro neděli!');
+            return;
+        }
 
         const { data, error } = await supabaseClient.from('rezervace').select('*').eq('email', emailInput.trim()).eq('datum', dateInputVal.trim()).eq('zruseno', false);
         if (error || !data || data.length === 0) {
@@ -835,7 +851,7 @@
             return;
         }
         const customerName = data[0].jmeno || 'Zákazník';
-        userTokenModalTitle.textContent = `Správa rezervace: ${escapeHTML(customerName)}`;
+        userTokenModalTitle.textContent = `Změnit rezervaci: ${escapeHTML(customerName)}`;
         userTokenCheckboxes.innerHTML = '';
         data.forEach(item => {
             const label = document.createElement('label');
@@ -1413,8 +1429,6 @@
             const groupedByTable = {};
             selectedSelections.forEach(s => { if (!groupedByTable[s.table]) groupedByTable[s.table] = []; groupedByTable[s.table].push(s.slot); });
             const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('\n');
-            
-            // Odkaz pro správu využívá e-mail a datum (žádné nové sloupce v DB)
             const manageUrl = `https://czudokumenty.github.io/Rezervace-stoln-tenis-TTC-Elizza-praha/?email=${encodeURIComponent(email)}&date=${selectedDate}`;
 
             if (email) await sendConfirmationEmail({ name, email, phone, date: selectedDate, formattedDate: formatCzechDate(selectedDate), reservationText, totalPrice, manageUrl });
