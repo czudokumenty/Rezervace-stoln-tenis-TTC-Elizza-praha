@@ -493,7 +493,6 @@
         userColorMap = {};
         nextColorIndex = 0;
         bookings.forEach(b => {
-            // Použije se vygenerované group_id z nové databázové funkce, bez prozrazení osobních údajů.
             const idKey = b.group_id || b.email || b.jmeno || b.id || 'Neznámý';
             if (userColorMap[idKey] === undefined) {
                 userColorMap[idKey] = nextColorIndex % 8;
@@ -733,14 +732,42 @@
     }
 
     function initDatePicker() {
-        const defaultSunday = getNextSunday(); dateInput.min = defaultSunday; dateInput.step = "7";
-        dateInput.value = defaultSunday; selectedDate = defaultSunday;
+        const defaultSunday = getNextSunday(); 
+        dateInput.min = defaultSunday; 
+        
+        // Omezení kalendáře na maximálně 2 týdny (14 dní) dopředu pro veřejnost
+        const maxDateObj = new Date();
+        maxDateObj.setDate(maxDateObj.getDate() + 14);
+        dateInput.max = getLocalIsoDate(maxDateObj);
+
+        dateInput.step = "7";
+        dateInput.value = defaultSunday;
+        selectedDate = defaultSunday;
+
         dateInput.addEventListener('change', (e) => {
             if (!e.target.value) { dateInput.value = selectedDate; return; }
             const picked = new Date(e.target.value);
-            if (picked.getDay() !== 0) { alert('Rezervace jsou možné pouze na neděli!'); const correctedSunday = getNextSunday(picked); dateInput.value = correctedSunday; selectedDate = correctedSunday; } 
-            else { selectedDate = e.target.value; }
-            clearSelection(); loadAndRender();
+            
+            if (!isAdminLoggedIn) {
+                const diffTime = picked - new Date();
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                if (diffDays > 14) {
+                    alert('Rezervace je možné vytvářet maximálně 2 týdny dopředu.');
+                    dateInput.value = selectedDate;
+                    return;
+                }
+            }
+
+            if (picked.getDay() !== 0) { 
+                alert('Rezervace jsou možné pouze na neděli!'); 
+                const correctedSunday = getNextSunday(picked); 
+                dateInput.value = correctedSunday; 
+                selectedDate = correctedSunday; 
+            } else { 
+                selectedDate = e.target.value; 
+            }
+            clearSelection(); 
+            loadAndRender();
         });
     }
 
@@ -759,7 +786,6 @@
             const { data: publicData, error } = await supabaseClient.rpc('get_public_slots', { check_date: selectedDate });
             if (error) {
                 console.error("Chyba při načítání dat z databáze:", error);
-                alert("POZOR: Rezervace se nepodařilo načíst! Zkontroluj si v Supabase, zda jsi správně vytvořil funkci 'get_public_slots'.");
             }
             active = publicData || [];
         }
