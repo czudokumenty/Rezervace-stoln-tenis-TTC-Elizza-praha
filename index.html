@@ -112,9 +112,35 @@
 
         .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
         .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
-        .table-header-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; width: 100%; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        
+        /* UNIFORMNÍ HLAVIČKA STOLU PRO DOKONALÉ ZAROVNÁNÍ */
+        .table-header-btn { 
+            background: transparent; 
+            border: 2px solid var(--primary); 
+            color: var(--primary); 
+            padding: 6px 10px; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-bottom: 12px; 
+            width: 100%; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 2px;
+            min-height: 54px;
+        }
         .table-header-btn:hover:not(:disabled), .table-header-btn.all-selected { background-color: var(--primary); color: white; }
-        .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.7; }
+        .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.8; }
+        
+        .header-subtext {
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+        }
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
         .slot-btn { padding: 8px; border: 1px solid transparent; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; transition: background-color 0.2s; }
@@ -158,31 +184,10 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
         }
 
-        /* DOROVNÁNÍ VÝŠKY PLNĚ OBSAZENÉHO STOLU NA POČÍTAČI */
-        @media (min-width: 769px) {
-            .table-card.fully-booked-card {
-                justify-content: flex-start;
-            }
-            .fully-booked-spacer {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-                opacity: 0;
-                pointer-events: none;
-                user-select: none;
-            }
-            .fully-booked-spacer .dummy-slot {
-                padding: 8px;
-                font-size: 0.85rem;
-                height: 35px;
-            }
-        }
-
         @media (max-width: 768px) {
             .slot-list.fully-booked-mobile { display: none; }
             .table-card.fully-booked-card { justify-content: center; min-height: 50px; padding: 8px; }
-            .table-card.fully-booked-card .table-header-btn { margin-bottom: 0; }
-            .fully-booked-spacer { display: none; }
+            .table-card.fully-booked-card .table-header-btn { margin-bottom: 0; min-height: auto; }
         }
 
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
@@ -1073,13 +1078,15 @@
             headerBtn.className = `table-header-btn ${isAllSelected ? 'all-selected' : ''}`;
             
             if (isFullyBooked) {
-                headerBtn.innerHTML = `Stůl ${t} (Obsazeno)`;
                 headerBtn.disabled = true;
                 card.classList.add('fully-booked-card');
+                headerBtn.innerHTML = `<span>Stůl ${t}</span><span class="header-subtext">(Obsazeno)</span>`;
             } else {
-                headerBtn.innerHTML = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
                 headerBtn.disabled = false;
                 headerBtn.onclick = () => toggleWholeTableSelection(t);
+                const titleText = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
+                // Vždy přidáme podnadpis (buď prázdnou mezeru, nebo text), aby měly všechny hlavičky stejnou výšku
+                headerBtn.innerHTML = `<span>${titleText}</span><span class="header-subtext">&nbsp;</span>`;
             }
             card.appendChild(headerBtn);
 
@@ -1116,19 +1123,6 @@
                 slotList.appendChild(btn);
             });
             card.appendChild(slotList);
-
-            // Pokud je plně obsazeno, přidáme na počítači neviditelnou mezeru pro dorovnání výšky
-            if (isFullyBooked) {
-                const spacer = document.createElement('div');
-                spacer.className = 'fully-booked-spacer';
-                timeSlots.forEach(() => {
-                    const dummy = document.createElement('div');
-                    dummy.className = 'dummy-slot';
-                    spacer.appendChild(dummy);
-                });
-                card.appendChild(spacer);
-            }
-
             reservableGrid.appendChild(card);
         }
     }
