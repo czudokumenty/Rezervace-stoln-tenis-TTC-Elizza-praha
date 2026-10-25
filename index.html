@@ -306,7 +306,7 @@
     <div class="info-notice-banner" id="info-notice-banner">
         <div>
             <span>ℹ️</span>
-            <span>Pro částečné nebo úplné zrušení rezervace použijte <strong>⚙️ Změna rezervace</strong>.</span>
+            <span><strong>Zrušení rezervace:</strong> Pro částečné nebo úplné zrušení rezervace použijte <strong>⚙️ Změna rezervace</strong>.</span>
         </div>
         <button type="button" class="btn-cancel" id="open-user-token-modal-btn" style="font-size: 0.85rem; padding: 6px 12px; background-color: var(--primary);">⚙️ Změna rezervace</button>
     </div>
@@ -1117,13 +1117,12 @@
         });
     }
 
-    // --- OPRAVENÉ NAČÍTÁNÍ DAT PŘÍMO Z TABULKY PRO VŠECHNY ---
+    // --- BEZPEČNÉ NAČÍTÁNÍ DAT (VEŘEJNOST NEVIDÍ JMÉNA, ADMIN ANO) ---
     async function fetchBookings() {
         if (!supabaseClient) return { active: [], cancelled: [], past: [] };
         const todayStr = getLocalIsoDate();
         let active = []; let cancelled = []; let pastData = [];
 
-        // Čtení dat přímo z tabulky rezervace (funguje pro veřejnost i admina spolehlivě)
         const { data: selectedData, error } = await supabaseClient
             .from('rezervace')
             .select('*')
@@ -1133,8 +1132,16 @@
             console.error("Chyba při načítání dat:", error.message);
         }
 
-        active = (selectedData || []).filter(b => !b.zruseno);
-        cancelled = (selectedData || []).filter(b => b.zruseno === true);
+        // ZABEZPEČENÍ: Pokud NENÍ přihlášený admin, úmyslně vymažeme jména, aby nedošlo k úniku informací!
+        const processedData = (selectedData || []).map(item => {
+            if (!isAdminLoggedIn) {
+                return { ...item, jmeno: 'Obsazeno' }; // Veřejnost vidí jen "Obsazeno"
+            }
+            return item; // Admin vidí normálně jména
+        });
+
+        active = processedData.filter(b => !b.zruseno);
+        cancelled = processedData.filter(b => b.zruseno === true);
 
         if (isAdminLoggedIn) {
             const { data: pastRes } = await supabaseClient
@@ -1328,7 +1335,7 @@
                         btn.innerHTML = `<span>${escapeHTML(bookingInfo.jmeno || 'Bez jména')}</span><span class="time-txt">${slot}</span>`;
                     } else {
                         btn.className = `slot-btn occupied ${colorClass} ${isLive ? 'live-slot' : ''}`;
-                        btn.innerHTML = `<span>${escapeHTML(bookingInfo.jmeno || 'Obsazeno')}</span><span class="time-txt">${slot}</span>`;
+                        btn.innerHTML = `<span>Obsazeno</span><span class="time-txt">${slot}</span>`;
                     }
                     btn.disabled = true;
                 } else {
