@@ -16,8 +16,8 @@
             --card-bg: #ffffff;
             --text: #212529;
             --border: #dee2e6;
-            --available: #e9ecef;
-            --available-text: #212529;
+            --available: #198754; /* Sytě zelená pro světlý režim */
+            --available-text: #ffffff;
             --occupied: #f8d7da;
             --occupied-text: #842029;
             --selected: #0d6efd;
@@ -37,8 +37,8 @@
             --card-bg: #1e1e1e;
             --text: #e0e0e0;
             --border: #333333;
-            --available: #2d3748;
-            --available-text: #e2e8f0;
+            --available: rgba(25, 135, 84, 0.25); /* Průsvitná zelená pro tmavý režim */
+            --available-text: #8fdfa4;
             --occupied: #4a121a;
             --occupied-text: #ff99a8;
             --selected: #0d6efd;
@@ -121,7 +121,7 @@
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
         .slot-btn { padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; transition: background-color 0.2s; }
-        .slot-btn.available { background-color: var(--available); color: var(--available-text); }
+        .slot-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
         .slot-btn.occupied { cursor: not-allowed; opacity: 0.95; }
         .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); border-color: var(--selected); }
         
@@ -266,8 +266,6 @@
         </div>
         <div class="legend" style="align-items: center;">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
-            <div class="legend-item"><div class="legend-color" style="background: var(--selected); border-color: var(--selected);"></div> Vybráno</div>
-            <div class="legend-item"><div class="legend-color uc-0" style="border:none;"></div> Obsazeno</div>
             <div class="legend-item"><div class="legend-color" style="border: 2px solid var(--danger); background: transparent; width: 20px; height: 20px;"></div> Právě probíhá</div>
         </div>
     </div>
