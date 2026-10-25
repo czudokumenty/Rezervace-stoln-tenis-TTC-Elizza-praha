@@ -338,6 +338,42 @@
     </div>
 </div>
 
+<!-- MODAL PRO SELEKTIVNÍ STORNO (ADMIN) -->
+<div class="modal-overlay" id="selective-cancel-modal">
+    <div class="modal-card" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3 id="sel-cancel-modal-title">Zrušení vybraných slotů</h3>
+            <button class="modal-close-btn" id="close-sel-cancel-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 0.9rem; color: var(--subtext);">Zaškrtněte sloty, které chcete <strong>zrušit</strong>:</p>
+            <div id="sel-cancel-checkboxes" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="btn-cancel-sel-modal">Zpět</button>
+            <button class="btn-delete" id="btn-confirm-sel-cancel">Potvrdit zrušení vybraných</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PRO SELEKTIVNÍ OBNOVU (ADMIN) -->
+<div class="modal-overlay" id="selective-restore-modal">
+    <div class="modal-card" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3 id="sel-restore-modal-title">Obnovení vybraných slotů</h3>
+            <button class="modal-close-btn" id="close-sel-restore-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 0.9rem; color: var(--subtext);">Zaškrtněte sloty, které chcete <strong>obnovit</strong>:</p>
+            <div id="sel-restore-checkboxes" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="btn-cancel-sel-restore">Zpět</button>
+            <button class="btn-restore" id="btn-confirm-sel-restore">Potvrdit obnovení vybraných</button>
+        </div>
+    </div>
+</div>
+
 <div class="booking-panel" id="booking-panel">
     <div class="mobile-summary-bar">
         <div class="mobile-summary-info">
@@ -579,6 +615,21 @@
     const btnExecuteSingleDelete = document.getElementById('btn-execute-single-delete');
     let pendingSingleDeleteIds = [];
 
+    // Modaly pro selektivní storno/obnovu
+    const selectiveCancelModal = document.getElementById('selective-cancel-modal');
+    const closeSelCancelModal = document.getElementById('close-sel-cancel-modal');
+    const btnCancelSelModal = document.getElementById('btn-cancel-sel-modal');
+    const btnConfirmSelCancel = document.getElementById('btn-confirm-sel-cancel');
+    const selCancelCheckboxes = document.getElementById('sel-cancel-checkboxes');
+    const selCancelModalTitle = document.getElementById('sel-cancel-modal-title');
+
+    const selectiveRestoreModal = document.getElementById('selective-restore-modal');
+    const closeSelRestoreModal = document.getElementById('close-sel-restore-modal');
+    const btnCancelSelRestore = document.getElementById('btn-cancel-sel-restore');
+    const btnConfirmSelRestore = document.getElementById('btn-confirm-sel-restore');
+    const selRestoreCheckboxes = document.getElementById('sel-restore-checkboxes');
+    const selRestoreModalTitle = document.getElementById('sel-restore-modal-title');
+
     const inputName = document.getElementById('cust-name');
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
@@ -675,6 +726,73 @@
         btnUnblockDay.disabled = false;
     });
 
+    // --- LOGIKA PRO SELEKTIVNÍ STORNO A OBNOVU ---
+    function openSelectiveCancelModal(itemsArray, customerName) {
+        selCancelModalTitle.textContent = `Zrušení slotů: ${escapeHTML(customerName)}`;
+        selCancelCheckboxes.innerHTML = '';
+        itemsArray.forEach(item => {
+            const label = document.createElement('label');
+            label.className = 'checkbox-container';
+            label.style.fontSize = '0.95rem';
+            label.innerHTML = `<input type="checkbox" value="${item.id}" checked> Stůl ${item.stul} (${item.cas})`;
+            selCancelCheckboxes.appendChild(label);
+        });
+        selectiveCancelModal.classList.add('active');
+    }
+
+    closeSelCancelModal.onclick = () => selectiveCancelModal.classList.remove('active');
+    btnCancelSelModal.onclick = () => selectiveCancelModal.classList.remove('active');
+
+    btnConfirmSelCancel.onclick = async () => {
+        const checkedBoxes = selCancelCheckboxes.querySelectorAll('input[type="checkbox"]:checked');
+        const idsToCancel = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+        if (idsToCancel.length === 0) { alert('Není vybrán žádný slot ke zrušení.'); return; }
+
+        btnConfirmSelCancel.disabled = true; btnConfirmSelCancel.textContent = "Zpracovávám...";
+        const { error } = await supabaseClient.from('rezervace').update({ zruseno: true }).in('id', idsToCancel);
+        if (error) alert('Chyba při stornování slotů.');
+        else { selectiveCancelModal.classList.remove('active'); loadAndRender(); }
+        btnConfirmSelCancel.disabled = false; btnConfirmSelCancel.textContent = "Potvrdit zrušení vybraných";
+    };
+
+    function openSelectiveRestoreModal(itemsArray, customerName) {
+        selRestoreModalTitle.textContent = `Obnovení slotů: ${escapeHTML(customerName)}`;
+        selRestoreCheckboxes.innerHTML = '';
+        itemsArray.forEach(item => {
+            const label = document.createElement('label');
+            label.className = 'checkbox-container';
+            label.style.fontSize = '0.95rem';
+            label.innerHTML = `<input type="checkbox" value="${item.id}" checked> Stůl ${item.stul} (${item.cas})`;
+            selRestoreCheckboxes.appendChild(label);
+        });
+        selectiveRestoreModal.classList.add('active');
+    }
+
+    closeSelRestoreModal.onclick = () => selectiveRestoreModal.classList.remove('active');
+    btnCancelSelRestore.onclick = () => selectiveRestoreModal.classList.remove('active');
+
+    btnConfirmSelRestore.onclick = async () => {
+        const checkedBoxes = selRestoreCheckboxes.querySelectorAll('input[type="checkbox"]:checked');
+        const idsToRestore = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+        if (idsToRestore.length === 0) { alert('Není vybrán žádný slot k obnovení.'); return; }
+
+        // Ověření kolizí s aktuálně aktivními sloty
+        const freshBookings = await fetchBookings();
+        const { data: toRestoreRows } = await supabaseClient.from('rezervace').select('*').in('id', idsToRestore);
+        const conflicts = (toRestoreRows || []).filter(res => freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas));
+        
+        if (conflicts.length > 0) {
+            alert(`Nelze obnovit! Následující sloty jsou již mezitím obsazené:\n${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
+            return;
+        }
+
+        btnConfirmSelRestore.disabled = true; btnConfirmSelRestore.textContent = "Zpracovávám...";
+        const { error } = await supabaseClient.from('rezervace').update({ zruseno: false }).in('id', idsToRestore);
+        if (error) alert('Chyba při obnovení slotů.');
+        else { selectiveRestoreModal.classList.remove('active'); loadAndRender(); }
+        btnConfirmSelRestore.disabled = false; btnConfirmSelRestore.textContent = "Potvrdit obnovení vybraných";
+    };
+
     openGdprBtn.addEventListener('click', () => gdprModal.classList.add('active'));
     function closeGdprModal() { gdprModal.classList.remove('active'); }
     closeGdprBtn.addEventListener('click', closeGdprModal); closeGdprFooterBtn.addEventListener('click', closeGdprModal);
@@ -735,7 +853,6 @@
         const defaultSunday = getNextSunday(); 
         dateInput.min = defaultSunday; 
         
-        // Omezení kalendáře na maximálně 2 týdny (14 dní) dopředu pro veřejnost
         const maxDateObj = new Date();
         maxDateObj.setDate(maxDateObj.getDate() + 14);
         dateInput.max = getLocalIsoDate(maxDateObj);
@@ -825,25 +942,16 @@
 
     async function sendConfirmationEmail(details) {
         if (!window.emailjs || !details.email) return;
-        try { await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { to_name: details.name, to_email: details.email, phone: details.phone, date: details.formattedDate, reservation_details: details.reservationText, total_price: details.totalPrice }); } catch (err) {}
-    }
-
-    async function cancelGroupInCloud(idsArray, customerName) {
-        if (!supabaseClient || !idsArray || idsArray.length === 0) return;
-        if (!confirm(`Opravdu chcete zrušit rezervaci pro zákazníka ${customerName}?`)) return;
-        const { error } = await supabaseClient.from('rezervace').update({ zruseno: true }).in('id', idsArray);
-        if (!error) { loadAndRender(); } else alert('Odepřeno.');
-    }
-
-    async function restoreGroupInCloud(idsArray, customerName) {
-        if (!supabaseClient || !idsArray || idsArray.length === 0) return;
-        if (!confirm(`Opravdu chcete obnovit rezervaci pro ${customerName}?`)) return;
-        const { data: toRestore } = await supabaseClient.from('rezervace').select('*').in('id', idsArray);
-        const freshBookings = await fetchBookings();
-        const conflicts = toRestore.filter(res => freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas));
-        if (conflicts.length > 0) { alert(`Nelze obnovit! Sloty obsazené:\n${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`); return; }
-        const { error } = await supabaseClient.from('rezervace').update({ zruseno: false }).in('id', idsArray);
-        if (!error) { loadAndRender(); }
+        try { 
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { 
+                to_name: details.name, 
+                to_email: details.email, 
+                phone: details.phone, 
+                date: details.formattedDate, 
+                reservation_details: details.reservationText, 
+                total_price: details.totalPrice 
+            }); 
+        } catch (err) {}
     }
 
     async function loadAndRender() {
@@ -1011,10 +1119,12 @@
         const grouped = {};
         bookingsList.forEach(b => {
             const key = b.group_id || (includeDate ? `${b.datum}_${b.email}_${b.jmeno}` : `${b.email}_${b.jmeno}`);
-            if (!grouped[key]) grouped[key] = { date: b.datum, name: b.jmeno||'', email: b.email||'', phone: b.telefon||'', tables: {}, ids: [], totalSlotsCount: 0 };
+            if (!grouped[key]) {
+                grouped[key] = { date: b.datum, name: b.jmeno||'', email: b.email||'', phone: b.telefon||'', tables: {}, items: [], totalSlotsCount: 0 };
+            }
             if (!grouped[key].tables[b.stul]) grouped[key].tables[b.stul] = [];
             grouped[key].tables[b.stul].push(b.cas);
-            grouped[key].ids.push(b.id);
+            grouped[key].items.push({ id: b.id, stul: b.stul, cas: b.cas });
             grouped[key].totalSlotsCount++;
         });
         return grouped;
@@ -1043,7 +1153,7 @@
                 tr.innerHTML = `<td><strong>${escapeHTML(c.name)}</strong></td><td>${displayEmail(c.email)}</td><td>${displayPhone(c.phone)}</td>
                     <td>${Object.keys(c.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(c.tables[t])}`).join('<br>')}</td>
                     <td><strong>${rowPrice} Kč</strong></td>
-                    <td><button class="btn-delete" onclick='cancelGroupInCloud(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Zrušit vše</button></td>`;
+                    <td><button class="btn-delete" onclick='openSelectiveCancelModal(${JSON.stringify(c.items)}, "${escapeHTML(c.name)}")'>Upravit / Zrušit</button></td>`;
                 adminBookingList.appendChild(tr);
             });
             const trTotal = document.createElement('tr'); trTotal.className = 'total-row';
@@ -1060,7 +1170,7 @@
                 tr.innerHTML = `<td><strong>${formatCzechDate(c.date)}</strong></td><td>${escapeHTML(c.name)}</td><td>${displayEmail(c.email)}</td><td>${displayPhone(c.phone)}</td>
                     <td>${Object.keys(c.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(c.tables[t])}`).join('<br>')}</td>
                     <td><strong>${rowPrice} Kč</strong></td>
-                    <td><button class="btn-delete" onclick='promptSingleDelete(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Vymazat</button></td>`;
+                    <td><button class="btn-delete" onclick='promptSingleDelete(${JSON.stringify(c.items.map(i=>i.id))}, "${escapeHTML(c.name)}")'>Vymazat</button></td>`;
                 adminPastList.appendChild(tr);
             });
             const trTotal = document.createElement('tr'); trTotal.className = 'total-row';
@@ -1077,8 +1187,10 @@
                 tr.innerHTML = `<td><span style="text-decoration: line-through;">${escapeHTML(c.name)}</span></td><td>${displayEmail(c.email)}</td><td>${displayPhone(c.phone)}</td>
                     <td>${Object.keys(c.tables).sort((a,b)=>a-b).map(t => `<strong>Stůl ${t}:</strong> ${formatTimeRanges(c.tables[t])}`).join('<br>')}</td>
                     <td>${rowPrice} Kč</td>
-                    <td><button class="btn-restore" onclick='restoreGroupInCloud(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Obnovit</button>
-                    <button class="btn-delete" style="margin-left: 6px;" onclick='promptSingleDelete(${JSON.stringify(c.ids)}, "${escapeHTML(c.name)}")'>Vymazat</button></td>`;
+                    <td>
+                        <button class="btn-restore" onclick='openSelectiveRestoreModal(${JSON.stringify(c.items)}, "${escapeHTML(c.name)}")'>Obnovit...</button>
+                        <button class="btn-delete" style="margin-top: 4px;" onclick='promptSingleDelete(${JSON.stringify(c.items.map(i=>i.id))}, "${escapeHTML(c.name)}")'>Vymazat</button>
+                    </td>`;
                 adminCancelledList.appendChild(tr);
             });
             const trTotal = document.createElement('tr'); trTotal.className = 'total-row';
@@ -1122,7 +1234,7 @@
         await supabaseClient.auth.signOut();
         isAdminLoggedIn = false; showAdminContacts = false; clearTimeout(inactivityTimer);
         toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
-        adminLoginBtn.textContent = '🔒 Admin přihlášení'; adminLoginBtn.style.backgroundColor = '';
+        adminLoginBtn.textContent = '🔒 Admin přihlášen'; adminLoginBtn.style.backgroundColor = '';
         adminLogoutBtnHeader.style.display = 'none';
         updateFormValidationForAdmin(); await loadAndRender();
     }
