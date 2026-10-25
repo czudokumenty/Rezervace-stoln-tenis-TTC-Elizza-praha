@@ -158,10 +158,31 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
         }
 
+        /* DOROVNÁNÍ VÝŠKY PLNĚ OBSAZENÉHO STOLU NA POČÍTAČI */
+        @media (min-width: 769px) {
+            .table-card.fully-booked-card {
+                justify-content: flex-start;
+            }
+            .fully-booked-spacer {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                opacity: 0;
+                pointer-events: none;
+                user-select: none;
+            }
+            .fully-booked-spacer .dummy-slot {
+                padding: 8px;
+                font-size: 0.85rem;
+                height: 35px;
+            }
+        }
+
         @media (max-width: 768px) {
             .slot-list.fully-booked-mobile { display: none; }
             .table-card.fully-booked-card { justify-content: center; min-height: 50px; padding: 8px; }
             .table-card.fully-booked-card .table-header-btn { margin-bottom: 0; }
+            .fully-booked-spacer { display: none; }
         }
 
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
@@ -615,7 +636,6 @@
     const btnExecuteSingleDelete = document.getElementById('btn-execute-single-delete');
     let pendingSingleDeleteIds = [];
 
-    // Modaly pro selektivní storno/obnovu
     const selectiveCancelModal = document.getElementById('selective-cancel-modal');
     const closeSelCancelModal = document.getElementById('close-sel-cancel-modal');
     const btnCancelSelModal = document.getElementById('btn-cancel-sel-modal');
@@ -726,7 +746,6 @@
         btnUnblockDay.disabled = false;
     });
 
-    // --- LOGIKA PRO SELEKTIVNÍ STORNO A OBNOVU ---
     function openSelectiveCancelModal(itemsArray, customerName) {
         selCancelModalTitle.textContent = `Zrušení slotů: ${escapeHTML(customerName)}`;
         selCancelCheckboxes.innerHTML = '';
@@ -776,7 +795,6 @@
         const idsToRestore = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
         if (idsToRestore.length === 0) { alert('Není vybrán žádný slot k obnovení.'); return; }
 
-        // Ověření kolizí s aktuálně aktivními sloty
         const freshBookings = await fetchBookings();
         const { data: toRestoreRows } = await supabaseClient.from('rezervace').select('*').in('id', idsToRestore);
         const conflicts = (toRestoreRows || []).filter(res => freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas));
@@ -1097,7 +1115,21 @@
                 }
                 slotList.appendChild(btn);
             });
-            card.appendChild(slotList); reservableGrid.appendChild(card);
+            card.appendChild(slotList);
+
+            // Pokud je plně obsazeno, přidáme na počítači neviditelnou mezeru pro dorovnání výšky
+            if (isFullyBooked) {
+                const spacer = document.createElement('div');
+                spacer.className = 'fully-booked-spacer';
+                timeSlots.forEach(() => {
+                    const dummy = document.createElement('div');
+                    dummy.className = 'dummy-slot';
+                    spacer.appendChild(dummy);
+                });
+                card.appendChild(spacer);
+            }
+
+            reservableGrid.appendChild(card);
         }
     }
 
