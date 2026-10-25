@@ -113,7 +113,6 @@
         .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
         .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
         
-        /* UNIFORMNÍ HLAVIČKA STOLU PRO DOKONALÉ ZAROVNÁNÍ */
         .table-header-btn { 
             background: transparent; 
             border: 2px solid var(--primary); 
@@ -143,14 +142,31 @@
         }
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
-        .slot-btn { padding: 8px; border: 1px solid transparent; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; transition: background-color 0.2s; }
+        
+        /* UNIFORMNÍ VÝŠKA PRO VŠECHNY SLOTY NA PC, ABY BYLY V JEDNÉ ROVINĚ */
+        .slot-btn { 
+            padding: 6px 8px; 
+            border: 1px solid transparent; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            text-align: center; 
+            transition: background-color 0.2s; 
+            height: 44px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1.2;
+        }
         .slot-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
         .slot-btn.occupied { cursor: not-allowed; opacity: 0.95; border: 1px solid rgba(0,0,0,0.1); }
         .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); }
         
-        .slot-btn.admin-occupied { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px; line-height: 1.2; cursor: not-allowed; border: 1px solid rgba(0,0,0,0.1); }
+        .slot-btn.admin-occupied { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 2px 4px; cursor: not-allowed; border: 1px solid rgba(0,0,0,0.1); }
         .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-        .slot-btn.admin-occupied span.time-txt { font-size: 0.85rem; font-weight: 600; }
+        .slot-btn.admin-occupied span.time-txt { font-size: 0.8rem; font-weight: 600; }
 
         /* UNIKÁTNÍ BARVY PRO REZERVACE */
         .uc-0 { background-color: #0d6efd; color: #ffffff; } /* Modrá */
@@ -188,6 +204,7 @@
             .slot-list.fully-booked-mobile { display: none; }
             .table-card.fully-booked-card { justify-content: center; min-height: 50px; padding: 8px; }
             .table-card.fully-booked-card .table-header-btn { margin-bottom: 0; min-height: auto; }
+            .slot-btn { height: auto !important; padding: 8px !important; }
         }
 
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
@@ -1085,7 +1102,6 @@
                 headerBtn.disabled = false;
                 headerBtn.onclick = () => toggleWholeTableSelection(t);
                 const titleText = isAllSelected ? `✓ Stůl ${t} (vybrán)` : `Stůl ${t}`;
-                // Vždy přidáme podnadpis (buď prázdnou mezeru, nebo text), aby měly všechny hlavičky stejnou výšku
                 headerBtn.innerHTML = `<span>${titleText}</span><span class="header-subtext">&nbsp;</span>`;
             }
             card.appendChild(headerBtn);
@@ -1111,13 +1127,15 @@
                         btn.className = `slot-btn admin-occupied ${colorClass} ${isLive ? 'live-slot' : ''}`;
                         btn.innerHTML = `<span>${escapeHTML(bookingInfo.jmeno || 'Bez jména')}</span><span class="time-txt">${slot}</span>`;
                     } else {
+                        // Obyčejný uživatel vidí v obsazeném slotu jméno a čas pod ním, aby to mělo stejnou výšku jako admin nebo volný slot
                         btn.className = `slot-btn occupied ${colorClass} ${isLive ? 'live-slot' : ''}`;
-                        btn.textContent = slot;
+                        btn.innerHTML = `<span>${escapeHTML(bookingInfo.jmeno || 'Obsazeno')}</span><span class="time-txt">${slot}</span>`;
                     }
                     btn.disabled = true;
                 } else {
+                    // Volný slot má stejnou výšku – nahoře neviditelná mezera, dole čas, aby byl v rovině s ostatními
                     btn.className = `slot-btn ${isSelected ? 'selected' : 'available'} ${isLive ? 'live-slot' : ''}`;
-                    btn.textContent = slot; 
+                    btn.innerHTML = `<span style="opacity:0; font-size:0.65rem;">&nbsp;</span><span>${slot}</span>`; 
                     btn.addEventListener('click', () => toggleSlotSelection(t, slot));
                 }
                 slotList.appendChild(btn);
