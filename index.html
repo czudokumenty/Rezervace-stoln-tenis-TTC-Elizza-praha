@@ -16,8 +16,8 @@
             --card-bg: #ffffff;
             --text: #212529;
             --border: #dee2e6;
-            --available: #d1e7dd;
-            --available-text: #0f5132;
+            --available: #e9ecef;
+            --available-text: #212529;
             --occupied: #f8d7da;
             --occupied-text: #842029;
             --selected: #0d6efd;
@@ -37,8 +37,8 @@
             --card-bg: #1e1e1e;
             --text: #e0e0e0;
             --border: #333333;
-            --available: #1b4332;
-            --available-text: #75e6da;
+            --available: #2d3748;
+            --available-text: #e2e8f0;
             --occupied: #4a121a;
             --occupied-text: #ff99a8;
             --selected: #0d6efd;
@@ -88,13 +88,16 @@
         .badges-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .slots-count-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; transition: all 0.3s ease; }
 
-        .badge-green { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
+        /* VÝRAZNÉ BARVY PRO BADGE (Světlý režim) */
+        .badge-green { background-color: #198754; color: #ffffff; border-color: #146c43; }
+        .badge-yellow { background-color: #ffc107; color: #000000; border-color: #cc9a06; }
+        .badge-orange { background-color: #fd7e14; color: #ffffff; border-color: #e0690b; }
+        .badge-red { background-color: #dc3545; color: #ffffff; border-color: #b02a37; }
+
+        /* Tmavý režim - pastelovější pro oči */
         [data-theme="dark"] .badge-green { background-color: #1b4332; color: #75e6da; border-color: #2d6a4f; }
-        .badge-yellow { background-color: #fff3cd; color: #664d03; border-color: #ffecb5; }
         [data-theme="dark"] .badge-yellow { background-color: #4a3b00; color: #ffe066; border-color: #665200; }
-        .badge-orange { background-color: #ffe5d0; color: #843900; border-color: #ffd0a8; }
         [data-theme="dark"] .badge-orange { background-color: #5c2800; color: #ffb380; border-color: #803700; }
-        .badge-red { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
         [data-theme="dark"] .badge-red { background-color: #4a121a; color: #ff99a8; border-color: #7a1f2b; }
 
         /* Blokování dne */
@@ -105,7 +108,7 @@
 
         .legend { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.85rem; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
-        .legend-color { width: 16px; height: 16px; border-radius: 4px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 
         .grid-section { margin-bottom: 30px; }
         .section-title { font-size: 1.2rem; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid var(--primary); }
@@ -117,33 +120,48 @@
         .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.7; }
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
-        .slot-btn { padding: 8px; border: 1px solid transparent; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; transition: background-color 0.2s; }
-        .slot-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
+        .slot-btn { padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-align: center; transition: background-color 0.2s; }
+        .slot-btn.available { background-color: var(--available); color: var(--available-text); }
         .slot-btn.occupied { cursor: not-allowed; opacity: 0.95; }
-        .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); }
+        .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); border-color: var(--selected); }
         
         .slot-btn.admin-occupied { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px; line-height: 1.2; cursor: not-allowed; }
         .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .slot-btn.admin-occupied span.time-txt { font-size: 0.85rem; font-weight: 600; }
 
-        /* Pastelové barvy pro identifikaci uživatelů (sdílené veřejnost i admin) */
-        .uc-0 { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
-        .uc-1 { background-color: #e2d9f3; color: #381b53; border-color: #d3c4ec; }
-        .uc-2 { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
-        .uc-3 { background-color: #fff3cd; color: #856404; border-color: #ffe8a1; }
-        .uc-4 { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
-        .uc-5 { background-color: #e2e3e5; color: #383d41; border-color: #d6d8db; }
-        .uc-6 { background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
-        .uc-7 { background-color: #fce8e6; color: #c5221f; border-color: #fad1ce; }
+        /* VÝRAZNÉ A KONTRASTNÍ BARVY PRO UŽIVATELE (Světlý režim) */
+        .uc-0 { background-color: #0d6efd; color: #ffffff; border-color: #0a58ca; } /* Modrá */
+        .uc-1 { background-color: #6f42c1; color: #ffffff; border-color: #59359a; } /* Fialová */
+        .uc-2 { background-color: #198754; color: #ffffff; border-color: #146c43; } /* Zelená */
+        .uc-3 { background-color: #fd7e14; color: #ffffff; border-color: #e0690b; } /* Oranžová */
+        .uc-4 { background-color: #e83e8c; color: #ffffff; border-color: #ba3270; } /* Růžová */
+        .uc-5 { background-color: #0dcaf0; color: #000000; border-color: #0aa2c0; } /* Tyrkysová */
+        .uc-6 { background-color: #ffc107; color: #000000; border-color: #cc9a06; } /* Žlutá */
+        .uc-7 { background-color: #dc3545; color: #ffffff; border-color: #b02a37; } /* Červená */
         
+        /* Tmavý režim - pastelovější/čitelnější na tmavém pozadí */
         [data-theme="dark"] .uc-0 { background-color: #003366; color: #99ccff; border-color: #004080; }
         [data-theme="dark"] .uc-1 { background-color: #2b1747; color: #c4b5fd; border-color: #381f5c; }
-        [data-theme="dark"] .uc-2 { background-color: #4a121a; color: #ff99a8; border-color: #631722; }
-        [data-theme="dark"] .uc-3 { background-color: #4d3a00; color: #ffe066; border-color: #664d00; }
-        [data-theme="dark"] .uc-4 { background-color: #0f401b; color: #8fdfa4; border-color: #135222; }
-        [data-theme="dark"] .uc-5 { background-color: #2c2e2f; color: #a2aab0; border-color: #383b3d; }
-        [data-theme="dark"] .uc-6 { background-color: #093c47; color: #82cddb; border-color: #0c4d5a; }
-        [data-theme="dark"] .uc-7 { background-color: #5c100e; color: #f4a5a1; border-color: #751411; }
+        [data-theme="dark"] .uc-2 { background-color: #0f401b; color: #8fdfa4; border-color: #135222; }
+        [data-theme="dark"] .uc-3 { background-color: #5c2800; color: #ffb380; border-color: #803700; }
+        [data-theme="dark"] .uc-4 { background-color: #4a1236; color: #f48fb1; border-color: #611847; }
+        [data-theme="dark"] .uc-5 { background-color: #093c47; color: #82cddb; border-color: #0c4d5a; }
+        [data-theme="dark"] .uc-6 { background-color: #4d3a00; color: #ffe066; border-color: #664d00; }
+        [data-theme="dark"] .uc-7 { background-color: #4a121a; color: #ff99a8; border-color: #631722; }
+
+        /* LIVE ZVÝRAZNĚNÍ BĚŽÍCÍHO SLOTU */
+        @keyframes pulse-live {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 7px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        .live-slot { border: 2px solid var(--danger) !important; animation: pulse-live 2s infinite; position: relative; z-index: 2; font-weight: 800; }
+        [data-theme="dark"] .live-slot { border-color: #ff4d4d !important; animation: pulse-live-dark 2s infinite; }
+        @keyframes pulse-live-dark {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.6); }
+            70% { box-shadow: 0 0 0 7px rgba(255, 77, 77, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+        }
 
         /* Optimalizace pro mobily - Skrytí časů plně obsazeného stolu */
         @media (max-width: 768px) {
@@ -246,10 +264,11 @@
             <div class="slots-count-badge badge-green" id="slots-count-badge">🏓 Volné sloty na rezervaci: -- / 48</div>
             <div class="slots-count-badge badge-green" id="walkin-count-badge">🏓 Stoly bez rezervace: --/3</div>
         </div>
-        <div class="legend">
+        <div class="legend" style="align-items: center;">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
-            <div class="legend-item"><div class="legend-color" style="background: var(--selected);"></div> Vybráno</div>
-            <div class="legend-item"><div class="legend-color" style="background: var(--occupied);"></div> Obsazeno</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--selected); border-color: var(--selected);"></div> Vybráno</div>
+            <div class="legend-item"><div class="legend-color uc-0" style="border:none;"></div> Obsazeno</div>
+            <div class="legend-item"><div class="legend-color" style="border: 2px solid var(--danger); background: transparent; width: 20px; height: 20px;"></div> Právě probíhá</div>
         </div>
     </div>
     
@@ -301,7 +320,16 @@
         <h4>Aktivní rezervace na vybraný den</h4>
         <div style="overflow-x: auto; margin-top: 10px;">
             <table class="admin-table">
-                <thead><tr><th>Jméno a příjmení</th><th>E-mail</th><th>Telefon</th><th>Rezervované stoly a časy</th><th>Celkem Kč</th><th>Akce</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Jméno a příjmení</th>
+                        <th>E-mail <button type="button" class="btn-cancel" id="btn-copy-emails" style="padding: 2px 8px; font-size: 0.8rem; margin-left: 5px; background: #6c757d; border-radius: 4px;" title="Zkopírovat všechny unikátní e-maily">📋 Copy</button></th>
+                        <th>Telefon</th>
+                        <th>Rezervované stoly a časy</th>
+                        <th>Celkem Kč</th>
+                        <th>Akce</th>
+                    </tr>
+                </thead>
                 <tbody id="admin-booking-list"></tbody>
             </table>
         </div>
@@ -363,6 +391,7 @@
     </div>
 </div>
 
+<!-- Modaly pro přihlášení, GDPR, atd. -->
 <div class="modal-overlay" id="admin-login-modal">
     <div class="modal-card" style="max-width: 400px;">
         <div class="modal-header">
@@ -487,12 +516,30 @@
     const PRICE_PER_SLOT = 75;
     const TOTAL_SLOTS = 6 * timeSlots.length;
 
-    // Sdílené přiřazení pastelové barvy pro uživatele (stejná pro admina i veřejnost)
+    // Sdílené přiřazení syté barvy pro uživatele (stejná pro admina i veřejnost)
     function getUserColorClass(identifier) {
         if (!identifier) return 'uc-5';
         let hash = 0;
         for (let i = 0; i < identifier.length; i++) { hash = identifier.charCodeAt(i) + ((hash << 5) - hash); }
         return `uc-${Math.abs(hash) % 8}`;
+    }
+
+    // Detekce právě probíhajícího slotu
+    function isCurrentLiveSlot(dateStr, slotStr) {
+        const todayStr = getLocalIsoDate();
+        if (dateStr !== todayStr) return false;
+        
+        const now = new Date();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        
+        const [start, end] = slotStr.split('-');
+        const [sH, sM] = start.split(':').map(Number);
+        const [eH, eM] = end.split(':').map(Number);
+        
+        const startMins = sH * 60 + sM;
+        const endMins = eH * 60 + eM;
+        
+        return currentMins >= startMins && currentMins < endMins;
     }
 
     let selectedSelections = []; let selectedDate = null;
@@ -561,6 +608,24 @@
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
 
+    // Akce pro zkopírování e-mailů do schránky
+    document.getElementById('btn-copy-emails').addEventListener('click', () => {
+        if (currentBookings.length === 0) {
+            alert('Na tento den nejsou žádné aktivní rezervace s e-maily.');
+            return;
+        }
+        const emails = [...new Set(currentBookings.map(b => b.email).filter(e => e))];
+        if (emails.length === 0) {
+            alert('Nebyly nalezeny žádné e-mailové adresy.');
+            return;
+        }
+        navigator.clipboard.writeText(emails.join(', ')).then(() => {
+            alert(`Úspěšně zkopírováno ${emails.length} unikátních e-mailů do schránky.`);
+        }).catch(() => {
+            alert('Chyba při kopírování e-mailů do schránky.');
+        });
+    });
+
     async function openAdminLoginModal() {
         if (isAdminLoggedIn) { alert('Již jste přihlášeni jako správce.'); return; }
         adminPwdInput.value = ''; adminPwdInput.disabled = false; btnSubmitAdminLogin.disabled = false;
@@ -619,7 +684,6 @@
         btnExecuteSingleDelete.disabled = false; btnExecuteSingleDelete.textContent = "Ano";
     });
 
-    // Zablokování a odblokování dne (Stůl = 0)
     btnBlockDay.addEventListener('click', async () => {
         if (!supabaseClient) return;
         const reason = adminBlockReason.value.trim() || "Z technických důvodů zrušeno.";
@@ -771,12 +835,10 @@
         await fetchOnsiteStatus();
         const fetched = await fetchBookings();
         
-        // Zjištění, jestli je den zablokovaný (Stůl 0)
         const blockRecord = fetched.active.find(b => b.stul === 0);
         isDayBlocked = !!blockRecord;
         blockReasonText = blockRecord ? blockRecord.jmeno : "";
 
-        // Očištění dat od fiktivního stolu 0
         currentBookings = fetched.active.filter(b => b.stul > 0); 
         cancelledBookings = fetched.cancelled.filter(b => b.stul > 0); 
         pastBookings = fetched.past.filter(b => b.stul > 0);
@@ -787,7 +849,6 @@
             slotsCountBadge.style.display = 'none';
             walkinCountBadge.style.display = 'none';
             blockedDayBanner.classList.add('active');
-            // Zobrazení jasného důvodu pro veřejnost i admina
             blockedDayReasonText.innerHTML = `Herna je pro veřejnost uzavřena.<br><br><strong>Důvod zrušení:</strong> ${escapeHTML(blockReasonText)}`;
             
             adminBlockReason.value = blockReasonText;
@@ -887,24 +948,24 @@
                 const bookingInfo = currentBookings.find(b => b.stul === t && b.cas === slot);
                 const isOccupied = !!bookingInfo;
                 const isSelected = selectedSelections.some(s => s.table === t && s.slot === slot);
+                const isLive = isCurrentLiveSlot(selectedDate, slot);
                 
                 const btn = document.createElement('button');
                 
                 if (isOccupied) {
-                    // Generujeme stejnou barvu pro admina i pro veřejnost (podle e-mailu/jména)
                     const userKey = bookingInfo.email || bookingInfo.jmeno || 'Neznámý';
                     const colorClass = getUserColorClass(userKey);
                     
                     if (isAdminLoggedIn) {
-                        btn.className = `slot-btn admin-occupied ${colorClass}`;
+                        btn.className = `slot-btn admin-occupied ${colorClass} ${isLive ? 'live-slot' : ''}`;
                         btn.innerHTML = `<span>${escapeHTML(bookingInfo.jmeno || 'Bez jména')}</span><span class="time-txt">${slot}</span>`;
                     } else {
-                        btn.className = `slot-btn occupied ${colorClass}`;
+                        btn.className = `slot-btn occupied ${colorClass} ${isLive ? 'live-slot' : ''}`;
                         btn.textContent = slot;
                     }
                     btn.disabled = true;
                 } else {
-                    btn.className = `slot-btn ${isSelected ? 'selected' : 'available'}`;
+                    btn.className = `slot-btn ${isSelected ? 'selected' : 'available'} ${isLive ? 'live-slot' : ''}`;
                     btn.textContent = slot; 
                     btn.addEventListener('click', () => toggleSlotSelection(t, slot));
                 }
@@ -1084,6 +1145,9 @@
         }
         submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci";
     });
+
+    // Přenastavení gridu každou minutu pro případnou aktualizaci zvýraznění live slotu
+    setInterval(() => { if (!isDayBlocked) renderGrid(); }, 60000);
 
     async function initApp() {
         initDatePicker(); updateFormValidationForAdmin(); loadSavedUserData(); checkGdprNoticeDate();
