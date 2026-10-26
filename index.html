@@ -107,6 +107,25 @@
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 
+        /* Styly pro orientační plán */
+        .plan-section { margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
+        .plan-header { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 8px; }
+        .btn-toggle-plan { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-toggle-plan:hover { background-color: var(--non-res); }
+        .plan-container { display: flex; justify-content: center; align-items: center; width: 100%; cursor: pointer; transition: transform 0.2s ease; }
+        .plan-container:hover { transform: scale(1.01); }
+        .plan-image { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .plan-svetly { display: block; }
+        .plan-tmavy { display: none; }
+        [data-theme="dark"] .plan-svetly { display: none; }
+        [data-theme="dark"] .plan-tmavy { display: block; }
+        .plan-hint { text-align: center; font-size: 0.8rem; color: var(--subtext); margin-top: 6px; font-style: italic; }
+
+        /* Modal pro zvětšení obrázku */
+        .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; cursor: zoom-out; }
+        .image-modal.active { display: flex; }
+        .image-modal img { max-width: 95%; max-height: 95vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
         .grid-section { margin-bottom: 30px; }
         .section-title { font-size: 1.2rem; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid var(--primary); }
 
@@ -309,6 +328,25 @@
             <span><strong>Zrušení rezervace:</strong> Pro částečné nebo úplné zrušení rezervace použijte <strong>⚙️ Změna rezervace</strong>.</span>
         </div>
         <button type="button" class="btn-cancel" id="open-user-token-modal-btn" style="font-size: 0.85rem; padding: 6px 12px; background-color: var(--primary);">⚙️ Změna rezervace</button>
+    </div>
+
+    <!-- Orientační plán hrací plochy (Skrývatelný, Zvětšovací) -->
+    <div class="plan-section" id="plan-section">
+        <div class="plan-header">
+            <button class="btn-toggle-plan" id="btn-toggle-plan" title="Skrýt/Zobrazit plánek pro tento prohlížeč">👁️ Skrýt orientační plánek napořád</button>
+        </div>
+        <div id="plan-content-wrapper">
+            <div class="plan-container" id="plan-container" title="Klikněte pro zvětšení">
+                <img class="plan-image plan-svetly" src="světlý motiv.jpg" alt="Orientační plán hrací plochy">
+                <img class="plan-image plan-tmavy" src="černý motiv.jpg" alt="Orientační plán hrací plochy">
+            </div>
+            <p class="plan-hint">🔍 Klikněte na obrázek pro zvětšení</p>
+        </div>
+    </div>
+
+    <!-- Modal pro zvětšení obrázku -->
+    <div class="image-modal" id="image-modal">
+        <img id="image-modal-content" src="" alt="Zvětšený plán">
     </div>
 
     <div class="blocked-day-banner" id="blocked-day-banner">
@@ -611,6 +649,48 @@
         document.addEventListener(evt, resetInactivityTimer, { passive: true });
     });
 
+    // --- Funkce pro plánek ---
+    const btnTogglePlan = document.getElementById('btn-toggle-plan');
+    const planContentWrapper = document.getElementById('plan-content-wrapper');
+    const planContainer = document.getElementById('plan-container');
+    const imageModal = document.getElementById('image-modal');
+    const imageModalContent = document.getElementById('image-modal-content');
+    
+    function initPlanVisibility() {
+        const isHidden = localStorage.getItem('ttc_elizza_plan_hidden') === 'true';
+        if (isHidden) {
+            planContentWrapper.style.display = 'none';
+            btnTogglePlan.innerHTML = '👁️ Zobrazit orientační plánek';
+        } else {
+            planContentWrapper.style.display = 'block';
+            btnTogglePlan.innerHTML = '👁️ Skrýt orientační plánek napořád';
+        }
+    }
+
+    btnTogglePlan.addEventListener('click', () => {
+        const currentlyHidden = planContentWrapper.style.display === 'none';
+        if (currentlyHidden) {
+            planContentWrapper.style.display = 'block';
+            btnTogglePlan.innerHTML = '👁️ Skrýt orientační plánek napořád';
+            localStorage.setItem('ttc_elizza_plan_hidden', 'false');
+        } else {
+            planContentWrapper.style.display = 'none';
+            btnTogglePlan.innerHTML = '👁️ Zobrazit orientační plánek';
+            localStorage.setItem('ttc_elizza_plan_hidden', 'true');
+        }
+    });
+
+    planContainer.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        imageModalContent.src = isDark ? 'černý motiv.jpg' : 'světlý motiv.jpg';
+        imageModal.classList.add('active');
+    });
+
+    imageModal.addEventListener('click', () => {
+        imageModal.classList.remove('active');
+    });
+    // ------------------------
+
     const timeSlots = ["17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00", "19:00-19:30", "19:30-20:00", "20:00-20:30", "20:30-21:00"];
     const PRICE_PER_SLOT = 75;
     const TOTAL_SLOTS = 6 * timeSlots.length;
@@ -672,6 +752,7 @@
     const adminPastList = document.getElementById('admin-past-list');
     const slotsCountBadge = document.getElementById('slots-count-badge');
     const walkinCountBadge = document.getElementById('walkin-count-badge');
+    const planSection = document.getElementById('plan-section');
     
     const adminBlockReason = document.getElementById('admin-block-reason');
     const btnBlockDay = document.getElementById('btn-block-day');
@@ -739,7 +820,6 @@
     const inputEmail = document.getElementById('cust-email');
     const inputPhone = document.getElementById('cust-phone');
 
-    // Funkce pro smazání uložených údajů z LocalStorage
     function clearStoredUserData() {
         localStorage.removeItem('ttc_elizza_user_data');
         localStorage.removeItem('ttc_elizza_lookup_email');
@@ -841,7 +921,6 @@
         btnUnblockDay.disabled = false;
     });
 
-    // --- ZMĚNA REZERVACE ---
     async function handleTokenFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         const emailToken = urlParams.get('email');
@@ -1232,6 +1311,7 @@
             infoNoticeBanner.style.display = 'none';
             slotsCountBadge.style.display = 'none';
             walkinCountBadge.style.display = 'none';
+            planSection.style.display = 'none';
             blockedDayBanner.classList.add('active');
             blockedDayReasonText.innerHTML = `Herna je pro veřejnost uzavřena.<br><br><strong>Důvod zrušení:</strong> ${escapeHTML(blockReasonText)}`;
             
@@ -1243,6 +1323,7 @@
             infoNoticeBanner.style.display = 'flex';
             slotsCountBadge.style.display = 'block';
             walkinCountBadge.style.display = 'block';
+            planSection.style.display = 'flex';
             blockedDayBanner.classList.remove('active');
             
             adminBlockReason.value = '';
@@ -1543,6 +1624,7 @@
 
     async function initApp() {
         initDatePicker(); updateFormValidationForAdmin(); loadSavedUserData(); checkGdprNoticeDate();
+        initPlanVisibility();
 
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
