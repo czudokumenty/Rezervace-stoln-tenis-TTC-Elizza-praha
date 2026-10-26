@@ -58,8 +58,11 @@
         .gdpr-alert-topbar { display: none; background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         [data-theme="dark"] .gdpr-alert-topbar { background-color: #4a3b00; color: #ffe066; border-color: #665200; }
         .gdpr-alert-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .btn-gdpr-delete { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; }
-        .btn-gdpr-delete:hover { background-color: #bb2d3b; }
+        
+        /* Taktilní prvky: GDPRmazací tlačítko */
+        .btn-gdpr-delete { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .btn-gdpr-delete:hover { background-color: #bb2d3b; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(220,53,69,0.3); }
+        .btn-gdpr-delete:active { transform: translateY(1px); }
 
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
@@ -74,15 +77,19 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .admin-login-btn { background-color: #343a40; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .admin-login-btn:hover { background-color: #212529; }
+        /* Taktilní prvek: Admin tlačítko v hlavičce */
+        .admin-login-btn { background-color: #343a40; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .admin-login-btn:hover { background-color: #212529; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.25); }
+        .admin-login-btn:active { transform: translateY(0px); }
 
         .controls { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 15px; }
         .date-picker-group { display: flex; align-items: center; gap: 10px; }
         .date-picker-group label { font-weight: 600; }
         
         input[type="date"]::-webkit-clear-button { display: none; }
-        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; background-color: var(--input-bg); color: var(--text); }
+        input[type="date"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"] { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; background-color: var(--input-bg); color: var(--text); transition: border-color 0.2s, box-shadow 0.2s; }
+        input[type="date"]:hover, input[type="text"]:hover, input[type="email"]:hover, input[type="tel"]:hover, input[type="password"]:hover { border-color: var(--primary); }
+        input[type="date"]:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="password"]:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15); }
 
         .info-notice-banner { background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .badges-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -107,11 +114,15 @@
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 
-        /* Styly pro orientační plán (zmenšený, vejde se na obrazovku) */
+        /* Styly pro orientační plán */
         .plan-section { margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
         .plan-header { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .btn-toggle-plan { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .btn-toggle-plan:hover { background-color: var(--non-res); }
+        
+        /* Taktilní prvek: Tlačítko pro skrytí plánku */
+        .btn-toggle-plan { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: transform 0.15s ease, background-color 0.2s, border-color 0.2s, box-shadow 0.2s; }
+        .btn-toggle-plan:hover { background-color: var(--non-res); border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-toggle-plan:active { transform: translateY(1px); }
+
         .plan-container { display: flex; justify-content: center; align-items: center; width: 100%; }
         .plan-image { max-width: 100%; max-height: 400px; height: auto; object-fit: contain; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .plan-svetly { display: block; }
@@ -123,8 +134,12 @@
         .section-title { font-size: 1.2rem; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid var(--primary); }
 
         .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
-        .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
         
+        /* Taktilní prvek: Jemné nadzvednutí celé karty stolů při najetí myší */
+        .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+        .table-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); border-color: var(--primary); }
+        
+        /* Taktilní prvek: Hlavičkové tlačítko pro výběr celého stolu */
         .table-header-btn { 
             background: transparent; 
             border: 2px solid var(--primary); 
@@ -144,8 +159,10 @@
             gap: 2px;
             height: 54px; 
         }
-        .table-header-btn:hover:not(:disabled), .table-header-btn.all-selected { background-color: var(--primary); color: white; }
-        .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.8; }
+        .table-header-btn:hover:not(:disabled) { background-color: var(--primary); color: white; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3); }
+        .table-header-btn:active:not(:disabled) { transform: translateY(1px); }
+        .table-header-btn.all-selected { background-color: var(--primary); color: white; }
+        .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.8; transform: none !important; box-shadow: none !important; }
         
         .header-subtext {
             font-size: 0.75rem;
@@ -155,6 +172,7 @@
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
         
+        /* Taktilní prvek: Tlačítka jednotlivých slotů */
         .slot-btn { 
             padding: 6px 8px; 
             border: 1px solid transparent; 
@@ -163,7 +181,7 @@
             font-size: 0.85rem; 
             cursor: pointer; 
             text-align: center; 
-            transition: background-color 0.2s; 
+            transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s, filter 0.2s; 
             height: 48px; 
             width: 100%;
             display: flex; 
@@ -173,8 +191,14 @@
             line-height: 1.2;
         }
         .slot-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
+        .slot-btn.available:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(25, 135, 84, 0.3); }
+        .slot-btn.available:active { transform: translateY(1px); }
+
         .slot-btn.occupied { cursor: not-allowed; opacity: 0.95; border: 1px solid rgba(0,0,0,0.1); }
+        
         .slot-btn.selected { background-color: var(--selected); color: var(--selected-text); }
+        .slot-btn.selected:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3); }
+        .slot-btn.selected:active { transform: translateY(1px); }
         
         .slot-btn.admin-occupied { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 2px 4px; cursor: not-allowed; border: 1px solid rgba(0,0,0,0.1); }
         .slot-btn.admin-occupied span { font-size: 0.65rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-align: center; }
@@ -218,11 +242,14 @@
             .slot-btn { height: auto !important; padding: 8px !important; }
         }
 
-        /* Styly pro stoly 7, 8, 9 (jednotný blokový styl jako stoly 1-6) */
+        /* Styly pro stoly 7, 8, 9 (volná hra) + taktilní karta */
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .non-reservable-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
+        .non-reservable-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+        .non-reservable-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); border-color: var(--primary); }
+        
         .non-reservable-header { border: 2px solid var(--primary); color: var(--primary); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; height: 54px; display: flex; align-items: center; justify-content: center; background: transparent; }
         
+        /* Taktilní prvek pro tlačítka volné hry 7-9 */
         .walkin-btn {
             padding: 6px 8px;
             border-radius: 6px;
@@ -237,22 +264,32 @@
             justify-content: center;
             line-height: 1.2;
             border: 1px solid transparent;
+            transition: transform 0.15s ease, filter 0.2s, box-shadow 0.2s;
         }
         .walkin-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
         .walkin-btn.occupied { background-color: var(--danger); color: #ffffff; border-color: #b02a37; }
         [data-theme="dark"] .walkin-btn.occupied { background-color: #4a121a; color: #ff99a8; border-color: #7a1f2b; }
+        
+        .walkin-btn[style*="cursor: pointer"]:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
+        .walkin-btn[style*="cursor: pointer"]:active { transform: translateY(1px); }
 
         .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); }
         .booking-panel.active { display: block; }
         .mobile-summary-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .mobile-summary-info .m-price { font-size: 1.15rem; font-weight: 700; color: #198754; display: block; }
         .mobile-summary-info .m-slots { font-size: 0.85rem; color: var(--subtext); }
-        .btn-continue-mobile { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); }
+        
+        /* Taktilní prvek: Mobilní pokračovací tlačítko */
+        .btn-continue-mobile { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .btn-continue-mobile:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(13, 110, 253, 0.4); }
+        .btn-continue-mobile:active { transform: translateY(1px); }
+
         .booking-content { display: none; padding: 15px 20px; max-width: 1200px; margin: 0 auto; flex-direction: column; gap: 15px; }
-        .btn-collapse-mobile { display: none; background: transparent; border: none; color: var(--primary); font-weight: 600; font-size: 0.95rem; text-align: left; cursor: pointer; margin-bottom: -5px; }
-        .booking-panel.expanded .mobile-summary-bar { display: none; }
-        .booking-panel.expanded .booking-content { display: flex; }
-        .booking-panel.expanded .btn-collapse-mobile { display: block; }
+        
+        /* Taktilní prvek: Kolabovací tlačítko zpět */
+        .btn-collapse-mobile { display: none; background: transparent; border: none; color: var(--primary); font-weight: 600; font-size: 0.95rem; text-align: left; cursor: pointer; margin-bottom: -5px; transition: color 0.2s; }
+        .btn-collapse-mobile:hover { color: var(--primary-hover); text-decoration: underline; }
+
         .summary-info-grid h4 { margin: 0; font-size: 1.05rem; white-space: nowrap; }
         .summary-info-grid p { margin: 0; color: var(--text); font-size: 0.95rem; }
         .price-tag { color: #198754; font-weight: bold; font-size: 1.1rem; white-space: nowrap; }
@@ -260,9 +297,19 @@
         .inputs-row { display: flex; gap: 10px; flex-wrap: wrap; }
         .checkbox-container { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--subtext); user-select: none; cursor: pointer; }
         .gdpr-notice-text { font-size: 0.8rem; color: var(--subtext); margin-top: 4px; }
-        .gdpr-link { color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; }
-        .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        
+        /* Taktilní prvek: GDPR odkaz */
+        .gdpr-link { color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; transition: color 0.2s; }
+        .gdpr-link:hover { color: var(--primary-hover); }
+
+        /* Taktilní prvky: Hlavní tlačítka Confirm a Cancel */
+        .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .btn-confirm:hover { background-color: #146c43; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(25,135,84,0.3); }
+        .btn-confirm:active { transform: translateY(1px); }
+
+        .btn-cancel { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .btn-cancel:hover { background-color: #5c636a; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(108,117,125,0.3); }
+        .btn-cancel:active { transform: translateY(1px); }
 
         @media (min-width: 768px) {
             .mobile-summary-bar { display: none !important; }
@@ -276,7 +323,11 @@
         .modal-card { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 12px; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; gap: 15px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .modal-header h3 { margin: 0; font-size: 1.3rem; }
-        .modal-close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: 0 5px; }
+        
+        /* Taktilní prvek: Křížek pro zavření modalu */
+        .modal-close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: 0 5px; border-radius: 4px; transition: color 0.2s, background-color 0.2s; }
+        .modal-close-btn:hover { color: var(--danger); background-color: rgba(0,0,0,0.05); }
+
         .modal-body { font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: 12px; }
         .modal-body ul { padding-left: 20px; margin: 0; }
         .modal-footer { border-top: 1px solid var(--border); padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px; }
@@ -286,8 +337,16 @@
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
         .admin-table th, .admin-table td { padding: 10px; border: 1px solid var(--border); text-align: left; }
         .admin-table th { background-color: var(--non-res); }
-        .btn-delete { background-color: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .btn-restore { background-color: #0d6efd; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        
+        /* Taktilní prvky v admin tabulkách (Mazací a obnovovací tlačítka) */
+        .btn-delete { background-color: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .btn-delete:hover { background-color: #bb2d3b; transform: translateY(-1px); box-shadow: 0 3px 6px rgba(220,53,69,0.3); }
+        .btn-delete:active { transform: translateY(1px); }
+
+        .btn-restore { background-color: #0d6efd; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
+        .btn-restore:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 3px 6px rgba(13,110,253,0.3); }
+        .btn-restore:active { transform: translateY(1px); }
+
         .history-title { margin-top: 30px; padding-top: 15px; border-top: 2px dashed var(--border); color: var(--subtext); }
         .total-row td { border-top: 3px solid var(--text) !important; background-color: var(--non-res); font-size: 1.05rem; }
     </style>
@@ -344,7 +403,7 @@
         <button type="button" class="btn-cancel" id="open-user-token-modal-btn" style="font-size: 0.85rem; padding: 6px 12px; background-color: var(--primary);">⚙️ Změna rezervace</button>
     </div>
 
-    <!-- Orientační plán hrací plochy (Zmenšený, vejde se na obrazovku) -->
+    <!-- Orientační plán hrací plochy -->
     <div class="plan-section" id="plan-section">
         <div class="plan-header">
             <button class="btn-toggle-plan" id="btn-toggle-plan" title="Skrýt/Zobrazit plánek pro tento prohlížeč">👁️ Skrýt orientační plánek napořád</button>
@@ -656,7 +715,7 @@
         document.addEventListener(evt, resetInactivityTimer, { passive: true });
     });
 
-    // --- Funkce pro plánek (skrývání bez zvětšování) ---
+    // --- Funkce pro plánek (skrývání) ---
     const btnTogglePlan = document.getElementById('btn-toggle-plan');
     const planContentWrapper = document.getElementById('plan-content-wrapper');
     
