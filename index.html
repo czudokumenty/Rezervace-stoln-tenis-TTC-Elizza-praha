@@ -338,7 +338,7 @@
         <div id="plan-content-wrapper">
             <div class="plan-container" id="plan-container" title="Klikněte pro zvětšení">
                 <img class="plan-image plan-svetly" src="světlý motiv.jpg" alt="Orientační plán hrací plochy">
-                <img class="plan-image plan-tmavy" src="černý motiv.jpg" alt="Orientační plán hrací plochy">
+                <img class="plan-image plan-tmavy" src="tmavý motiv.jpg" alt="Orientační plán hrací plochy">
             </div>
             <p class="plan-hint">🔍 Klikněte na obrázek pro zvětšení</p>
         </div>
@@ -548,7 +548,6 @@
     </div>
 </div>
 
-<!-- PLNĚ AKTUALIZOVANÉ GDPR OKNO -->
 <div class="modal-overlay" id="gdpr-modal">
     <div class="modal-card">
         <div class="modal-header">
@@ -682,7 +681,7 @@
 
     planContainer.addEventListener('click', () => {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        imageModalContent.src = isDark ? 'černý motiv.jpg' : 'světlý motiv.jpg';
+        imageModalContent.src = isDark ? 'tmavý motiv.jpg' : 'světlý motiv.jpg';
         imageModal.classList.add('active');
     });
 
@@ -1209,7 +1208,6 @@
         });
     }
 
-    // --- BEZPEČNÉ NAČÍTÁNÍ DAT (VEŘEJNOST NEVIDÍ JMÉNA, ADMIN ANO) ---
     async function fetchBookings() {
         if (!supabaseClient) return { active: [], cancelled: [], past: [] };
         const todayStr = getLocalIsoDate();
