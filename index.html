@@ -867,7 +867,10 @@
             adminLoginBtn.textContent = '✅ Správce přihlášen'; adminLoginBtn.style.backgroundColor = '#198754';
             adminLogoutBtnHeader.style.display = 'block';
             resetInactivityTimer();
-            closeAdminLoginModal(); updateFormValidationForAdmin(); await loadAndRender();
+            closeAdminLoginModal(); 
+            updateFormValidationForAdmin(); 
+            updateDateRangeLimits(); // Povolení výběru vzdálených nedělí pro admina
+            await loadAndRender();
         }
         btnSubmitAdminLogin.disabled = false; btnSubmitAdminLogin.textContent = "Přihlásit";
     });
@@ -1169,17 +1172,30 @@
         return getLocalIsoDate(date);
     }
 
-    function initDatePicker() {
+    function updateDateRangeLimits() {
         const defaultSunday = getNextSunday(); 
         dateInput.min = defaultSunday; 
         
-        const maxDateObj = new Date();
-        maxDateObj.setDate(maxDateObj.getDate() + 14);
-        dateInput.max = getLocalIsoDate(maxDateObj);
+        if (isAdminLoggedIn) {
+            // Admin může volit libovolně daleko do budoucna (např. 1 rok dopředu)
+            const maxDateObj = new Date();
+            maxDateObj.setFullYear(maxDateObj.getFullYear() + 1);
+            dateInput.max = getLocalIsoDate(maxDateObj);
+        } else {
+            // Veřejnost max 2 týdny dopředu
+            const maxDateObj = new Date();
+            maxDateObj.setDate(maxDateObj.getDate() + 14);
+            dateInput.max = getLocalIsoDate(maxDateObj);
+        }
+    }
+
+    function initDatePicker() {
+        const defaultSunday = getNextSunday(); 
+        updateDateRangeLimits();
 
         dateInput.step = "7";
-        dateInput.value = defaultSunday;
-        selectedDate = defaultSunday;
+        if (!dateInput.value) dateInput.value = defaultSunday;
+        selectedDate = dateInput.value;
 
         dateInput.addEventListener('change', (e) => {
             if (!e.target.value) { dateInput.value = selectedDate; return; }
@@ -1576,7 +1592,9 @@
         toggleContactsBtn.textContent = '👁️ Zobrazit kontakty';
         adminLoginBtn.textContent = '🔒 Admin přihlášen'; adminLoginBtn.style.backgroundColor = '';
         adminLogoutBtnHeader.style.display = 'none';
-        updateFormValidationForAdmin(); await loadAndRender();
+        updateFormValidationForAdmin(); 
+        updateDateRangeLimits(); // Vrácení limitu 14 dnů pro veřejnost
+        await loadAndRender();
     }
 
     adminLogoutBtn.addEventListener('click', handleLogout); adminLogoutBtnHeader.addEventListener('click', handleLogout);
@@ -1627,7 +1645,7 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             isAdminLoggedIn = true; adminLoginBtn.textContent = '✅ Správce přihlášen'; adminLoginBtn.style.backgroundColor = '#198754';
-            adminLogoutBtnHeader.style.display = 'block'; updateFormValidationForAdmin(); resetInactivityTimer();
+            adminLogoutBtnHeader.style.display = 'block'; updateFormValidationForAdmin(); updateDateRangeLimits(); resetInactivityTimer();
         }
         await loadAndRender();
         await handleTokenFromUrl();
