@@ -107,24 +107,17 @@
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 
-        /* Styly pro orientační plán */
+        /* Styly pro orientační plán (zmenšený, vejde se na obrazovku) */
         .plan-section { margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
         .plan-header { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 8px; }
         .btn-toggle-plan { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .btn-toggle-plan:hover { background-color: var(--non-res); }
-        .plan-container { display: flex; justify-content: center; align-items: center; width: 100%; cursor: pointer; transition: transform 0.2s ease; }
-        .plan-container:hover { transform: scale(1.01); }
-        .plan-image { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .plan-container { display: flex; justify-content: center; align-items: center; width: 100%; }
+        .plan-image { max-width: 100%; max-height: 400px; height: auto; object-fit: contain; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .plan-svetly { display: block; }
         .plan-tmavy { display: none; }
         [data-theme="dark"] .plan-svetly { display: none; }
         [data-theme="dark"] .plan-tmavy { display: block; }
-        .plan-hint { text-align: center; font-size: 0.8rem; color: var(--subtext); margin-top: 6px; font-style: italic; }
-
-        /* Modal pro zvětšení obrázku */
-        .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); z-index: 2000; justify-content: center; align-items: center; cursor: zoom-out; }
-        .image-modal.active { display: flex; }
-        .image-modal img { max-width: 95%; max-height: 95vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
 
         .grid-section { margin-bottom: 30px; }
         .section-title { font-size: 1.2rem; margin-bottom: 12px; padding-left: 10px; border-left: 4px solid var(--primary); }
@@ -225,8 +218,29 @@
             .slot-btn { height: auto !important; padding: 8px !important; }
         }
 
-        .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .non-reservable-card { background: var(--non-res); color: var(--non-res-text); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid var(--border); }
+        /* Styly pro stoly 7, 8, 9 (jednotný blokový styl jako stoly 1-6) */
+        .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .non-reservable-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
+        .non-reservable-header { border: 2px solid var(--primary); color: var(--primary); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; height: 54px; display: flex; align-items: center; justify-content: center; background: transparent; }
+        
+        .walkin-btn {
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            height: 48px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+            border: 1px solid transparent;
+        }
+        .walkin-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
+        .walkin-btn.occupied { background-color: var(--danger); color: #ffffff; border-color: #b02a37; }
+        [data-theme="dark"] .walkin-btn.occupied { background-color: #4a121a; color: #ff99a8; border-color: #7a1f2b; }
 
         .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); }
         .booking-panel.active { display: block; }
@@ -318,7 +332,7 @@
         </div>
         <div class="legend" style="align-items: center;">
             <div class="legend-item"><div class="legend-color" style="background: var(--available);"></div> Volno</div>
-            <div class="legend-item"><div class="legend-color" style="border: 2px solid var(--danger); background: transparent; width: 20px; height: 20px;"></div> Právě probíhá</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--danger);"></div> Obsazeno</div>
         </div>
     </div>
     
@@ -330,23 +344,17 @@
         <button type="button" class="btn-cancel" id="open-user-token-modal-btn" style="font-size: 0.85rem; padding: 6px 12px; background-color: var(--primary);">⚙️ Změna rezervace</button>
     </div>
 
-    <!-- Orientační plán hrací plochy (Skrývatelný, Zvětšovací) -->
+    <!-- Orientační plán hrací plochy (Zmenšený, vejde se na obrazovku) -->
     <div class="plan-section" id="plan-section">
         <div class="plan-header">
             <button class="btn-toggle-plan" id="btn-toggle-plan" title="Skrýt/Zobrazit plánek pro tento prohlížeč">👁️ Skrýt orientační plánek napořád</button>
         </div>
         <div id="plan-content-wrapper">
-            <div class="plan-container" id="plan-container" title="Klikněte pro zvětšení">
+            <div class="plan-container" id="plan-container">
                 <img class="plan-image plan-svetly" src="světlý motiv.jpg" alt="Orientační plán hrací plochy">
                 <img class="plan-image plan-tmavy" src="tmavý motiv.jpg" alt="Orientační plán hrací plochy">
             </div>
-            <p class="plan-hint">🔍 Klikněte na obrázek pro zvětšení</p>
         </div>
-    </div>
-
-    <!-- Modal pro zvětšení obrázku -->
-    <div class="image-modal" id="image-modal">
-        <img id="image-modal-content" src="" alt="Zvětšený plán">
     </div>
 
     <div class="blocked-day-banner" id="blocked-day-banner">
@@ -648,12 +656,9 @@
         document.addEventListener(evt, resetInactivityTimer, { passive: true });
     });
 
-    // --- Funkce pro plánek ---
+    // --- Funkce pro plánek (skrývání bez zvětšování) ---
     const btnTogglePlan = document.getElementById('btn-toggle-plan');
     const planContentWrapper = document.getElementById('plan-content-wrapper');
-    const planContainer = document.getElementById('plan-container');
-    const imageModal = document.getElementById('image-modal');
-    const imageModalContent = document.getElementById('image-modal-content');
     
     function initPlanVisibility() {
         const isHidden = localStorage.getItem('ttc_elizza_plan_hidden') === 'true';
@@ -677,16 +682,6 @@
             btnTogglePlan.innerHTML = '👁️ Zobrazit orientační plánek';
             localStorage.setItem('ttc_elizza_plan_hidden', 'true');
         }
-    });
-
-    planContainer.addEventListener('click', () => {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        imageModalContent.src = isDark ? 'tmavý motiv.jpg' : 'světlý motiv.jpg';
-        imageModal.classList.add('active');
-    });
-
-    imageModal.addEventListener('click', () => {
-        imageModal.classList.remove('active');
     });
     // ------------------------
 
@@ -869,7 +864,7 @@
             resetInactivityTimer();
             closeAdminLoginModal(); 
             updateFormValidationForAdmin(); 
-            updateDateRangeLimits(); // Povolení výběru vzdálených nedělí pro admina
+            updateDateRangeLimits();
             await loadAndRender();
         }
         btnSubmitAdminLogin.disabled = false; btnSubmitAdminLogin.textContent = "Přihlásit";
@@ -1177,12 +1172,10 @@
         dateInput.min = defaultSunday; 
         
         if (isAdminLoggedIn) {
-            // Admin může volit libovolně daleko do budoucna (např. 1 rok dopředu)
             const maxDateObj = new Date();
             maxDateObj.setFullYear(maxDateObj.getFullYear() + 1);
             dateInput.max = getLocalIsoDate(maxDateObj);
         } else {
-            // Veřejnost max 2 týdny dopředu
             const maxDateObj = new Date();
             maxDateObj.setDate(maxDateObj.getDate() + 14);
             dateInput.max = getLocalIsoDate(maxDateObj);
@@ -1463,9 +1456,26 @@
         for (let t = 7; t <= 9; t++) {
             const isOccupied = onsiteStatus[t];
             const card = document.createElement('div');
-            card.className = `non-reservable-card ${isOccupied ? 'occupied-onsite' : ''}`;
-            card.innerHTML = `<h4>Stůl ${t}</h4><p>${isOccupied ? '🔴 Obsazeno na místě' : '🟢 Volno pro příchozí (bez rezervace)'}</p>
-                ${isAdminLoggedIn ? `<button class="btn-cancel" style="margin-top:10px; font-size:0.8rem;" onclick="toggleOnsiteStatus(${t})">Změnit stav (Admin)</button>` : ''}`;
+            card.className = 'non-reservable-card';
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'non-reservable-header';
+            headerDiv.innerHTML = `<span>Stůl ${t}</span>`;
+            card.appendChild(headerDiv);
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `walkin-btn ${isOccupied ? 'occupied' : 'available'}`;
+            btn.innerHTML = `<span>${isOccupied ? 'Obsazeno' : 'Volno'}</span>`;
+            
+            if (isAdminLoggedIn) {
+                btn.style.cursor = 'pointer';
+                btn.title = 'Kliknutím změnit stav';
+                btn.onclick = () => toggleOnsiteStatus(t);
+            } else {
+                btn.style.cursor = 'default';
+            }
+            card.appendChild(btn);
             nonReservableGrid.appendChild(card);
         }
         updateSlotsCount();
@@ -1593,7 +1603,7 @@
         adminLoginBtn.textContent = '🔒 Admin přihlášen'; adminLoginBtn.style.backgroundColor = '';
         adminLogoutBtnHeader.style.display = 'none';
         updateFormValidationForAdmin(); 
-        updateDateRangeLimits(); // Vrácení limitu 14 dnů pro veřejnost
+        updateDateRangeLimits();
         await loadAndRender();
     }
 
