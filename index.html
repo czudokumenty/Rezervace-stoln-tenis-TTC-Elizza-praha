@@ -65,14 +65,15 @@
 
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
-        .header-title p { color: var(--subtext); font-size: 0.95rem; display: flex; flex-direction: column; gap: 4px; }
         
-        @media (min-width: 768px) {
-            .header-title p { flex-direction: row; gap: 0; display: block; }
-            .header-title p span.separator { margin: 0 8px; }
-        }
-        @media (max-width: 767px) {
-            .header-title p span.separator { display: none; }
+        /* Styly pro rozdělení textu v hlavičce na mobilech (3 řádky) */
+        .header-desc { color: var(--subtext); font-size: 0.95rem; }
+        .header-desc .line-desktop { display: inline; }
+        .header-desc .line-mobile { display: none; }
+
+        @media (max-width: 768px) {
+            .header-desc .line-desktop { display: none; }
+            .header-desc .line-mobile { display: block; line-height: 1.4; }
         }
 
         .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
@@ -234,7 +235,6 @@
         .walkin-btn[style*="cursor: pointer"]:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
         .walkin-btn[style*="cursor: pointer"]:active { transform: translateY(1px); }
 
-        /* OPRAVENO: max-height, overflow a velmi vysoký z-index, aby mobilní panel fungoval naprosto bezchybně */
         .booking-panel { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); 
@@ -246,7 +246,6 @@
         .mobile-summary-info .m-price { font-size: 1.15rem; font-weight: 700; color: #198754; display: block; }
         .mobile-summary-info .m-slots { font-size: 0.85rem; color: var(--subtext); }
         
-        /* OPRAVENO: Tlačítko pokračovat na mobilu - vypnuto uskakování při kliku, je větší */
         .btn-continue-mobile { 
             background-color: var(--primary); color: white; border: none; 
             padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 1.05rem; 
@@ -338,12 +337,9 @@
     <header>
         <div class="header-title">
             <h1>TTC Elizza Praha – rezervace veřejnosti</h1>
-            <p>
-                <span>Rezervace stolů na stolní tenis</span>
-                <span class="separator">|</span>
-                <span>Neděle 17:00 – 21:00 (sloty po 30 min)</span>
-                <span class="separator">|</span>
-                <span>Cena: 150 Kč / hodina (75 Kč za 30 min)</span>
+            <p class="header-desc">
+                <span class="line-desktop">Rezervace stolů na stolní tenis | Neděle 17:00 – 21:00 (sloty po 30 min) | Cena: 150 Kč / hodina (75 Kč za 30 min)</span>
+                <span class="line-mobile">Rezervace stolů na stolní tenis<br>Neděle 17:00 – 21:00 (sloty po 30 min)<br>Cena: 150 Kč / hodina (75 Kč za 30 min)</span>
             </p>
         </div>
         <div class="header-actions">
@@ -542,13 +538,11 @@
         </div>
         <div style="display: flex; gap: 8px;">
             <button type="button" class="btn-cancel" style="padding: 10px 15px;" onclick="clearSelection()" title="Zrušit">✖</button>
-            <!-- OPRAVENO: Přidán přímý inline onclick zaručující bezchybnou aktivaci na mobilu -->
             <button type="button" class="btn-continue-mobile" id="btn-expand-mobile" onclick="document.getElementById('booking-panel').classList.add('expanded')">Pokračovat</button>
         </div>
     </div>
 
     <div class="booking-content" id="booking-content">
-        <!-- OPRAVENO: Přidán přímý inline onclick -->
         <button type="button" class="btn-collapse-mobile" id="btn-collapse-mobile" onclick="document.getElementById('booking-panel').classList.remove('expanded')">⬇ Zpět k výběru stolů</button>
         <div class="summary-info-grid">
             <h4 id="summary-title">Vybráno: 0 slotů</h4>
@@ -793,13 +787,6 @@
 
     const mobileSummaryPrice = document.getElementById('mobile-summary-price');
     const mobileSummarySlots = document.getElementById('mobile-summary-slots');
-    
-    // OPRAVENO: Události pro nová tlačítka vázaná přímo pomocí HTML "onclick",
-    // ale necháváme to zde i přes event listeners jako pojistku:
-    const btnExpandMobile = document.getElementById('btn-expand-mobile');
-    const btnCollapseMobile = document.getElementById('btn-collapse-mobile');
-    if(btnExpandMobile) { btnExpandMobile.addEventListener('click', () => bookingPanel.classList.add('expanded')); }
-    if(btnCollapseMobile) { btnCollapseMobile.addEventListener('click', () => bookingPanel.classList.remove('expanded')); }
 
     const adminLoginModal = document.getElementById('admin-login-modal');
     const adminLoginForm = document.getElementById('admin-login-form');
@@ -968,6 +955,7 @@
         const dateToken = urlParams.get('date');
         if (!emailToken || !dateToken) return;
 
+        if (!supabaseClient) return;
         const { data, error } = await supabaseClient.from('rezervace').select('*').eq('email', emailToken).eq('datum', dateToken).eq('zruseno', false);
         if (error || !data || data.length === 0) {
             alert('Nenalezeny žádné aktivní rezervace pro tento e-mail a datum.');
@@ -1144,8 +1132,7 @@
         const conflicts = (toRestoreRows || []).filter(res => freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas));
         
         if (conflicts.length > 0) {
-            alert(`Nelze obnovit! Následující sloty jsou již mezitím obsazené:
-${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
+            alert(`Nelze obnovit! Následující sloty jsou již mezitím obsazené:\n${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
             return;
         }
 
@@ -1661,8 +1648,7 @@ ${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
         const conflicts = selectedSelections.filter(sel => freshBookings.active.some(b => b.stul === sel.table && b.cas === sel.slot));
 
         if (conflicts.length > 0) {
-            alert(`Omlouváme se, tyto sloty už si právě někdo zarezervoval:
-${conflicts.map(c => `Stůl ${c.table} (${c.slot})`).join(', ')}`);
+            alert(`Omlouváme se, tyto sloty už si právě někdo zarezervoval:\n${conflicts.map(c => `Stůl ${c.table} (${c.slot})`).join(', ')}`);
             clearSelection(); loadAndRender(); submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci"; return;
         }
 
@@ -1678,14 +1664,11 @@ ${conflicts.map(c => `Stůl ${c.table} (${c.slot})`).join(', ')}`);
             const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
             const groupedByTable = {};
             selectedSelections.forEach(s => { if (!groupedByTable[s.table]) groupedByTable[s.table] = []; groupedByTable[s.table].push(s.slot); });
-            const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('
-');
+            const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('\n');
             const manageUrl = `https://czudokumenty.github.io/Rezervace-stoln-tenis-TTC-Elizza-praha/?email=${encodeURIComponent(email)}&date=${selectedDate}`;
 
             if (email) await sendConfirmationEmail({ name, email, phone, date: selectedDate, formattedDate: formatCzechDate(selectedDate), reservationText, totalPrice, manageUrl });
-            alert(`Rezervace byla úspěšně vytvořena!
-Datum: ${formatCzechDate(selectedDate)}
-Cena: ${totalPrice} Kč`);
+            alert(`Rezervace byla úspěšně vytvořena!\nDatum: ${formatCzechDate(selectedDate)}\nCena: ${totalPrice} Kč`);
             clearSelection(); loadAndRender();
         }
         submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci";
@@ -1697,11 +1680,14 @@ Cena: ${totalPrice} Kč`);
         initDatePicker(); updateFormValidationForAdmin(); loadSavedUserData(); checkGdprNoticeDate();
         initPlanVisibility();
 
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            isAdminLoggedIn = true; adminLoginBtn.textContent = '✅ Správce přihlášen'; adminLoginBtn.style.backgroundColor = '#198754';
-            adminLogoutBtnHeader.style.display = 'block'; updateFormValidationForAdmin(); updateDateRangeLimits(); resetInactivityTimer();
+        if (supabaseClient) {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                isAdminLoggedIn = true; adminLoginBtn.textContent = '✅ Správce přihlášen'; adminLoginBtn.style.backgroundColor = '#198754';
+                adminLogoutBtnHeader.style.display = 'block'; updateFormValidationForAdmin(); updateDateRangeLimits(); resetInactivityTimer();
+            }
         }
+        
         await loadAndRender();
         await handleTokenFromUrl();
     }
