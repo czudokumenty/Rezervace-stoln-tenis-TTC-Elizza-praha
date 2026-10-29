@@ -59,14 +59,22 @@
         [data-theme="dark"] .gdpr-alert-topbar { background-color: #4a3b00; color: #ffe066; border-color: #665200; }
         .gdpr-alert-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         
-        /* Taktilní prvky: GDPRmazací tlačítko */
         .btn-gdpr-delete { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
         .btn-gdpr-delete:hover { background-color: #bb2d3b; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(220,53,69,0.3); }
         .btn-gdpr-delete:active { transform: translateY(1px); }
 
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
-        .header-title p { color: var(--subtext); font-size: 0.95rem; }
+        .header-title p { color: var(--subtext); font-size: 0.95rem; display: flex; flex-direction: column; gap: 4px; }
+        
+        @media (min-width: 768px) {
+            .header-title p { flex-direction: row; gap: 0; display: block; }
+            .header-title p span.separator { margin: 0 8px; }
+        }
+        @media (max-width: 767px) {
+            .header-title p span.separator { display: none; }
+        }
+
         .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
 
         .theme-switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; user-select: none; }
@@ -77,7 +85,6 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        /* Taktilní prvek: Admin tlačítko v hlavičce */
         .admin-login-btn { background-color: #343a40; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
         .admin-login-btn:hover { background-color: #212529; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.25); }
         .admin-login-btn:active { transform: translateY(0px); }
@@ -114,11 +121,9 @@
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
 
-        /* Styly pro orientační plán */
         .plan-section { margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
         .plan-header { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 8px; }
         
-        /* Taktilní prvek: Tlačítko pro skrytí plánku */
         .btn-toggle-plan { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: transform 0.15s ease, background-color 0.2s, border-color 0.2s, box-shadow 0.2s; }
         .btn-toggle-plan:hover { background-color: var(--non-res); border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-toggle-plan:active { transform: translateY(1px); }
@@ -135,60 +140,30 @@
 
         .table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
         
-        /* Taktilní prvek: Jemné nadzvednutí celé karty stolů při najetí myší */
         .table-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .table-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); border-color: var(--primary); }
         
-        /* Taktilní prvek: Hlavičkové tlačítko pro výběr celého stolu */
         .table-header-btn { 
-            background: transparent; 
-            border: 2px solid var(--primary); 
-            color: var(--primary); 
-            padding: 6px 10px; 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            font-weight: 700; 
-            cursor: pointer; 
-            margin-bottom: 12px; 
-            width: 100%; 
-            transition: all 0.2s ease; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 2px;
-            height: 54px; 
+            background: transparent; border: 2px solid var(--primary); color: var(--primary); 
+            padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; 
+            margin-bottom: 12px; width: 100%; transition: all 0.2s ease; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 54px; 
         }
         .table-header-btn:hover:not(:disabled) { background-color: var(--primary); color: white; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3); }
         .table-header-btn:active:not(:disabled) { transform: translateY(1px); }
         .table-header-btn.all-selected { background-color: var(--primary); color: white; }
         .table-header-btn:disabled { border-color: var(--border); color: var(--subtext); background-color: var(--non-res); cursor: not-allowed; opacity: 0.8; transform: none !important; box-shadow: none !important; }
         
-        .header-subtext {
-            font-size: 0.75rem;
-            font-weight: 600;
-            line-height: 1;
-        }
+        .header-subtext { font-size: 0.75rem; font-weight: 600; line-height: 1; }
 
         .slot-list { display: flex; flex-direction: column; gap: 6px; }
         
-        /* Taktilní prvek: Tlačítka jednotlivých slotů */
         .slot-btn { 
-            padding: 6px 8px; 
-            border: 1px solid transparent; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            font-size: 0.85rem; 
-            cursor: pointer; 
-            text-align: center; 
+            padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; font-weight: 600; 
+            font-size: 0.85rem; cursor: pointer; text-align: center; 
             transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s, filter 0.2s; 
-            height: 48px; 
-            width: 100%;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            line-height: 1.2;
+            height: 48px; width: 100%; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; line-height: 1.2;
         }
         .slot-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
         .slot-btn.available:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(25, 135, 84, 0.3); }
@@ -242,29 +217,15 @@
             .slot-btn { height: auto !important; padding: 8px !important; }
         }
 
-        /* Styly pro stoly 7, 8, 9 (volná hra) + taktilní karta */
         .non-reservable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .non-reservable-card { background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .non-reservable-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); border-color: var(--primary); }
         
         .non-reservable-header { border: 2px solid var(--primary); color: var(--primary); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; height: 54px; display: flex; align-items: center; justify-content: center; background: transparent; }
         
-        /* Taktilní prvek pro tlačítka volné hry 7-9 */
         .walkin-btn {
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-align: center;
-            height: 48px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.2;
-            border: 1px solid transparent;
-            transition: transform 0.15s ease, filter 0.2s, box-shadow 0.2s;
+            padding: 6px 8px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; text-align: center; 
+            height: 48px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; border: 1px solid transparent; transition: transform 0.15s ease, filter 0.2s, box-shadow 0.2s;
         }
         .walkin-btn.available { background-color: var(--available); color: var(--available-text); border-color: var(--available); }
         .walkin-btn.occupied { background-color: var(--danger); color: #ffffff; border-color: #b02a37; }
@@ -273,23 +234,40 @@
         .walkin-btn[style*="cursor: pointer"]:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
         .walkin-btn[style*="cursor: pointer"]:active { transform: translateY(1px); }
 
-        .booking-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); display: none; z-index: 100; border-top: 1px solid var(--border); }
+        /* OPRAVENO: max-height, overflow a velmi vysoký z-index, aby mobilní panel fungoval naprosto bezchybně */
+        .booking-panel { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: var(--card-bg); box-shadow: 0 -4px 15px rgba(0,0,0,0.2); 
+            display: none; z-index: 9999; border-top: 1px solid var(--border); 
+            max-height: 90vh; overflow-y: auto; 
+        }
         .booking-panel.active { display: block; }
         .mobile-summary-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
         .mobile-summary-info .m-price { font-size: 1.15rem; font-weight: 700; color: #198754; display: block; }
         .mobile-summary-info .m-slots { font-size: 0.85rem; color: var(--subtext); }
         
-        /* Taktilní prvek: Mobilní pokračovací tlačítko */
-        .btn-continue-mobile { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
-        .btn-continue-mobile:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(13, 110, 253, 0.4); }
-        .btn-continue-mobile:active { transform: translateY(1px); }
+        /* OPRAVENO: Tlačítko pokračovat na mobilu - vypnuto uskakování při kliku, je větší */
+        .btn-continue-mobile { 
+            background-color: var(--primary); color: white; border: none; 
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 1.05rem; 
+            cursor: pointer; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); 
+            transition: background-color 0.2s, box-shadow 0.2s; 
+        }
+        .btn-continue-mobile:hover { background-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4); }
+        .btn-continue-mobile:active { transform: none; background-color: var(--primary-hover); }
 
         .booking-content { display: none; padding: 15px 20px; max-width: 1200px; margin: 0 auto; flex-direction: column; gap: 15px; }
         
-        /* Taktilní prvek: Kolabovací tlačítko zpět */
-        .btn-collapse-mobile { display: none; background: transparent; border: none; color: var(--primary); font-weight: 600; font-size: 0.95rem; text-align: left; cursor: pointer; margin-bottom: -5px; transition: color 0.2s; }
+        .btn-collapse-mobile { 
+            display: none; background: transparent; border: none; color: var(--primary); 
+            font-weight: 600; font-size: 1rem; text-align: left; cursor: pointer; 
+            margin-bottom: -5px; padding: 10px 0; transition: color 0.2s; 
+        }
         .btn-collapse-mobile:hover { color: var(--primary-hover); text-decoration: underline; }
 
+        .booking-panel.expanded .mobile-summary-bar { display: none; }
+        .booking-panel.expanded .booking-content { display: flex; }
+        
         .summary-info-grid h4 { margin: 0; font-size: 1.05rem; white-space: nowrap; }
         .summary-info-grid p { margin: 0; color: var(--text); font-size: 0.95rem; }
         .price-tag { color: #198754; font-weight: bold; font-size: 1.1rem; white-space: nowrap; }
@@ -298,11 +276,9 @@
         .checkbox-container { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--subtext); user-select: none; cursor: pointer; }
         .gdpr-notice-text { font-size: 0.8rem; color: var(--subtext); margin-top: 4px; }
         
-        /* Taktilní prvek: GDPR odkaz */
         .gdpr-link { color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; transition: color 0.2s; }
         .gdpr-link:hover { color: var(--primary-hover); }
 
-        /* Taktilní prvky: Hlavní tlačítka Confirm a Cancel */
         .btn-confirm { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
         .btn-confirm:hover { background-color: #146c43; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(25,135,84,0.3); }
         .btn-confirm:active { transform: translateY(1px); }
@@ -324,7 +300,6 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .modal-header h3 { margin: 0; font-size: 1.3rem; }
         
-        /* Taktilní prvek: Křížek pro zavření modalu */
         .modal-close-btn { background: transparent; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: 0 5px; border-radius: 4px; transition: color 0.2s, background-color 0.2s; }
         .modal-close-btn:hover { color: var(--danger); background-color: rgba(0,0,0,0.05); }
 
@@ -338,7 +313,6 @@
         .admin-table th, .admin-table td { padding: 10px; border: 1px solid var(--border); text-align: left; }
         .admin-table th { background-color: var(--non-res); }
         
-        /* Taktilní prvky v admin tabulkách (Mazací a obnovovací tlačítka) */
         .btn-delete { background-color: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: transform 0.15s ease, background-color 0.2s, box-shadow 0.2s; }
         .btn-delete:hover { background-color: #bb2d3b; transform: translateY(-1px); box-shadow: 0 3px 6px rgba(220,53,69,0.3); }
         .btn-delete:active { transform: translateY(1px); }
@@ -364,7 +338,13 @@
     <header>
         <div class="header-title">
             <h1>TTC Elizza Praha – rezervace veřejnosti</h1>
-            <p>Rezervace stolů na stolní tenis | Neděle 17:00 – 21:00 (sloty po 30 min) | Cena: 150 Kč / hodina (75 Kč za 30 min)</p>
+            <p>
+                <span>Rezervace stolů na stolní tenis</span>
+                <span class="separator">|</span>
+                <span>Neděle 17:00 – 21:00 (sloty po 30 min)</span>
+                <span class="separator">|</span>
+                <span>Cena: 150 Kč / hodina (75 Kč za 30 min)</span>
+            </p>
         </div>
         <div class="header-actions">
             <button class="admin-login-btn" id="admin-login-btn">🔒 Admin přihlášení</button>
@@ -561,13 +541,15 @@
             <span class="m-slots" id="mobile-summary-slots">Vybráno: 0 slotů</span>
         </div>
         <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-cancel" style="padding: 10px;" onclick="clearSelection()" title="Zrušit">✖</button>
-            <button type="button" class="btn-continue-mobile" id="btn-expand-mobile">Pokračovat</button>
+            <button type="button" class="btn-cancel" style="padding: 10px 15px;" onclick="clearSelection()" title="Zrušit">✖</button>
+            <!-- OPRAVENO: Přidán přímý inline onclick zaručující bezchybnou aktivaci na mobilu -->
+            <button type="button" class="btn-continue-mobile" id="btn-expand-mobile" onclick="document.getElementById('booking-panel').classList.add('expanded')">Pokračovat</button>
         </div>
     </div>
 
     <div class="booking-content" id="booking-content">
-        <button type="button" class="btn-collapse-mobile" id="btn-collapse-mobile">⬇ Zpět k výběru stolů</button>
+        <!-- OPRAVENO: Přidán přímý inline onclick -->
+        <button type="button" class="btn-collapse-mobile" id="btn-collapse-mobile" onclick="document.getElementById('booking-panel').classList.remove('expanded')">⬇ Zpět k výběru stolů</button>
         <div class="summary-info-grid">
             <h4 id="summary-title">Vybráno: 0 slotů</h4>
             <p id="summary-details">Datum: -- | Vybrané stoly a časy: --</p>
@@ -579,7 +561,7 @@
                 <input type="email" id="cust-email" placeholder="E-mail" required>
                 <input type="tel" id="cust-phone" placeholder="Telefon" required>
                 <button type="submit" class="btn-confirm" id="btn-confirm-submit">Dokončit rezervaci</button>
-                <button type="button" class="btn-cancel" id="btn-cancel">Zrušit výběr</button>
+                <button type="button" class="btn-cancel" id="btn-cancel" onclick="clearSelection()">Zrušit výběr</button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 2px;">
                 <label class="checkbox-container">
@@ -625,8 +607,8 @@
             <p><strong>Správce osobních údajů:</strong><br><strong>TTC ELIZZA PRAHA, z.s.</strong>, sídlem Brandlova 1386/21, 149 00 Praha 11-Chodov, IČO: <strong>45251804</strong>.</p>
             <p><strong>Účel a právní základ zpracování:</strong><br>Osobní údaje zpracováváme za účelem vyřízení a správy rezervace stolů na stolní tenis (plnění smlouvy).</p>
             <p><strong>Jaké osobní údaje zpracováváme?</strong><br>Pro účely rezervace stolů zpracováváme: Jméno a příjmení, E-mail, Telefon.</p>
-            <p><strong>Příjemci osobních údajů (Cloud):</strong><br>Příjemcem osobních údajů je poskytovatel cloudových a hostingových služeb <strong>Supabase</strong>, který zajišťuje bezpečné uložení dat v naší cloudové databázi. Servery se nacházejí v Evropské unii (region: eu-west-1).</p>
-            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace a osobní údaje jsou v databázi uchovávány nejdéle do <strong>1. července následujícího roku</strong> pro účely každoročního promazání proběhlých a stornovaných rezervací.</p>
+            <p><strong>Příjemci osobních údajů (Cloud):</strong><br>Příjemcem osobních údajů je poskytovatel cloudových a hostingových služeb <strong>Supabase</strong>, který zajišťuje bezpečné uložení dat v naší cloudové databázi. Zpracováváme také <strong>Odeslanou poštu v e-mailu</strong>. Servery se nacházejí v Evropské unii (region: eu-west-1).</p>
+            <p><strong>Doba uchovávání údajů:</strong><br>Všechny rezervace, osobní údaje a odeslaná pošta v e-mailu jsou uchovávány nejdéle do <strong>následujícího 1. června</strong> pro účely každoročního promazání proběhlých a stornovaných rezervací.</p>
             <p><strong>Ukládání dat (LocalStorage):</strong><br>Vaše kontaktní údaje se pro usnadnění příští rezervace mohou uložit do lokální paměti vašeho prohlížeče (LocalStorage). Toto technické ukládání probíhá na základě oprávněného zájmu pro zajištění rychlého fungování a pohodlí při opakované rezervaci. Ukládání dat ve svém prohlížeči můžete kdykoliv smazat v nastavení historie/dat webů.</p>
             <p><strong>Vaše práva a lhůty:</strong><br>Máte právo požadovat přístup k vašim údajům, jejich opravu nebo výmaz. Dále máte k dispozici tato specifická práva:</p>
             <ul>
@@ -715,7 +697,6 @@
         document.addEventListener(evt, resetInactivityTimer, { passive: true });
     });
 
-    // --- Funkce pro plánek (skrývání) ---
     const btnTogglePlan = document.getElementById('btn-toggle-plan');
     const planContentWrapper = document.getElementById('plan-content-wrapper');
     
@@ -742,7 +723,6 @@
             localStorage.setItem('ttc_elizza_plan_hidden', 'true');
         }
     });
-    // ------------------------
 
     const timeSlots = ["17:00-17:30", "17:30-18:00", "18:00-18:30", "18:30-19:00", "19:00-19:30", "19:30-20:00", "20:00-20:30", "20:30-21:00"];
     const PRICE_PER_SLOT = 75;
@@ -813,8 +793,13 @@
 
     const mobileSummaryPrice = document.getElementById('mobile-summary-price');
     const mobileSummarySlots = document.getElementById('mobile-summary-slots');
+    
+    // OPRAVENO: Události pro nová tlačítka vázaná přímo pomocí HTML "onclick",
+    // ale necháváme to zde i přes event listeners jako pojistku:
     const btnExpandMobile = document.getElementById('btn-expand-mobile');
     const btnCollapseMobile = document.getElementById('btn-collapse-mobile');
+    if(btnExpandMobile) { btnExpandMobile.addEventListener('click', () => bookingPanel.classList.add('expanded')); }
+    if(btnCollapseMobile) { btnCollapseMobile.addEventListener('click', () => bookingPanel.classList.remove('expanded')); }
 
     const adminLoginModal = document.getElementById('admin-login-modal');
     const adminLoginForm = document.getElementById('admin-login-form');
@@ -1159,7 +1144,8 @@
         const conflicts = (toRestoreRows || []).filter(res => freshBookings.active.some(active => active.stul === res.stul && active.cas === res.cas));
         
         if (conflicts.length > 0) {
-            alert(`Nelze obnovit! Následující sloty jsou již mezitím obsazené:\n${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
+            alert(`Nelze obnovit! Následující sloty jsou již mezitím obsazené:
+${conflicts.map(c => `Stůl ${c.stul} (${c.cas})`).join(', ')}`);
             return;
         }
 
@@ -1174,9 +1160,6 @@
     function closeGdprModal() { gdprModal.classList.remove('active'); }
     closeGdprBtn.addEventListener('click', closeGdprModal); closeGdprFooterBtn.addEventListener('click', closeGdprModal);
     gdprModal.addEventListener('click', (e) => { if (e.target === gdprModal) closeGdprModal(); });
-
-    btnExpandMobile.addEventListener('click', () => bookingPanel.classList.add('expanded'));
-    btnCollapseMobile.addEventListener('click', () => bookingPanel.classList.remove('expanded'));
 
     function updateFormValidationForAdmin() {
         if (isAdminLoggedIn) {
@@ -1667,7 +1650,6 @@
     }
 
     adminLogoutBtn.addEventListener('click', handleLogout); adminLogoutBtnHeader.addEventListener('click', handleLogout);
-    document.getElementById('btn-cancel').addEventListener('click', clearSelection);
 
     document.getElementById('booking-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1679,7 +1661,8 @@
         const conflicts = selectedSelections.filter(sel => freshBookings.active.some(b => b.stul === sel.table && b.cas === sel.slot));
 
         if (conflicts.length > 0) {
-            alert(`Omlouváme se, tyto sloty už si právě někdo zarezervoval:\n${conflicts.map(c => `Stůl ${c.table} (${c.slot})`).join(', ')}`);
+            alert(`Omlouváme se, tyto sloty už si právě někdo zarezervoval:
+${conflicts.map(c => `Stůl ${c.table} (${c.slot})`).join(', ')}`);
             clearSelection(); loadAndRender(); submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci"; return;
         }
 
@@ -1695,11 +1678,14 @@
             const totalPrice = selectedSelections.length * PRICE_PER_SLOT;
             const groupedByTable = {};
             selectedSelections.forEach(s => { if (!groupedByTable[s.table]) groupedByTable[s.table] = []; groupedByTable[s.table].push(s.slot); });
-            const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('\n');
+            const reservationText = Object.keys(groupedByTable).sort((a,b) => a - b).map(t => `• Stůl ${t}: ${formatTimeRanges(groupedByTable[t])}`).join('
+');
             const manageUrl = `https://czudokumenty.github.io/Rezervace-stoln-tenis-TTC-Elizza-praha/?email=${encodeURIComponent(email)}&date=${selectedDate}`;
 
             if (email) await sendConfirmationEmail({ name, email, phone, date: selectedDate, formattedDate: formatCzechDate(selectedDate), reservationText, totalPrice, manageUrl });
-            alert(`Rezervace byla úspěšně vytvořena!\nDatum: ${formatCzechDate(selectedDate)}\nCena: ${totalPrice} Kč`);
+            alert(`Rezervace byla úspěšně vytvořena!
+Datum: ${formatCzechDate(selectedDate)}
+Cena: ${totalPrice} Kč`);
             clearSelection(); loadAndRender();
         }
         submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci";
