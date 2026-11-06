@@ -66,7 +66,6 @@
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header-title h1 { color: var(--header-title); font-size: 1.8rem; margin-bottom: 4px; }
         
-        /* Styly pro rozdělení textu v hlavičce na mobilech (3 řádky) */
         .header-desc { color: var(--subtext); font-size: 0.95rem; }
         .header-desc .line-desktop { display: inline; }
         .header-desc .line-mobile { display: none; }
@@ -969,6 +968,9 @@
         btnSearchUserReservation.style.display = 'none';
         btnConfirmUserTokenCancel.style.display = 'block';
         userTokenCheckboxes.innerHTML = '';
+        
+        // OPRAVA: Uložíme e-mail z URL do skrytého políčka, aby šel použít pro RPC storno
+        lookupEmailInput.value = emailToken;
 
         data.forEach(item => {
             const label = document.createElement('label');
@@ -1067,9 +1069,19 @@
         if (!confirm('Opravdu chcete vybrané sloty zrušit?')) return;
 
         btnConfirmUserTokenCancel.disabled = true; btnConfirmUserTokenCancel.textContent = "Zpracovávám...";
-        const { error } = await supabaseClient.from('rezervace').update({ zruseno: true }).in('id', idsToCancel);
-        if (error) alert('Chyba při stornování slotů.');
-        else {
+        
+        const userEmail = lookupEmailInput.value.trim();
+        
+        // OPRAVA: Volání RPC funkce s ověřením emailu na serveru
+        const { error } = await supabaseClient.rpc('stornuj_moje_sloty', { 
+            p_ids: idsToCancel, 
+            p_email: userEmail 
+        });
+        
+        if (error) {
+            console.error(error);
+            alert('Chyba při stornování slotů (možná nesouhlasí e-mail nebo nemáte oprávnění).');
+        } else {
             alert('Vybrané sloty byly úspěšně zrušeny.');
             userTokenModal.classList.remove('active');
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1212,12 +1224,21 @@
     }
 
     function initDatePicker() {
-        const defaultSunday = getNextSunday(); 
         updateDateRangeLimits();
+        
+        // OPRAVA: Načítání a ukládání data ze sessionStorage
+        const savedDate = sessionStorage.getItem('ttc_elizza_selected_date');
+        
+        if (savedDate) {
+            dateInput.value = savedDate;
+            selectedDate = savedDate;
+        } else {
+            const defaultSunday = getNextSunday(); 
+            dateInput.value = defaultSunday;
+            selectedDate = defaultSunday;
+        }
 
         dateInput.step = "7";
-        if (!dateInput.value) dateInput.value = defaultSunday;
-        selectedDate = dateInput.value;
 
         dateInput.addEventListener('change', (e) => {
             if (!e.target.value) { dateInput.value = selectedDate; return; }
@@ -1241,6 +1262,9 @@
             } else { 
                 selectedDate = e.target.value; 
             }
+            
+            sessionStorage.setItem('ttc_elizza_selected_date', selectedDate);
+            
             clearSelection(); 
             loadAndRender();
         });
@@ -1261,7 +1285,8 @@
         }
 
         const processedData = (selectedData || []).map(item => {
-            if (!isAdminLoggedIn) {
+            // OPRAVA: Skrytí jména, s výjimkou stolu 0 (kde je zapsaný důvod blokace)
+            if (!isAdminLoggedIn && item.stul !== 0) {
                 return { ...item, jmeno: 'Obsazeno' }; 
             }
             return item; 
