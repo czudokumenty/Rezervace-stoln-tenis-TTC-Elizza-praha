@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Google reCAPTCHA SDK -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         :root {
             --primary: #0d6efd;
@@ -553,9 +555,16 @@
                 <input type="text" id="cust-name" placeholder="Jméno a příjmení" required>
                 <input type="email" id="cust-email" placeholder="E-mail" required>
                 <input type="tel" id="cust-phone" placeholder="Telefon" required>
+            </div>
+            
+            <!-- GOOGLE reCAPTCHA (S TVÝM KLÍČEM) -->
+            <div class="g-recaptcha" data-sitekey="6LcyAxQuAAAAAIsCjPw9qyY-TQLzEEDnb3nRd_l_" style="margin-bottom: 15px;"></div>
+
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <button type="submit" class="btn-confirm" id="btn-confirm-submit">Dokončit rezervaci</button>
                 <button type="button" class="btn-cancel" id="btn-cancel" onclick="clearSelection()">Zrušit výběr</button>
             </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 2px;">
                 <label class="checkbox-container">
                     <input type="checkbox" id="save-data-checkbox" checked>
@@ -1071,7 +1080,6 @@
         
         const userEmail = lookupEmailInput.value.trim();
         
-        // Bezpečné volání RPC funkce stornuj_moje_sloty
         const { error } = await supabaseClient.rpc('stornuj_moje_sloty', { 
             p_ids: idsToCancel, 
             p_email: userEmail 
@@ -1662,6 +1670,16 @@
 
     document.getElementById('booking-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Ověření reCAPTCHA před odesláním (pokud není přihlášen admin)
+        if (!isAdminLoggedIn) {
+            const recaptchaResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            if (!recaptchaResponse || recaptchaResponse.length === 0) {
+                alert('Zaškrtněte prosím políčko "Nejsem robot".');
+                return;
+            }
+        }
+
         if (selectedSelections.length === 0) { alert('Vyberte prosím alespoň jeden časový slot.'); return; }
         const submitBtn = document.getElementById('btn-confirm-submit');
         submitBtn.disabled = true; submitBtn.textContent = "KONTROLUJI...";
@@ -1691,12 +1709,18 @@
 
             if (email) await sendConfirmationEmail({ name, email, phone, date: selectedDate, formattedDate: formatCzechDate(selectedDate), reservationText, totalPrice, manageUrl });
             alert(`Rezervace byla úspěšně vytvořena!\nDatum: ${formatCzechDate(selectedDate)}\nCena: ${totalPrice} Kč`);
+            
+            if (typeof grecaptcha !== 'undefined') {
+                try { grecaptcha.reset(); } catch(err) {}
+            }
+            
             clearSelection(); loadAndRender();
         }
         submitBtn.disabled = false; submitBtn.textContent = "Dokončit rezervaci";
     });
 
-    setInterval(() => { if (!isDayBlocked) renderGrid(); }, 60000);
+    // Tichá aktualizace každých 30 vteřin
+    setInterval(() => { if (!isDayBlocked) loadAndRender(); }, 30000);
 
     async function initApp() {
         initDatePicker(); updateFormValidationForAdmin(); loadSavedUserData(); checkGdprNoticeDate();
