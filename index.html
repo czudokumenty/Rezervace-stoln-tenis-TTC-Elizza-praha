@@ -969,7 +969,6 @@
         btnConfirmUserTokenCancel.style.display = 'block';
         userTokenCheckboxes.innerHTML = '';
         
-        // OPRAVA: Uložíme e-mail z URL do skrytého políčka, aby šel použít pro RPC storno
         lookupEmailInput.value = emailToken;
 
         data.forEach(item => {
@@ -1072,7 +1071,7 @@
         
         const userEmail = lookupEmailInput.value.trim();
         
-        // OPRAVA: Volání RPC funkce s ověřením emailu na serveru
+        // Bezpečné volání RPC funkce stornuj_moje_sloty
         const { error } = await supabaseClient.rpc('stornuj_moje_sloty', { 
             p_ids: idsToCancel, 
             p_email: userEmail 
@@ -1226,7 +1225,6 @@
     function initDatePicker() {
         updateDateRangeLimits();
         
-        // OPRAVA: Načítání a ukládání data ze sessionStorage
         const savedDate = sessionStorage.getItem('ttc_elizza_selected_date');
         
         if (savedDate) {
@@ -1285,7 +1283,6 @@
         }
 
         const processedData = (selectedData || []).map(item => {
-            // OPRAVA: Skrytí jména, s výjimkou stolu 0 (kde je zapsaný důvod blokace)
             if (!isAdminLoggedIn && item.stul !== 0) {
                 return { ...item, jmeno: 'Obsazeno' }; 
             }
